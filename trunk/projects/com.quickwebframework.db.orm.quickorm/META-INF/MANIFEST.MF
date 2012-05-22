@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: QuickWebFramework ORM Bundle(QuickORM)
+Bundle-SymbolicName: com.quickwebframework.db.orm.quickorm
+Bundle-Version: 1.1.0.qualifier
+Bundle-Activator: com.quickwebframework.db.orm.quickorm.Activator
+Bundle-Vendor: aaaSoft
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: javax.sql,
+ org.osgi.framework;version="1.3.0"
+Require-Bundle: com.quickwebframework.bundle;bundle-version="1.0.0"
+Bundle-ClassPath: quickorm_1.1.0.201205081106.jar,
+ .
+Export-Package: com.quickorm.config,
+ com.quickorm.core,
+ com.quickorm.core.impl,
+ com.quickorm.core.support,
+ com.quickorm.dao,
+ com.quickorm.dialect,
+ com.quickorm.entity,
+ com.quickorm.helpers,
+ com.quickorm.logging,
+ com.quickorm.stereotype,
+ com.quickorm.support,
+ com.quickwebframework.db.orm.quickorm,
+ com.quickwebframework.db.orm.quickorm.service,
+ com.quickwebframework.db.orm.quickorm.service.impl
