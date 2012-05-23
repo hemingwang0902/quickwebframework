@@ -45,8 +45,15 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 	public final static String CONFIG_LOCATION_PARAMETER_NAME = "quickwebframeworkConfigLocation";
 
 	private static Framework framework;
-	// OSGi Bundle Context
-	private static BundleContext bundleContext;
+
+	/**
+	 * 得到Framework对象
+	 * 
+	 * @return
+	 */
+	public static Framework getFramework() {
+		return framework;
+	}
 
 	/**
 	 * 得到BundleContext对象
@@ -55,7 +62,7 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 	 * @return
 	 */
 	public static BundleContext getBundleContext() {
-		return bundleContext;
+		return framework.getBundleContext();
 	}
 
 	/**
@@ -64,11 +71,11 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 	 * @return
 	 */
 	public static Object getDispatcherServletObject() {
-		ServiceReference<?> serviceReference = bundleContext
+		ServiceReference<?> serviceReference = getBundleContext()
 				.getServiceReference(CONST_DISPATCHER_SERVLET_CLASS_NAME);
 		if (serviceReference == null)
 			return null;
-		return bundleContext.getService(serviceReference);
+		return getBundleContext().getService(serviceReference);
 	}
 
 	public void contextInitialized(ServletContextEvent arg0) {
@@ -158,10 +165,9 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		try {
 			// Framework初始化
 			framework.init();
-			bundleContext = framework.getBundleContext();
 
 			// 将ServletContext注册为服务
-			bundleContext.registerService(ServletContext.class.getName(),
+			getBundleContext().registerService(ServletContext.class.getName(),
 					servletContext, null);
 
 			// 设置插件要用到的配置文件
@@ -178,18 +184,18 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 							.getProperty(propertieName);
 					Dictionary<String, String> dict = new Hashtable<String, String>();
 					dict.put("quickwebframework.pluginConfigFile", propName);
-					bundleContext.registerService(String.class.getName(),
+					getBundleContext().registerService(String.class.getName(),
 							servletContext.getRealPath(filePath), dict);
 				}
 			}
 
 			// Bundle监听器
-			bundleContext.addBundleListener(new BundleListener() {
+			getBundleContext().addBundleListener(new BundleListener() {
 				public void bundleChanged(BundleEvent arg0) {
 				}
 			});
 			// Service监听器
-			bundleContext.addServiceListener(new ServiceListener() {
+			getBundleContext().addServiceListener(new ServiceListener() {
 				public void serviceChanged(ServiceEvent arg0) {
 				}
 			});

@@ -228,8 +228,18 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 			}
 
 			String mod = formFieldProperties.getProperty("mod");
+
+			// 重启框架
+			if ("restartFramework".equals(mod)) {
+				try {
+					//更新OSGi Framework
+					QuickWebFrameworkLoaderListener.getFramework().update();
+				} catch (Exception ex) {
+					throw new RuntimeException(ex);
+				}
+			}
 			// 安装插件
-			if ("installPlugin".equals(mod)) {
+			else if ("installPlugin".equals(mod)) {
 				if (!formFileMap.containsKey("pluginFile")) {
 					pushMessage(request, "未找到pluginFile参数！");
 					doGet(request, response);
