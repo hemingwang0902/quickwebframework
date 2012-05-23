@@ -20,21 +20,25 @@ public class DefaultLogImpl implements Log {
 	public DefaultLogImpl(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 		defaultLog = new JavaLoggerImpl();
-		currentLog = getServiceLog();
-		if (currentLog == null)
-			currentLog = defaultLog;
+		refreshCurrentLog();
 
 		bundleContext.addServiceListener(new ServiceListener() {
 			@Override
 			public void serviceChanged(ServiceEvent arg0) {
 				if (arg0.getServiceReference().toString()
 						.contains(LogService.class.getName())) {
-					Log tmpLog = getServiceLog();
-					if (tmpLog != null)
-						currentLog = tmpLog;
+					refreshCurrentLog();
 				}
 			}
 		});
+	}
+
+	private void refreshCurrentLog() {
+		Log tmpLog = getServiceLog();
+		if (tmpLog == null)
+			currentLog = defaultLog;
+		else
+			currentLog = tmpLog;
 	}
 
 	// 得到服务中的Log

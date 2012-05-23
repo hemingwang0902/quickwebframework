@@ -11,9 +11,6 @@ import org.osgi.framework.ServiceReference;
 import com.quickwebframework.service.LogService;
 
 public class Activator implements BundleActivator {
-
-	private static Logger logger = Logger.getLogger(Activator.class);
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -34,7 +31,8 @@ public class Activator implements BundleActivator {
 		}
 
 		if (log4jConfigFilePath == null || log4jConfigFilePath.isEmpty()) {
-			throw new RuntimeException("Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.log.log4j.properties'！");
+			throw new RuntimeException(
+					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.log.log4j.properties'！");
 		} else {
 			PropertyConfigurator.configure(log4jConfigFilePath);
 		}
@@ -60,6 +58,5 @@ public class Activator implements BundleActivator {
 				"%-d{yyyy-MM-dd HH:mm:ss,SSS} [%c]-[%p] %m%n");
 
 		PropertyConfigurator.configure(prop);
-		logger.info("CIMM日志插件已停止");
 	}
 }
