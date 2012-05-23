@@ -35,6 +35,7 @@ import com.quickwebframework.Activator;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.ViewRender;
 import com.quickwebframework.entity.impl.PluginControllerInfo;
+import com.quickwebframework.service.LogFactory;
 import com.quickwebframework.service.PluginService;
 import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.service.WebSettingService;
@@ -45,6 +46,8 @@ import com.quickwebframework.util.PluginPathMatcher;
 import com.quickwebframework.util.PluginUrlPathHelper;
 
 public class DispatcherServlet {
+	private static Log log = LogFactory.getLog();
+
 	// Servlet上下文
 	private ServletContext servletContext;
 	// Bundle上下文
@@ -189,9 +192,7 @@ public class DispatcherServlet {
 			applicationContext.refresh();
 			applicationContext.start();
 		} catch (Exception ex) {
-			Log log = Activator.getLog();
-			if (log != null)
-				log.error("用Spring扫描插件时出错异常，插件启动失败！", ex);
+			log.error("用Spring扫描插件时出错异常，插件启动失败！", ex);
 			// 停止插件
 			try {
 				bundle.stop();

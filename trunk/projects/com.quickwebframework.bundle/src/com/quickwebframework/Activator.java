@@ -9,24 +9,17 @@ import org.osgi.framework.ServiceReference;
 import com.quickwebframework.core.DispatcherServlet;
 import com.quickwebframework.core.PluginServletContext;
 import com.quickwebframework.entity.Log;
+import com.quickwebframework.service.LogFactory;
 import com.quickwebframework.service.LogService;
 
 public class Activator implements BundleActivator {
+
+	private static Log log = LogFactory.getLog();
 
 	private static BundleContext context;
 
 	public static BundleContext getContext() {
 		return context;
-	}
-
-	public static Log getLog() {
-		ServiceReference serviceReference = context
-				.getServiceReference(LogService.class.getName());
-		if (serviceReference == null)
-			return null;
-		LogService logService = (LogService) context
-				.getService(serviceReference);
-		return logService.getLog();
 	}
 
 	/*
@@ -38,7 +31,9 @@ public class Activator implements BundleActivator {
 	 */
 	public void start(BundleContext context) throws Exception {
 		Activator.context = context;
-		System.out.println("Starting QuickWebFramework...");
+		LogFactory.setBundleContext(context);
+
+		log.info("Starting [com.quickwebframework.bundle]...");
 
 		ServiceReference servletContextServiceReference = null;
 		ServiceReference[] allServiceReferences = context
@@ -63,7 +58,8 @@ public class Activator implements BundleActivator {
 		context.registerService(DispatcherServlet.class.getName(),
 				dispatcherServlet, null);
 
-		System.out.println("Started QuickWebFramework.");
+		log.info("Started [com.quickwebframework.bundle].");
+
 	}
 
 	/*
@@ -73,9 +69,9 @@ public class Activator implements BundleActivator {
 	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		System.out.println("Stoping QuickWebFramework...");
+		log.info("Stoping [com.quickwebframework.bundle]...");
 		Activator.context = null;
-		System.out.println("Stoped QuickWebFramework.");
+		log.info("Stoped [com.quickwebframework.bundle].");
 	}
 
 }
