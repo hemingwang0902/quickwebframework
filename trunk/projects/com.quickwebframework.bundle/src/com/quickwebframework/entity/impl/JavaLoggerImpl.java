@@ -6,9 +6,12 @@ import java.util.logging.Logger;
 import com.quickwebframework.entity.Log;
 
 public class JavaLoggerImpl implements Log {
-
 	// Java默认全局日志对象
-	Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	private Logger logger;
+
+	public JavaLoggerImpl(String name) {
+		logger = Logger.getLogger(name);
+	}
 
 	@Override
 	public void debug(Object message) {

@@ -14,7 +14,7 @@ import com.quickwebframework.service.LogService;
 
 public class Activator implements BundleActivator {
 
-	private static Log log = LogFactory.getLog();
+	private static Log log;
 
 	private static BundleContext context;
 
@@ -32,6 +32,7 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext context) throws Exception {
 		Activator.context = context;
 		LogFactory.setBundleContext(context);
+		log = LogFactory.getLog(Activator.class);
 
 		log.info("Starting [com.quickwebframework.bundle]...");
 

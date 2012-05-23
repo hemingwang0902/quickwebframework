@@ -10,9 +10,21 @@ import com.quickwebframework.entity.Log;
  */
 public interface LogService {
 	/**
+	 * 
 	 * 得到日志对象
 	 * 
+	 * @param name
+	 *            日志器名称
 	 * @return
 	 */
-	public Log getLog();
+	public Log getLog(String name);
+
+	/**
+	 * 得到日志对象
+	 * 
+	 * @param clazz
+	 *            类名
+	 * @return
+	 */
+	public Log getLog(Class clazz);
 }

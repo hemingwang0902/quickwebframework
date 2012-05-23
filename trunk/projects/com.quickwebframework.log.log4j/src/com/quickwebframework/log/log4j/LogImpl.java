@@ -8,8 +8,8 @@ public class LogImpl implements Log {
 
 	private Logger logger;
 
-	public LogImpl() {
-		logger = Logger.getRootLogger();
+	public LogImpl(String name) {
+		logger = Logger.getLogger(name);
 	}
 
 	@Override

@@ -17,24 +17,24 @@ public class DefaultLogImpl implements Log {
 	// 当前日志器
 	private Log currentLog = null;
 
-	public DefaultLogImpl(BundleContext bundleContext) {
+	public DefaultLogImpl(BundleContext bundleContext, final String name) {
 		this.bundleContext = bundleContext;
-		defaultLog = new JavaLoggerImpl();
-		refreshCurrentLog();
+		defaultLog = new JavaLoggerImpl(name);
+		refreshCurrentLog(name);
 
 		bundleContext.addServiceListener(new ServiceListener() {
 			@Override
 			public void serviceChanged(ServiceEvent arg0) {
 				if (arg0.getServiceReference().toString()
 						.contains(LogService.class.getName())) {
-					refreshCurrentLog();
+					refreshCurrentLog(name);
 				}
 			}
 		});
 	}
 
-	private void refreshCurrentLog() {
-		Log tmpLog = getServiceLog();
+	private void refreshCurrentLog(String name) {
+		Log tmpLog = getServiceLog(name);
 		if (tmpLog == null)
 			currentLog = defaultLog;
 		else
@@ -42,14 +42,16 @@ public class DefaultLogImpl implements Log {
 	}
 
 	// 得到服务中的Log
-	private Log getServiceLog() {
+	private Log getServiceLog(String name) {
+		if (bundleContext == null)
+			return null;
 		ServiceReference serviceReference = bundleContext
 				.getServiceReference(LogService.class.getName());
 		if (serviceReference == null)
 			return null;
 		LogService logService = (LogService) bundleContext
 				.getService(serviceReference);
-		return logService.getLog();
+		return logService.getLog(name);
 	}
 
 	@Override

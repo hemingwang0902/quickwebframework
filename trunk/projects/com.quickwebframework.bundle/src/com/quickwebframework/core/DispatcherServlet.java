@@ -46,7 +46,7 @@ import com.quickwebframework.util.PluginPathMatcher;
 import com.quickwebframework.util.PluginUrlPathHelper;
 
 public class DispatcherServlet {
-	private static Log log = LogFactory.getLog();
+	private static Log log = LogFactory.getLog(DispatcherServlet.class);
 
 	// Servlet上下文
 	private ServletContext servletContext;
