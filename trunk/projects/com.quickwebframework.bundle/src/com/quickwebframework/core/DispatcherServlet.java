@@ -378,7 +378,7 @@ public class DispatcherServlet {
 				.getServiceReference(WebSettingService.class.getName());
 		if (serviceReference == null) {
 			rep.getWriter()
-					.write("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://code.google.com/p/quickwebframework\">QuickWebFramework</a>!</body></html>");
+					.write("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!</body></html>");
 			return;
 		}
 		WebSettingService webSettingService = (WebSettingService) bundleContext

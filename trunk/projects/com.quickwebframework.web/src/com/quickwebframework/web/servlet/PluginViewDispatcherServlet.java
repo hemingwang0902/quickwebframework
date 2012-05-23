@@ -37,10 +37,9 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 	public void setMethodNameParameterName(String methodNameParameterName) {
 		this.methodNameParameterName = methodNameParameterName;
 	}
-	
+
 	// 初始化插件视图Servlet
-	public static HttpServlet initServlet(
-			ServletContext servletContext,
+	public static HttpServlet initServlet(ServletContext servletContext,
 			Properties quickWebFrameworkProperties) {
 		// 添加插件视图Servlet
 		PluginViewDispatcherServlet pluginViewDispatcherServlet = new PluginViewDispatcherServlet();
@@ -73,7 +72,8 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 			Object dispatcherServletObject = QuickWebFrameworkLoaderListener
 					.getDispatcherServletObject();
 			if (dispatcherServletObject == null) {
-				response.sendError(404, "DispatcherServlet object not found!");
+				response.getWriter()
+						.write("<html><head><title>Powered by QuickWebFramework</title></head><body><p>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!</p><p>You haven't install [com.quickwebframework.bundle] plugin to QuickWebFramework!</p></body></html>");
 				return;
 			}
 			// dispatcherServlet的类
