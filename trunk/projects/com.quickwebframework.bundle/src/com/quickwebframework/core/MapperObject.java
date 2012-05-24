@@ -7,8 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class MapperObject {
+
+	// 类中名称与方法列表映射的映射
+	private static Map<Class<?>, Map<String, List<Method>>> classNameMethodListMap = new HashMap<Class<?>, Map<String, List<Method>>>();
+
 	protected Object orginObject;
 	private Class<?> orginObjectClass;
+
 	// 名称与方法列表映射
 	private Map<String, List<Method>> nameMethodListMap;
 
@@ -16,19 +21,24 @@ public abstract class MapperObject {
 		this.orginObject = orginObject;
 		orginObjectClass = orginObject.getClass();
 
-		nameMethodListMap = new HashMap<String, List<Method>>();
-		Method[] methods = orginObjectClass.getMethods();
-		for (Method method : methods) {
-			String methodName = method.getName();
+		if (classNameMethodListMap.containsKey(orginObjectClass)) {
+			nameMethodListMap = classNameMethodListMap.get(orginObjectClass);
+		} else {
+			nameMethodListMap = new HashMap<String, List<Method>>();
+			Method[] methods = orginObjectClass.getMethods();
+			for (Method method : methods) {
+				String methodName = method.getName();
 
-			List<Method> methodList = null;
-			if (nameMethodListMap.containsKey(methodName)) {
-				methodList = nameMethodListMap.get(methodName);
-			} else {
-				methodList = new ArrayList<Method>();
-				nameMethodListMap.put(methodName, methodList);
+				List<Method> methodList = null;
+				if (nameMethodListMap.containsKey(methodName)) {
+					methodList = nameMethodListMap.get(methodName);
+				} else {
+					methodList = new ArrayList<Method>();
+					nameMethodListMap.put(methodName, methodList);
+				}
+				methodList.add(method);
 			}
-			methodList.add(method);
+			classNameMethodListMap.put(orginObjectClass, nameMethodListMap);
 		}
 	}
 

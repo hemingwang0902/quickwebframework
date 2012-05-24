@@ -97,9 +97,9 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 		sbPart0.append("<tbody>");
 		for (Bundle bundle : bundles) {
 			sbPart0.append("<tr>");
-			sbPart0.append(String.format("<td>%s</td>", bundle.getBundleId()));
-			sbPart0.append(String.format("<td>%s</td>",
-					bundle.getSymbolicName()));
+			sbPart0.append("<td>").append(bundle.getBundleId()).append("</td>");
+			sbPart0.append("<td>").append(bundle.getSymbolicName())
+					.append("</td>");
 			String bundleName = "";
 			try {
 				bundleName = bundle.getHeaders().get("Bundle-Name");
@@ -108,8 +108,8 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			sbPart0.append(String.format("<td>%s</td>", bundleName));
-			sbPart0.append(String.format("<td>%s</td>", bundle.getVersion()));
+			sbPart0.append("<td>").append(bundleName).append("</td>");
+			sbPart0.append("<td>").append(bundle.getVersion()).append("</td>");
 			sbPart0.append("<td>");
 			String stateString = null;
 			if (bundle.getState() == Bundle.UNINSTALLED)
@@ -129,25 +129,28 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 			sbPart0.append("<td>");
 			sbPart0.append("<div style=\"float:left\">");
 			sbPart0.append("<form method=\"post\">");
-			sbPart0.append(String
-					.format("<input id=\"hiddenPluginOperateMod_%s\" type=\"hidden\" name=\"mod\" value=\"\" />",
-							bundle.getBundleId()));
-			sbPart0.append(String.format(
-					"<input type=\"hidden\" name=\"pluginId\" value=\"%s\" />",
-					bundle.getBundleId()));
+			sbPart0.append("<input id=\"hiddenPluginOperateMod_")
+					.append(bundle.getBundleId())
+					.append("\" type=\"hidden\" name=\"mod\" value=\"\" />");
+			sbPart0.append("<input type=\"hidden\" name=\"pluginId\" value=\"")
+					.append(bundle.getBundleId()).append("\" />");
+
 			if (bundle.getState() == Bundle.INSTALLED
 					|| bundle.getState() == Bundle.RESOLVED) {
-				sbPart0.append(String
-						.format("<input type=\"submit\" class=\"button\" value=\"启动\" onclick=\"document.getElementById('hiddenPluginOperateMod_%s').value='startPlugin'\" />",
-								bundle.getBundleId()));
+				sbPart0.append(
+						"<input type=\"submit\" class=\"button\" value=\"启动\" onclick=\"document.getElementById('hiddenPluginOperateMod_")
+						.append(bundle.getBundleId())
+						.append("').value='startPlugin'\" />");
 			} else if (bundle.getState() == Bundle.ACTIVE) {
-				sbPart0.append(String
-						.format("<input type=\"submit\" class=\"button\" value=\"停止\" onclick=\"document.getElementById('hiddenPluginOperateMod_%s').value='stopPlugin'\" />",
-								bundle.getBundleId()));
+				sbPart0.append(
+						"<input type=\"submit\" class=\"button\" value=\"停止\" onclick=\"document.getElementById('hiddenPluginOperateMod_")
+						.append(bundle.getBundleId())
+						.append("').value='stopPlugin'\" />");
 			}
-			sbPart0.append(String
-					.format("<input type=\"submit\" class=\"button\" value=\"卸载\" onclick=\"document.getElementById('hiddenPluginOperateMod_%s').value='uninstallPlugin'\" />",
-							bundle.getBundleId()));
+			sbPart0.append(
+					"<input type=\"submit\" class=\"button\" value=\"卸载\" onclick=\"document.getElementById('hiddenPluginOperateMod_")
+					.append(bundle.getBundleId())
+					.append("').value='uninstallPlugin'\" />");
 			sbPart0.append("</form>");
 			sbPart0.append("</div>");
 			sbPart0.append("</td>");
@@ -167,7 +170,7 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 			sbPart0.append("<tbody>");
 			sbPart0.append("<tr>");
 			sbPart0.append("<td>");
-			sbPart0.append(String.format("<p>%s</p>", messageObj));
+			sbPart0.append("<p>").append(messageObj).append("</p>");
 			sbPart0.append("</td>");
 			sbPart0.append("</tr>");
 			sbPart0.append("</tbody>");
@@ -232,7 +235,7 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 			// 重启框架
 			if ("restartFramework".equals(mod)) {
 				try {
-					//更新OSGi Framework
+					// 更新OSGi Framework
 					QuickWebFrameworkLoaderListener.getFramework().update();
 				} catch (Exception ex) {
 					throw new RuntimeException(ex);
