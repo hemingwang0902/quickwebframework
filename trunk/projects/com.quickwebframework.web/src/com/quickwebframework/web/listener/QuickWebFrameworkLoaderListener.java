@@ -65,17 +65,25 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		return framework.getBundleContext();
 	}
 
+	private static Object dispatcherServletObject;
+
 	/**
 	 * 得到DispatcherServlet对象
 	 * 
 	 * @return
 	 */
 	public static Object getDispatcherServletObject() {
+		return dispatcherServletObject;
+	}
+
+	// 刷新分发Servlet对象
+	private static void refreshDispatcherServletObject() {
 		ServiceReference<?> serviceReference = getBundleContext()
 				.getServiceReference(CONST_DISPATCHER_SERVLET_CLASS_NAME);
 		if (serviceReference == null)
-			return null;
-		return getBundleContext().getService(serviceReference);
+			return;
+		dispatcherServletObject = getBundleContext().getService(
+				serviceReference);
 	}
 
 	public void contextInitialized(ServletContextEvent arg0) {
@@ -197,6 +205,11 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 			// Service监听器
 			getBundleContext().addServiceListener(new ServiceListener() {
 				public void serviceChanged(ServiceEvent arg0) {
+					// 如果是DispatcherServlet服务更改
+					if (arg0.getServiceReference().toString()
+							.contains(CONST_DISPATCHER_SERVLET_CLASS_NAME)) {
+						refreshDispatcherServletObject();
+					}
 				}
 			});
 

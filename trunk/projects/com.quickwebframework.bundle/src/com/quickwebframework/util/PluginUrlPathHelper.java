@@ -13,9 +13,8 @@ public class PluginUrlPathHelper extends UrlPathHelper {
 	}
 
 	public String getRequestUri(HttpServletRequest request) {
-		String result = String.format("/%s/%s",
-				request.getAttribute(ARG_BUNDLE_NAME),
-				request.getAttribute(ARG_METHOD_NAME));
+		String result = "/" + request.getAttribute(ARG_BUNDLE_NAME) + "/"
+				+ request.getAttribute(ARG_METHOD_NAME);
 		return result;
 	}
 }

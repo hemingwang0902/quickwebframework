@@ -47,11 +47,25 @@ import com.quickwebframework.util.PluginUrlPathHelper;
 
 public class DispatcherServlet {
 	private static Log log = LogFactory.getLog(DispatcherServlet.class);
-
 	// Bundle上下文
 	private BundleContext bundleContext;
 	// 插件名与ControllerService对应Map
 	private Map<String, PluginControllerInfo> bundleNamePluginControllerInfoMap;
+	// 视图渲染器
+	private ViewRender viewRender;
+
+	// 刷新渲染器
+	private void refreshViewRender() {
+		ServiceReference viewRenderServiceReference = bundleContext
+				.getServiceReference(ViewRenderService.class.getName());
+		if (viewRenderServiceReference != null) {
+			ViewRenderService viewRenderService = (ViewRenderService) bundleContext
+					.getService(viewRenderServiceReference);
+			viewRender = viewRenderService.getViewRender();
+		} else {
+			viewRender = null;
+		}
+	}
 
 	/**
 	 * 渲染视图
@@ -62,12 +76,7 @@ public class DispatcherServlet {
 			PluginService pluginService, String viewName,
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
-			ServiceReference viewRenderServiceReference = bundleContext
-					.getServiceReference(ViewRenderService.class.getName());
-			if (viewRenderServiceReference != null) {
-				ViewRenderService viewRenderService = (ViewRenderService) bundleContext
-						.getService(viewRenderServiceReference);
-				ViewRender viewRender = viewRenderService.getViewRender();
+			if (viewRender != null) {
 				// 渲染视图
 				viewRender.renderView(pluginService.getBundle()
 						.getSymbolicName(), viewName, request, response);
@@ -99,10 +108,18 @@ public class DispatcherServlet {
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
+		// 刷新视图渲染器
+		refreshViewRender();
 
 		bundleContext.addServiceListener(new ServiceListener() {
 			@Override
 			public void serviceChanged(ServiceEvent arg0) {
+				// 如果视图渲染器服务改变，刷新视图渲染器
+				if (arg0.getServiceReference().toString()
+						.contains(ViewRenderService.class.getName())) {
+					refreshViewRender();
+				}
+
 				int serviceEventType = arg0.getType();
 				if (serviceEventType == ServiceEvent.REGISTERED) {
 					log.info(String.format("[%s]插件的[%s]服务已注册", arg0
@@ -333,7 +350,7 @@ public class DispatcherServlet {
 			PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
 					.get(bundleName);
 
-			String mappingUrl = String.format("/%s/%s", bundleName, methodName);
+			String mappingUrl = "/" + bundleName + "/" + methodName;
 
 			if (!pluginControllerInfo.getMappingUrlHandlerMap().containsKey(
 					mappingUrl)) {
