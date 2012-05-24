@@ -78,8 +78,6 @@ public class DispatcherServlet {
 							+ viewRender.getPluginNameAndPathSplitString()
 							+ viewName;
 				}
-				// 为视图名称添加统一的后缀
-				viewName = viewName + viewRender.getViewNameSuffix();
 				// 渲染视图
 				viewRender.renderView(viewName, request, response);
 			} else {

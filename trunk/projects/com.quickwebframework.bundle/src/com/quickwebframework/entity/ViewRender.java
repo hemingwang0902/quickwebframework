@@ -27,11 +27,4 @@ public interface ViewRender {
 	 * @return
 	 */
 	public String getPluginNameAndPathSplitString();
-
-	/**
-	 * 获取视图名称后缀
-	 * 
-	 * @return
-	 */
-	public String getViewNameSuffix();
 }

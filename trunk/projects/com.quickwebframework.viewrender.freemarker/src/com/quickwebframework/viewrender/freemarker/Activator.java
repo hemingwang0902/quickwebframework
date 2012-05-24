@@ -26,23 +26,38 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext context) throws Exception {
 
 		String freemarkerPropertyFilePath = null;
+		String viewrenderPropertyFilePath = null;
 
+		// 得到freemarker配置文件路径
 		ServiceReference[] serviceReferences = context
 				.getServiceReferences(
 						String.class.getName(),
-						"(quickwebframework.pluginConfigFile=com.quickwebframework.viewrender.freemarker.peoperties)");
-
+						"(quickwebframework.pluginConfigFile=com.quickwebframework.viewrender.freemarker.properties)");
 		if (serviceReferences != null && serviceReferences.length > 0) {
 			freemarkerPropertyFilePath = (String) context
 					.getService(serviceReferences[0]);
 		}
-
 		if (freemarkerPropertyFilePath == null
 				|| freemarkerPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
-					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.db.jdbc.properties'！");
+					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.viewrender.freemarker.properties'！");
+		}
+		// 得到viewrender配置文件路径
+		serviceReferences = context
+				.getServiceReferences(
+						String.class.getName(),
+						"(quickwebframework.pluginConfigFile=com.quickwebframework.viewrender.properties)");
+		if (serviceReferences != null && serviceReferences.length > 0) {
+			viewrenderPropertyFilePath = (String) context
+					.getService(serviceReferences[0]);
+		}
+		if (viewrenderPropertyFilePath == null
+				|| viewrenderPropertyFilePath.isEmpty()) {
+			throw new RuntimeException(
+					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.viewrender.properties'！");
 		}
 
+		// 读取freemarker配置文件
 		File freemarkerPropertyFile = new File(freemarkerPropertyFilePath);
 		if (!freemarkerPropertyFile.exists()
 				|| !freemarkerPropertyFile.isFile()) {
@@ -53,13 +68,28 @@ public class Activator implements BundleActivator {
 
 		InputStream inputStream = new FileInputStream(freemarkerPropertyFile);
 		Reader reader = new InputStreamReader(inputStream, "utf-8");
-		Properties prop = new Properties();
-		prop.load(reader);
+		Properties freemarkerProp = new Properties();
+		freemarkerProp.load(reader);
+		reader.close();
+		inputStream.close();
+		// 读取viewrender配置文件
+		File viewrenderPropertyFile = new File(viewrenderPropertyFilePath);
+		if (!viewrenderPropertyFile.exists()
+				|| !viewrenderPropertyFile.isFile()) {
+			String message = String.format("Config file [%s] not exist!",
+					viewrenderPropertyFilePath);
+			throw new IOException(message);
+		}
+
+		inputStream = new FileInputStream(viewrenderPropertyFile);
+		reader = new InputStreamReader(inputStream, "utf-8");
+		Properties viewrenderProp = new Properties();
+		viewrenderProp.load(reader);
 		reader.close();
 		inputStream.close();
 
 		ViewRenderService viewRenderService = new ViewRenderServiceImpl(
-				context, prop);
+				context, freemarkerProp, viewrenderProp);
 		context.registerService(ViewRenderService.class.getName(),
 				viewRenderService, null);
 	}
