@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
-import com.quickwebframework.Activator;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.ViewRender;
 import com.quickwebframework.entity.impl.PluginControllerInfo;
@@ -49,8 +48,6 @@ import com.quickwebframework.util.PluginUrlPathHelper;
 public class DispatcherServlet {
 	private static Log log = LogFactory.getLog(DispatcherServlet.class);
 
-	// Servlet上下文
-	private ServletContext servletContext;
 	// Bundle上下文
 	private BundleContext bundleContext;
 	// 插件名与ControllerService对应Map
@@ -71,16 +68,9 @@ public class DispatcherServlet {
 				ViewRenderService viewRenderService = (ViewRenderService) bundleContext
 						.getService(viewRenderServiceReference);
 				ViewRender viewRender = viewRenderService.getViewRender();
-
-				// 如果ViewName中未包括分隔符，即未包含插件名称，则添加当前插件名称为前缀
-				if (!viewName.contains(viewRender
-						.getPluginNameAndPathSplitString())) {
-					viewName = controllerService.getBundle().getSymbolicName()
-							+ viewRender.getPluginNameAndPathSplitString()
-							+ viewName;
-				}
 				// 渲染视图
-				viewRender.renderView(viewName, request, response);
+				viewRender.renderView(controllerService.getBundle()
+						.getSymbolicName(), viewName, request, response);
 			} else {
 				response.sendError(500,
 						"[com.quickwebframework.core.DispatcherServlet] cannot found ViewRender!");
@@ -90,9 +80,7 @@ public class DispatcherServlet {
 		}
 	}
 
-	public DispatcherServlet(ServletContext servletContext,
-			final BundleContext bundleContext) {
-		this.servletContext = servletContext;
+	public DispatcherServlet(final BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 
 		final Bundle currentBundle = bundleContext.getBundle();
@@ -262,7 +250,7 @@ public class DispatcherServlet {
 							sb.append("所有");
 						else
 							sb.setLength(sb.length() - 1);
-						
+
 						log.info(String.format(
 								"映射内部URL路径[%s]的[%s]HTTP请求到处理器'%s'", mappingUrl,
 								sb.toString(), handler.getClass().getName()));

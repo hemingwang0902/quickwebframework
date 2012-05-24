@@ -19,11 +19,6 @@ public class FreemarkerViewRender implements ViewRender {
 	// 插件模板加载器
 	private PluginTemplateLoader pluginTemplateLoader;
 
-	@Override
-	public String getPluginNameAndPathSplitString() {
-		return pluginTemplateLoader.getPluginNameAndPathSplitString();
-	}
-
 	public FreemarkerViewRender(Configuration configuration,
 			PluginTemplateLoader pluginTemplateLoader) {
 		this.configuration = configuration;
@@ -32,8 +27,17 @@ public class FreemarkerViewRender implements ViewRender {
 	}
 
 	@Override
-	public void renderView(String viewName, HttpServletRequest request,
-			HttpServletResponse response) {
+	public void renderView(String bundleName, String viewName,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		// 如果ViewName中未包括分隔符，即未包含插件名称，则添加当前插件名称为前缀
+		if (!viewName.contains(pluginTemplateLoader
+				.getPluginNameAndPathSplitString())) {
+			viewName = bundleName
+					+ pluginTemplateLoader.getPluginNameAndPathSplitString()
+					+ viewName;
+		}
+		// 准备数据
 		Map<String, Object> root = new HashMap<String, Object>();
 		Enumeration<String> attributeNameEnumeration = request
 				.getAttributeNames();

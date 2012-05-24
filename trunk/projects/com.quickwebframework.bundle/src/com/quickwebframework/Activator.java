@@ -53,8 +53,7 @@ public class Activator implements BundleActivator {
 		Object obj = context.getService(servletContextServiceReference);
 		ServletContext servletContext = new PluginServletContext(obj);
 
-		DispatcherServlet dispatcherServlet = new DispatcherServlet(
-				servletContext, context);
+		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
 		// 注册DispatcherServlet对象为Service
 		context.registerService(DispatcherServlet.class.getName(),
 				dispatcherServlet, null);

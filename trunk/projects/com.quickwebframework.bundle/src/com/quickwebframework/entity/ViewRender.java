@@ -13,18 +13,15 @@ public interface ViewRender {
 	/**
 	 * 渲染视图
 	 * 
-	 * @param pluginInfo
+	 * @param bundleName
+	 *            插件名称
 	 * @param viewName
+	 *            视图名称
 	 * @param request
+	 *            请求对象
 	 * @param response
+	 *            响应对象
 	 */
-	public void renderView(String viewName, HttpServletRequest request,
-			HttpServletResponse response);
-
-	/**
-	 * 得到插件名称与路径分隔字符串
-	 * 
-	 * @return
-	 */
-	public String getPluginNameAndPathSplitString();
+	public void renderView(String bundleName, String viewName,
+			HttpServletRequest request, HttpServletResponse response);
 }
