@@ -20,6 +20,7 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
+@SuppressWarnings("unchecked")
 public class PluginServletContext extends MapperObject implements
 		ServletContext {
 
@@ -226,7 +227,7 @@ public class PluginServletContext extends MapperObject implements
 
 	@Override
 	public void declareRoles(String... arg0) {
-		invokeOrginObjectMethod(arg0);
+		invokeOrginObjectMethod((Object[]) arg0);
 	}
 
 	@Override

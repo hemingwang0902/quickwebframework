@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+@SuppressWarnings("unchecked")
 public class PluginHttpServletRequest extends MapperObject implements
 		HttpServletRequest {
 

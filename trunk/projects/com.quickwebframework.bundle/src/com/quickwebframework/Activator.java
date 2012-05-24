@@ -1,16 +1,11 @@
 package com.quickwebframework;
 
-import javax.servlet.ServletContext;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.core.DispatcherServlet;
-import com.quickwebframework.core.PluginServletContext;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.service.LogFactory;
-import com.quickwebframework.service.LogService;
 
 public class Activator implements BundleActivator {
 
@@ -33,33 +28,12 @@ public class Activator implements BundleActivator {
 		Activator.context = context;
 		LogFactory.setBundleContext(context);
 		log = LogFactory.getLog(Activator.class);
-
 		log.info("Starting [com.quickwebframework.bundle]...");
-
-		ServiceReference servletContextServiceReference = null;
-		ServiceReference[] allServiceReferences = context
-				.getAllServiceReferences(null, null);
-		for (ServiceReference sr : allServiceReferences) {
-			if (sr.toString().contains(ServletContext.class.getName())) {
-				servletContextServiceReference = sr;
-				break;
-			}
-		}
-		if (servletContextServiceReference == null) {
-			throw new RuntimeException(
-					"在OSGi服务中未找到javax.servlet.ServletContext服务！");
-		}
-
-		Object obj = context.getService(servletContextServiceReference);
-		ServletContext servletContext = new PluginServletContext(obj);
-
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
 		// 注册DispatcherServlet对象为Service
 		context.registerService(DispatcherServlet.class.getName(),
 				dispatcherServlet, null);
-
 		log.info("Started [com.quickwebframework.bundle].");
-
 	}
 
 	/*

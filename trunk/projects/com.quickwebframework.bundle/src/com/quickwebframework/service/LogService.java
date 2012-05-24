@@ -26,5 +26,5 @@ public interface LogService {
 	 *            类名
 	 * @return
 	 */
-	public Log getLog(Class clazz);
+	public Log getLog(Class<?> clazz);
 }

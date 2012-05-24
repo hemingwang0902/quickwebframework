@@ -2,7 +2,6 @@ package com.quickwebframework.log.log4j;
 
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

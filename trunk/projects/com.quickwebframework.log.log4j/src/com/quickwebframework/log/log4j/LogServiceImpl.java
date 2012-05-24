@@ -29,7 +29,7 @@ public class LogServiceImpl implements LogService {
 	}
 
 	@Override
-	public Log getLog(Class clazz) {
+	public Log getLog(Class<?> clazz) {
 		return getLog(clazz.getName());
 	}
 }
