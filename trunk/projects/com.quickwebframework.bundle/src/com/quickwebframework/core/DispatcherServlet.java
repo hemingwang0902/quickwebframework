@@ -28,6 +28,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
@@ -116,7 +117,7 @@ public class DispatcherServlet {
 			public void serviceChanged(ServiceEvent arg0) {
 				int serviceEventType = arg0.getType();
 				if (serviceEventType == ServiceEvent.REGISTERED) {
-					System.out.println(String.format("[%s]插件的[%s]服务已注册", arg0
+					log.info(String.format("[%s]插件的[%s]服务已注册", arg0
 							.getServiceReference().getBundle()
 							.getSymbolicName(), arg0.getServiceReference()));
 
@@ -128,10 +129,9 @@ public class DispatcherServlet {
 						return;
 					initControllerService((PluginService) obj);
 				} else if (serviceEventType == ServiceEvent.UNREGISTERING) {
-					System.out.println(String.format("[%s]插件的[%s]服务正在取消注册",
-							arg0.getServiceReference().getBundle()
-									.getSymbolicName(),
-							arg0.getServiceReference()));
+					log.info(String.format("[%s]插件的[%s]服务正在取消注册", arg0
+							.getServiceReference().getBundle()
+							.getSymbolicName(), arg0.getServiceReference()));
 
 					ServiceReference serviceReference = arg0
 							.getServiceReference();
@@ -215,12 +215,11 @@ public class DispatcherServlet {
 		for (Thread thread : pluginControllerInfo.getThreadList()) {
 			try {
 				thread.start();
-				System.out.println(String.format("已成功启动插件[%s]的线程[%s]！",
+				log.info(String.format("已成功启动插件[%s]的线程[%s]！",
 						bundle.getSymbolicName(), thread));
 			} catch (Exception ex) {
-				System.out.println(String.format("启动插件[%s]的线程[%s]失败！",
+				log.error(String.format("启动插件[%s]的线程[%s]失败！",
 						bundle.getSymbolicName(), thread));
-				ex.printStackTrace();
 			}
 		}
 
@@ -247,12 +246,26 @@ public class DispatcherServlet {
 						}
 						mappingUrl = "/" + bundle.getSymbolicName()
 								+ mappingUrl;
-
 						pluginControllerInfo.getMappingUrlHandlerMap().put(
 								mappingUrl, handler);
-						System.out.println(String.format(
-								"映射内部URL路径[%s]到处理器'%s'", mappingUrl, handler
-										.getClass().getName()));
+
+						StringBuilder sb = new StringBuilder();
+						RequestMethod[] requestMethods = requestMapping
+								.method();
+						if (requestMethods != null) {
+							for (RequestMethod requestMethod : requestMethods) {
+								sb.append(requestMethod.name());
+								sb.append(",");
+							}
+						}
+						if (sb.length() == 0)
+							sb.append("所有");
+						else
+							sb.setLength(sb.length() - 1);
+						
+						log.info(String.format(
+								"映射内部URL路径[%s]的[%s]HTTP请求到处理器'%s'", mappingUrl,
+								sb.toString(), handler.getClass().getName()));
 
 						// 将处理器与对应的适配器放入映射中
 						if (!pluginControllerInfo.getHandlerAdapterMap()
@@ -305,10 +318,10 @@ public class DispatcherServlet {
 			for (Thread thread : pluginControllerInfo.getThreadList()) {
 				try {
 					thread.interrupt();
-					System.out.println(String.format("已成功向插件[%s]的线程[%s]中断命令！",
+					log.info(String.format("已成功向插件[%s]的线程[%s]中断命令！",
 							bundleName, thread));
 				} catch (Exception ex) {
-					System.out.println(String.format("向插件[%s]的线程[%s]中断命令失败！",
+					log.error(String.format("向插件[%s]的线程[%s]中断命令失败！",
 							bundleName, thread));
 					ex.printStackTrace();
 				}
