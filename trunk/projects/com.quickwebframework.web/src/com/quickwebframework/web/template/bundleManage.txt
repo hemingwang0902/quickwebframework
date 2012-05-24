@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Welcome to Use CIMM!</title>
+<title>Welcome to Use QuickWebFramework</title>
 <style>   
   form{margin:   0}   
 </style>
