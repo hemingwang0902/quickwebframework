@@ -59,7 +59,7 @@ public class DispatcherServlet {
 	 * @return
 	 */
 	public void renderView(ServletContext servletContext,
-			PluginService controllerService, String viewName,
+			PluginService pluginService, String viewName,
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
 			ServiceReference viewRenderServiceReference = bundleContext
@@ -69,7 +69,7 @@ public class DispatcherServlet {
 						.getService(viewRenderServiceReference);
 				ViewRender viewRender = viewRenderService.getViewRender();
 				// 渲染视图
-				viewRender.renderView(controllerService.getBundle()
+				viewRender.renderView(pluginService.getBundle()
 						.getSymbolicName(), viewName, request, response);
 			} else {
 				response.sendError(500,
