@@ -21,32 +21,34 @@ public class ViewRenderServiceImpl implements ViewRenderService {
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-		FreemarkerViewRender freemarkerViewRender = new FreemarkerViewRender(
-				configuration, bundleContext);
 
 		// 配置ViewRender
+		PluginTemplateLoader pluginTemplateLoader = new PluginTemplateLoader(
+				bundleContext);
 
 		// 分隔符
 		if (viewRenderProp
 				.containsKey("com.quickwebframework.viewrender.pluginNameAndPathSplitString")) {
-			freemarkerViewRender
+			pluginTemplateLoader
 					.setPluginNameAndPathSplitString(viewRenderProp
 							.getProperty("com.quickwebframework.viewrender.pluginNameAndPathSplitString"));
 		}
 		// 前缀
 		if (viewRenderProp
 				.containsKey("com.quickwebframework.viewrender.viewNamePrefix")) {
-			freemarkerViewRender
+			pluginTemplateLoader
 					.setViewNamePrefix(viewRenderProp
 							.getProperty("com.quickwebframework.viewrender.viewNamePrefix"));
 		}
 		// 后缀
 		if (viewRenderProp
 				.containsKey("com.quickwebframework.viewrender.viewNameSuffix")) {
-			freemarkerViewRender
+			pluginTemplateLoader
 					.setViewNameSuffix(viewRenderProp
 							.getProperty("com.quickwebframework.viewrender.viewNameSuffix"));
 		}
+		FreemarkerViewRender freemarkerViewRender = new FreemarkerViewRender(
+				configuration, pluginTemplateLoader);
 		viewRender = freemarkerViewRender;
 	}
 

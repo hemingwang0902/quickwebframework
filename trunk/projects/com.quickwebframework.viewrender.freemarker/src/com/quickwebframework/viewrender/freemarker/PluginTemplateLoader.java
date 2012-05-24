@@ -15,13 +15,35 @@ public class PluginTemplateLoader implements TemplateLoader {
 
 	// Bundle上下文
 	private BundleContext bundleContext;
-	// 分隔字符串
-	private String pluginNameAndPathSplitString;
 
-	public PluginTemplateLoader(BundleContext bundleContext,
+	// 插件名称与路径分隔符
+	private String pluginNameAndPathSplitString = ":";
+
+	public String getPluginNameAndPathSplitString() {
+		return pluginNameAndPathSplitString;
+	}
+
+	public void setPluginNameAndPathSplitString(
 			String pluginNameAndPathSplitString) {
-		this.bundleContext = bundleContext;
 		this.pluginNameAndPathSplitString = pluginNameAndPathSplitString;
+	}
+
+	// 视图名称前缀
+	private String viewNamePrefix = "";
+
+	public void setViewNamePrefix(String viewNamePrefix) {
+		this.viewNamePrefix = viewNamePrefix;
+	}
+
+	// 视图名称后缀
+	private String viewNameSuffix = ".ftl";
+
+	public void setViewNameSuffix(String viewNameSuffix) {
+		this.viewNameSuffix = viewNameSuffix;
+	}
+
+	public PluginTemplateLoader(BundleContext bundleContext) {
+		this.bundleContext = bundleContext;
 	}
 
 	@Override
@@ -33,6 +55,8 @@ public class PluginTemplateLoader implements TemplateLoader {
 		}
 		String pluginName = tmpArray[0];
 		String path = tmpArray[1];
+		// 对视图名称进行处理(添加前后缀)
+		path = viewNamePrefix + path + viewNameSuffix;
 
 		PluginService pluginService = null;
 		try {
