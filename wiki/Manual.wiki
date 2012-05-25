@@ -1,7 +1,7 @@
 #labels 使用手册
 = 介绍 =
 
-Add your content here.
+使用手册还在整理中，谢谢关注。
 
 
 = 详情 =
