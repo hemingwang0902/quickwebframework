@@ -16,7 +16,7 @@ public interface WebSettingService {
 	 * 
 	 * @return
 	 */
-	public String getRootRedirectUrl();
+	public HttpServlet getRootUrlHandleServlet();
 
 	/**
 	 * 得到URL未找到处理Servlet

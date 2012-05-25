@@ -370,9 +370,8 @@ public class DispatcherServlet {
 	private void processHttp(Object request, Object response,
 			String bundleName, String methodName) {
 		try {
-			PluginHttpServletRequest req = new PluginHttpServletRequest(request);
-			PluginHttpServletResponse rep = new PluginHttpServletResponse(
-					response);
+			HttpServletRequest req = new PluginHttpServletRequest(request);
+			HttpServletResponse rep = new PluginHttpServletResponse(response);
 
 			// 如果插件名称为null或Map中不存在此插件名称
 			if (bundleName == null
@@ -436,14 +435,16 @@ public class DispatcherServlet {
 
 	// 处理根URL："/"请求
 	public void serviceRootUrl(Object request, Object response)
-			throws IOException {
-		PluginHttpServletResponse rep = new PluginHttpServletResponse(response);
-		if (webSettingService == null) {
+			throws IOException, ServletException {
+		HttpServletResponse rep = new PluginHttpServletResponse(response);
+		if (webSettingService == null
+				|| webSettingService.getRootUrlHandleServlet() == null) {
 			rep.getWriter()
 					.write("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!</body></html>");
 			return;
 		}
-		rep.sendRedirect(webSettingService.getRootRedirectUrl());
+		HttpServletRequest req = new PluginHttpServletRequest(response);
+		webSettingService.getRootUrlHandleServlet().service(req, rep);
 	}
 
 	// 得到资源
@@ -460,8 +461,8 @@ public class DispatcherServlet {
 	// 处理过滤器,返回值是是否继续处理其他的过滤器
 	public boolean doFilter(Object request, Object response, Object chain)
 			throws IOException, ServletException {
-		PluginHttpServletRequest req = new PluginHttpServletRequest(request);
-		PluginHttpServletResponse rep = new PluginHttpServletResponse(response);
+		HttpServletRequest req = new PluginHttpServletRequest(request);
+		HttpServletResponse rep = new PluginHttpServletResponse(response);
 		BooleanFilterChain booleanFilterChain = new BooleanFilterChain();
 
 		for (PluginControllerInfo pluginControllerInfo : bundleNamePluginControllerInfoMap
