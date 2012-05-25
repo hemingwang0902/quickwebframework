@@ -1,5 +1,9 @@
 package com.quickwebframework.service;
 
+import javax.servlet.http.HttpServlet;
+
+import com.quickwebframework.entity.HandlerExceptionResolver;
+
 /**
  * WEB设置服务
  * 
@@ -13,4 +17,18 @@ public interface WebSettingService {
 	 * @return
 	 */
 	public String getRootRedirectUrl();
+
+	/**
+	 * 得到URL未找到处理Servlet
+	 * 
+	 * @return
+	 */
+	public HttpServlet getUrlNotFoundHandleServlet();
+
+	/**
+	 * 得到处理器异常解决器
+	 * 
+	 * @return
+	 */
+	public HandlerExceptionResolver getHandlerExceptionResolver();
 }

@@ -119,12 +119,10 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 					String otherString = requestURI.substring(contextPath
 							.length() + mapping.length() - 1);
 					String[] tmpArray = otherString.split("/");
-					if (tmpArray.length < 2) {
-						response.sendError(404);
-						return;
+					if (tmpArray.length >= 2) {
+						bundleName = tmpArray[0];
+						methodName = tmpArray[1];
 					}
-					bundleName = tmpArray[0];
-					methodName = tmpArray[1];
 				}
 				// 否则应该是类似于/view，只需要直接取出参数
 				else {

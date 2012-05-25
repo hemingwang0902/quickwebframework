@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
+import com.quickwebframework.entity.HandlerExceptionResolver;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.ViewRender;
 import com.quickwebframework.entity.impl.PluginControllerInfo;
@@ -65,6 +66,21 @@ public class DispatcherServlet {
 		} else {
 			viewRender = null;
 		}
+	}
+
+	// WEB设置服务
+	private WebSettingService webSettingService;
+
+	// 刷新WEB设置服务
+	private void refreshWebSettingService() {
+		ServiceReference serviceReference = bundleContext
+				.getServiceReference(WebSettingService.class.getName());
+		if (serviceReference == null) {
+			webSettingService = null;
+			return;
+		}
+		webSettingService = (WebSettingService) bundleContext
+				.getService(serviceReference);
 	}
 
 	/**
@@ -110,6 +126,8 @@ public class DispatcherServlet {
 		}
 		// 刷新视图渲染器
 		refreshViewRender();
+		// 刷新WEB设置服务
+		refreshWebSettingService();
 
 		bundleContext.addServiceListener(new ServiceListener() {
 			@Override
@@ -118,6 +136,9 @@ public class DispatcherServlet {
 				if (arg0.getServiceReference().toString()
 						.contains(ViewRenderService.class.getName())) {
 					refreshViewRender();
+				} else if (arg0.getServiceReference().toString()
+						.contains(WebSettingService.class.getName())) {
+					refreshWebSettingService();
 				}
 
 				int serviceEventType = arg0.getType();
@@ -335,16 +356,30 @@ public class DispatcherServlet {
 		bundleNamePluginControllerInfoMap.remove(bundleName);
 	}
 
-	private String processHttp(Object request, Object response,
+	private void handleUrlNotFound(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
+		if (webSettingService == null
+				|| webSettingService.getUrlNotFoundHandleServlet() == null)
+			response.sendError(404, "URL " + request.getRequestURI()
+					+ " not found!");
+		else
+			webSettingService.getUrlNotFoundHandleServlet().service(request,
+					response);
+	}
+
+	private void processHttp(Object request, Object response,
 			String bundleName, String methodName) {
 		try {
 			PluginHttpServletRequest req = new PluginHttpServletRequest(request);
 			PluginHttpServletResponse rep = new PluginHttpServletResponse(
 					response);
 
-			if (!bundleNamePluginControllerInfoMap.containsKey(bundleName)) {
-				rep.sendError(404, "Bundle not found!");
-				return null;
+			// 如果插件名称为null或Map中不存在此插件名称
+			if (bundleName == null
+					|| !bundleNamePluginControllerInfoMap
+							.containsKey(bundleName)) {
+				handleUrlNotFound(req, rep);
+				return;
 			}
 
 			PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
@@ -352,10 +387,12 @@ public class DispatcherServlet {
 
 			String mappingUrl = "/" + bundleName + "/" + methodName;
 
-			if (!pluginControllerInfo.getMappingUrlHandlerMap().containsKey(
-					mappingUrl)) {
-				rep.sendError(404, "Method not found!");
-				return null;
+			// 如果方法名称为null或Map中不存在此方法名称
+			if (methodName == null
+					|| !pluginControllerInfo.getMappingUrlHandlerMap()
+							.containsKey(mappingUrl)) {
+				handleUrlNotFound(req, rep);
+				return;
 			}
 
 			// 得到处理器对象
@@ -364,42 +401,48 @@ public class DispatcherServlet {
 			// 得到该处理器对应的适配器
 			AnnotationMethodHandlerAdapter adapter = pluginControllerInfo
 					.getHandlerAdapterMap().get(handler);
-			// 执行处理，得到模型与视图
-			ModelAndView mav = adapter.handle(req, rep, handler);
-			String viewName = mav.getViewName();
+			try {
+				// 执行处理，得到模型与视图
+				ModelAndView mav = adapter.handle(req, rep, handler);
+				String viewName = mav.getViewName();
 
-			// 如果视图不为空
-			if (viewName != null) {
-				renderView(req.getServletContext(),
-						pluginControllerInfo.getControllerService(), viewName,
-						req, rep);
+				// 如果视图不为空
+				if (viewName != null) {
+					renderView(req.getServletContext(),
+							pluginControllerInfo.getControllerService(),
+							viewName, req, rep);
+				}
+			} catch (Exception ex) {
+				if (webSettingService == null)
+					throw ex;
+
+				HandlerExceptionResolver resolver = webSettingService
+						.getHandlerExceptionResolver();
+				if (resolver == null)
+					throw ex;
+				// 解决处理器异常
+				resolver.resolveException(req, rep, handler, ex);
 			}
-			return viewName;
-
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
 	// 处理HTTP请求
-	public String service(Object request, Object response, String bundleName,
+	public void service(Object request, Object response, String bundleName,
 			String methodName) {
-		return processHttp(request, response, bundleName, methodName);
+		processHttp(request, response, bundleName, methodName);
 	}
 
 	// 处理根URL："/"请求
 	public void serviceRootUrl(Object request, Object response)
 			throws IOException {
 		PluginHttpServletResponse rep = new PluginHttpServletResponse(response);
-		ServiceReference serviceReference = bundleContext
-				.getServiceReference(WebSettingService.class.getName());
-		if (serviceReference == null) {
+		if (webSettingService == null) {
 			rep.getWriter()
 					.write("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!</body></html>");
 			return;
 		}
-		WebSettingService webSettingService = (WebSettingService) bundleContext
-				.getService(serviceReference);
 		rep.sendRedirect(webSettingService.getRootRedirectUrl());
 	}
 
