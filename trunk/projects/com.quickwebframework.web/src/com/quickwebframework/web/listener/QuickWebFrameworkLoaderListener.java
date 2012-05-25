@@ -128,6 +128,40 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
+
+		// ====================
+		// 初始化相关Servlet，Filter
+		// ====================
+
+		// 初始化插件视图Servlet
+		HttpServlet pluginViewDispatcherServlet = PluginViewDispatcherServlet
+				.initServlet(servletContext, quickWebFrameworkProperties);
+		// 初始化插件资源Servlet
+		PluginResourceDispatcherServlet.initServlet(servletContext,
+				quickWebFrameworkProperties);
+		// 初始化插件管理Servlet
+		PluginManageServlet.initServlet(servletContext,
+				quickWebFrameworkProperties);
+		// 初始化Web资源Servlet
+		WebDefaultServlet.initServlet(servletContext,
+				pluginViewDispatcherServlet);
+
+		// 添加过滤器
+		FilterRegistration.Dynamic filterDynamic = servletContext.addFilter(
+				PluginFilter.class.getName(), PluginFilter.class);
+		EnumSet<DispatcherType> dispatcherTypeSet = EnumSet
+				.noneOf(DispatcherType.class);
+		dispatcherTypeSet.add(DispatcherType.REQUEST);
+		dispatcherTypeSet.add(DispatcherType.FORWARD);
+		dispatcherTypeSet.add(DispatcherType.INCLUDE);
+		dispatcherTypeSet.add(DispatcherType.ERROR);
+
+		filterDynamic.addMappingForServletNames(dispatcherTypeSet, true,
+				PluginViewDispatcherServlet.class.getName());
+
+		// ====================
+		// 初始化OSGi框架
+		// ====================
 		String osgiFrameworkFactoryClass = quickWebFrameworkProperties
 				.getProperty("quickwebframework.osgiFrameworkFactoryClass");
 		Class<?> osgiFrameworkFactoryClazz;
@@ -218,32 +252,6 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		} catch (BundleException e) {
 			throw new RuntimeException("启动OSGi Framework失败！", e);
 		}
-
-		// 初始化插件视图Servlet
-		HttpServlet pluginViewDispatcherServlet = PluginViewDispatcherServlet
-				.initServlet(servletContext, quickWebFrameworkProperties);
-		// 初始化插件资源Servlet
-		PluginResourceDispatcherServlet.initServlet(servletContext,
-				quickWebFrameworkProperties);
-		// 初始化插件管理Servlet
-		PluginManageServlet.initServlet(servletContext,
-				quickWebFrameworkProperties);
-		// 初始化Web资源Servlet
-		WebDefaultServlet.initServlet(servletContext,
-				pluginViewDispatcherServlet);
-
-		// 添加过滤器
-		FilterRegistration.Dynamic filterDynamic = servletContext.addFilter(
-				PluginFilter.class.getName(), PluginFilter.class);
-		EnumSet<DispatcherType> dispatcherTypeSet = EnumSet
-				.noneOf(DispatcherType.class);
-		dispatcherTypeSet.add(DispatcherType.REQUEST);
-		dispatcherTypeSet.add(DispatcherType.FORWARD);
-		dispatcherTypeSet.add(DispatcherType.INCLUDE);
-		dispatcherTypeSet.add(DispatcherType.ERROR);
-
-		filterDynamic.addMappingForServletNames(dispatcherTypeSet, true,
-				PluginViewDispatcherServlet.class.getName());
 	}
 
 	public void contextDestroyed(ServletContextEvent arg0) {

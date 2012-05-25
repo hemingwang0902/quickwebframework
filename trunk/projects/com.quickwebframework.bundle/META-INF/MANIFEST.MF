@@ -31,6 +31,7 @@ Import-Package: javax.sql,
  org.xml.sax
 Export-Package: com.quickwebframework.entity;uses:="javax.servlet.http",
  com.quickwebframework.service;uses:="javax.sql,com.quickwebframework.entity,org.osgi.framework",
+ com.quickwebframework.util,
  javax.servlet;version="3.0.0";uses:="javax.servlet.descriptor,javax.servlet.annotation",
  javax.servlet.annotation;version="3.0.0";uses:="javax.servlet",
  javax.servlet.descriptor;version="3.0.0",

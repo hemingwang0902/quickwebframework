@@ -21,6 +21,10 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 
 	public static final String ARG_BUNDLE_NAME = "com.quickwebframework.util.ARG_BUNDLE_NAME";
 	public static final String ARG_METHOD_NAME = "com.quickwebframework.util.ARG_METHOD_NAME";
+	public static final String BUNDLE_METHOD_URL_TEMPLATE = "com.quickwebframework.util.BUNDLE_METHOD_URL_TEMPLATE";
+
+	// URL映射风格.1:/view/[插件名称]/[方法名称] 2:/view?bn=[插件名称]&mn=[方法名称]
+	private static int urlMappingStyle = 0;
 
 	private String mapping;
 	private String bundleNameParameterName;
@@ -62,6 +66,29 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 				PluginViewDispatcherServlet.class.getName(),
 				pluginViewDispatcherServlet);
 		viewDynamic.addMapping(pluginViewDispatcherServletMapping);
+
+		String urlTemplate = null;
+		// 如果映射的URL是类似于 /view/*
+		if (pluginViewDispatcherServlet.mapping.endsWith("*")) {
+			urlMappingStyle = 1;
+			urlTemplate = pluginViewDispatcherServlet.mapping.substring(0,
+					pluginViewDispatcherServlet.mapping.length() - 1 - 1)
+					+ "/%s/%s";
+		}
+		// 否则应该是类似于/view，只需要直接取出参数
+		else {
+			urlMappingStyle = 2;
+			urlTemplate = pluginViewDispatcherServlet.mapping + "?"
+					+ pluginViewDispatcherServlet.bundleNameParameterName
+					+ "=%s&"
+					+ pluginViewDispatcherServlet.methodNameParameterName
+					+ "=%s";
+		}
+		if (!urlTemplate.startsWith("/")) {
+			urlTemplate = "/" + urlTemplate;
+		}
+		servletContext.setAttribute(BUNDLE_METHOD_URL_TEMPLATE, urlTemplate);
+
 		return pluginViewDispatcherServlet;
 	}
 
@@ -113,7 +140,7 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 				// 得到bundleName和methodName
 
 				// 如果映射的URL是类似于 /view/*
-				if (mapping.endsWith("*")) {
+				if (urlMappingStyle == 1) {
 					if (!requestURI.endsWith("/"))
 						requestURI = requestURI + "/";
 					String otherString = requestURI.substring(contextPath
@@ -125,7 +152,7 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 					}
 				}
 				// 否则应该是类似于/view，只需要直接取出参数
-				else {
+				else if (urlMappingStyle == 2) {
 					bundleName = request.getParameter(bundleNameParameterName);
 					methodName = request.getParameter(methodNameParameterName);
 				}

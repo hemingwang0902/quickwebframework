@@ -11,6 +11,9 @@ import org.osgi.framework.Bundle;
 
 public class BundleUtil {
 
+	// 插件方法URL模板
+	public static String bundleMethodUrlTemplate;
+
 	/**
 	 * 得到Bundle中的路径列表
 	 * 
@@ -69,5 +72,19 @@ public class BundleUtil {
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	/**
+	 * 得到插件方法的URL
+	 * 
+	 * @param bundleName
+	 * @param methodName
+	 * @return
+	 */
+	public static String getBundleMethodUrl(String bundleName, String methodName) {
+		if (bundleMethodUrlTemplate == null
+				|| bundleMethodUrlTemplate.isEmpty())
+			return "Missing bundleMethodUrlTemplate";
+		return String.format(bundleMethodUrlTemplate, bundleName, methodName);
 	}
 }
