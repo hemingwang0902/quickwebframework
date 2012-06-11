@@ -13,7 +13,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,14 +66,10 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 
 		// 添加插件管理Servlet
 		PluginManageServlet pluginManageServlet = new PluginManageServlet();
-
-		// 添加Servlet映射
-		ServletRegistration.Dynamic viewDynamic = servletContext.addServlet(
-				PluginManageServlet.class.getName(), pluginManageServlet);
-		viewDynamic.addMapping(pluginManageDispatcherServletMapping);
 		return pluginManageServlet;
 	}
 
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
 		BundleContext bundleContext = QuickWebFrameworkLoaderListener
@@ -193,6 +188,7 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 		request.setAttribute("message", message);
 	}
 
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
 		BundleContext bundleContext = QuickWebFrameworkLoaderListener

@@ -12,7 +12,7 @@ import javax.servlet.ServletResponse;
 
 import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 
-public class PluginFilter implements Filter {
+public class CommonFilter implements Filter {
 
 	@Override
 	public void destroy() {

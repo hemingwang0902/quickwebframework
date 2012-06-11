@@ -6,19 +6,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Dictionary;
-import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.FilterRegistration;
-import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -30,12 +26,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 
-import com.quickwebframework.web.filter.PluginFilter;
-import com.quickwebframework.web.servlet.PluginManageServlet;
-import com.quickwebframework.web.servlet.PluginResourceDispatcherServlet;
-import com.quickwebframework.web.servlet.PluginViewDispatcherServlet;
-import com.quickwebframework.web.servlet.WebDefaultServlet;
-
 public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 
 	public final static String CONST_DISPATCHER_SERVLET_CLASS_NAME = "com.quickwebframework.core.DispatcherServlet";
@@ -43,6 +33,13 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 
 	// 配置文件路径参数名称
 	public final static String CONFIG_LOCATION_PARAMETER_NAME = "quickwebframeworkConfigLocation";
+
+	// QuickWebFramework的配置
+	private static Properties quickWebFrameworkProperties;
+
+	public static Properties getQuickWebFrameworkProperties() {
+		return quickWebFrameworkProperties;
+	}
 
 	private static Framework framework;
 
@@ -116,7 +113,7 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		}
 
 		// QuickWebFramework的配置
-		Properties quickWebFrameworkProperties = new Properties();
+		quickWebFrameworkProperties = new Properties();
 		try {
 			InputStream quickWebFrameworkPropertiesInputStream = new FileInputStream(
 					quickWebFrameworkPropertiesFilePath);
@@ -128,36 +125,6 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-
-		// ====================
-		// 初始化相关Servlet，Filter
-		// ====================
-
-		// 初始化插件视图Servlet
-		HttpServlet pluginViewDispatcherServlet = PluginViewDispatcherServlet
-				.initServlet(servletContext, quickWebFrameworkProperties);
-		// 初始化插件资源Servlet
-		PluginResourceDispatcherServlet.initServlet(servletContext,
-				quickWebFrameworkProperties);
-		// 初始化插件管理Servlet
-		PluginManageServlet.initServlet(servletContext,
-				quickWebFrameworkProperties);
-		// 初始化Web资源Servlet
-		WebDefaultServlet.initServlet(servletContext,
-				pluginViewDispatcherServlet);
-
-		// 添加过滤器
-		FilterRegistration.Dynamic filterDynamic = servletContext.addFilter(
-				PluginFilter.class.getName(), PluginFilter.class);
-		EnumSet<DispatcherType> dispatcherTypeSet = EnumSet
-				.noneOf(DispatcherType.class);
-		dispatcherTypeSet.add(DispatcherType.REQUEST);
-		dispatcherTypeSet.add(DispatcherType.FORWARD);
-		dispatcherTypeSet.add(DispatcherType.INCLUDE);
-		dispatcherTypeSet.add(DispatcherType.ERROR);
-
-		filterDynamic.addMappingForServletNames(dispatcherTypeSet, true,
-				PluginViewDispatcherServlet.class.getName());
 
 		// ====================
 		// 初始化OSGi框架

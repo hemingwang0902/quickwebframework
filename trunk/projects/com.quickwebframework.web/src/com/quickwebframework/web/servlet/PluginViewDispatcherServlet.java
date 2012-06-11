@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,12 +59,6 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 		pluginViewDispatcherServlet
 				.setMethodNameParameterName(quickWebFrameworkProperties
 						.getProperty(PluginViewDispatcherServlet.METHOD_NAME_PARAMETER_NAME_PROPERTY_KEY));
-
-		// 添加Servlet映射
-		ServletRegistration.Dynamic viewDynamic = servletContext.addServlet(
-				PluginViewDispatcherServlet.class.getName(),
-				pluginViewDispatcherServlet);
-		viewDynamic.addMapping(pluginViewDispatcherServletMapping);
 
 		String urlTemplate = null;
 		// 如果映射的URL是类似于 /view/*
@@ -169,6 +162,7 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 		}
 	}
 
+	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		processHttpMethod(request, response);
 	}

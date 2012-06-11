@@ -10,7 +10,6 @@ import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -85,8 +84,7 @@ public class PluginResourceDispatcherServlet extends
 	}
 
 	// 初始化插件资源Servlet
-	public static HttpServlet initServlet(
-			ServletContext servletContext,
+	public static HttpServlet initServlet(ServletContext servletContext,
 			Properties quickWebFrameworkProperties) {
 		// 添加插件资源Servlet
 		PluginResourceDispatcherServlet pluginResourceDispatcherServlet = new PluginResourceDispatcherServlet();
@@ -128,12 +126,6 @@ public class PluginResourceDispatcherServlet extends
 		pluginResourceDispatcherServlet
 				.setResourcePathPrefix(quickWebFrameworkProperties
 						.getProperty(PluginResourceDispatcherServlet.RESOURCE_PATH_PREFIX_PROPERTY_KEY));
-
-		// 添加Servlet映射
-		ServletRegistration.Dynamic resourceDynamic = servletContext
-				.addServlet(PluginResourceDispatcherServlet.class.getName(),
-						pluginResourceDispatcherServlet);
-		resourceDynamic.addMapping(pluginResourceDispatcherServletMapping);
 		return pluginResourceDispatcherServlet;
 	}
 
@@ -233,10 +225,12 @@ public class PluginResourceDispatcherServlet extends
 		}
 	}
 
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		processHttpMethod("doGetResource", request, response);
 	}
 
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		processHttpMethod("doGetResource", request, response);
 	}
