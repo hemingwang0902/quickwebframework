@@ -95,9 +95,8 @@ public class PluginTemplateLoader implements TemplateLoader {
 
 		InputStream inputStream = null;
 		try {
-			inputStream = pluginTemplateSource.controllerService
-					.getClassLoader().getResourceAsStream(
-							pluginTemplateSource.path);
+			inputStream = pluginTemplateSource.controllerService.getBundle()
+					.getResource(pluginTemplateSource.path).openStream();
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

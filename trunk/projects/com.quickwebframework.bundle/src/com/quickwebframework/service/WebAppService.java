@@ -15,11 +15,4 @@ public interface WebAppService {
 	 * @return
 	 */
 	public Bundle getBundle();
-
-	/**
-	 * 得到Bundle内部的ClassLoader
-	 * 
-	 * @return
-	 */
-	public ClassLoader getClassLoader();
 }

@@ -31,6 +31,8 @@ public class DispatcherServlet {
 	private static Log log = LogFactory.getLog(DispatcherServlet.class);
 	// Bundle上下文
 	private BundleContext bundleContext;
+	// 注册过滤器，线程的服务
+	private PluginService pluginService;
 
 	// 视图渲染服务
 	private ViewRenderService viewRenderService;
@@ -59,20 +61,6 @@ public class DispatcherServlet {
 			return;
 		}
 		webSettingService = (WebSettingService) bundleContext
-				.getService(serviceReference);
-	}
-
-	// 注册过滤器，线程的服务
-	private PluginService pluginService;
-
-	private void refreshPluginService() {
-		ServiceReference serviceReference = bundleContext
-				.getServiceReference(PluginService.class.getName());
-		if (serviceReference == null) {
-			pluginService = null;
-			return;
-		}
-		pluginService = (PluginService) bundleContext
 				.getService(serviceReference);
 	}
 
@@ -112,8 +100,10 @@ public class DispatcherServlet {
 		}
 	}
 
-	public DispatcherServlet(final BundleContext bundleContext) {
+	public DispatcherServlet(final BundleContext bundleContext,
+			PluginService pluginService) {
 		this.bundleContext = bundleContext;
+		this.pluginService = pluginService;
 
 		final Bundle currentBundle = bundleContext.getBundle();
 
@@ -121,8 +111,6 @@ public class DispatcherServlet {
 		refreshViewRenderService();
 		// 刷新WEB设置服务
 		refreshWebSettingService();
-		// 刷新插件服务(注册过滤器，线程等)
-		refreshPluginService();
 		// 刷新MVC框架服务
 		refreshMvcFrameworkService();
 
@@ -152,9 +140,6 @@ public class DispatcherServlet {
 				} else if (serviceReferenceName
 						.contains(WebSettingService.class.getName())) {
 					refreshWebSettingService();
-				} else if (serviceReferenceName.contains(PluginService.class
-						.getName())) {
-					refreshPluginService();
 				} else if (serviceReferenceName
 						.contains(MvcFrameworkService.class.getName())) {
 					refreshMvcFrameworkService();
@@ -269,12 +254,12 @@ public class DispatcherServlet {
 
 	// 得到资源
 	public InputStream doGetResource(Object request, Object response,
-			String bundleName, String resourcePath) {
+			String bundleName, String resourcePath) throws IOException {
 		WebAppService webAppService = mvcFrameworkService
 				.getWebAppService(bundleName);
 		if (webAppService == null)
 			return null;
-		return webAppService.getClassLoader().getResourceAsStream(resourcePath);
+		return webAppService.getBundle().getResource(resourcePath).openStream();
 	}
 
 	// 处理过滤器,返回值是是否继续处理其他的过滤器

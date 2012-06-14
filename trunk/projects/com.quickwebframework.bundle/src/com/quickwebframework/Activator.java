@@ -71,7 +71,8 @@ public class Activator implements BundleActivator {
 		context.registerService(PluginService.class.getName(), pluginService,
 				null);
 		// 注册DispatcherServlet对象为Service
-		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
+		DispatcherServlet dispatcherServlet = new DispatcherServlet(context,
+				pluginService);
 		context.registerService(DispatcherServlet.class.getName(),
 				dispatcherServlet, null);
 

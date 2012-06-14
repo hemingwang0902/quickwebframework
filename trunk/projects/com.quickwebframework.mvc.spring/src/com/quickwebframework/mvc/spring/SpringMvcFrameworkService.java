@@ -30,13 +30,13 @@ import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
 import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
+import com.quickwebframework.mvc.spring.util.FolderClassLoader;
 import com.quickwebframework.mvc.spring.util.PluginPathMatcher;
 import com.quickwebframework.mvc.spring.util.PluginUrlPathHelper;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.WebAppService;
 import com.quickwebframework.service.core.PluginService;
 import com.quickwebframework.util.BundleUtil;
-import com.quickwebframework.util.FolderClassLoader;
 import com.quickwebframework.util.IoUtil;
 
 public class SpringMvcFrameworkService implements MvcFrameworkService {
@@ -116,8 +116,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 			 */
 			
 			// 开始Spring扫描
-			FolderClassLoader folderClassLoader = new FolderClassLoader(
-					pluginControllerInfo.getWebAppService().getClassLoader(),
+			FolderClassLoader folderClassLoader = new FolderClassLoader( pluginControllerInfo.getWebAppService().getClass().getClassLoader(),
 					tmpFolderPath);
 			applicationContext.setClassLoader(folderClassLoader);
 			applicationContext.scan("*");

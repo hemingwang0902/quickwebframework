@@ -1,9 +1,11 @@
-package com.quickwebframework.util;
+package com.quickwebframework.mvc.spring.util;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Vector;
+
+import org.osgi.framework.Bundle;
 
 public class FolderClassLoader extends ClassLoader {
 	private String folderPathURI;
