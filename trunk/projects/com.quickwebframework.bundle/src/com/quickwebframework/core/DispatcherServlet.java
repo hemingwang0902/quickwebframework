@@ -1,19 +1,10 @@
 package com.quickwebframework.core;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -25,46 +16,34 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
 import com.quickwebframework.entity.HandlerExceptionResolver;
 import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.ViewRender;
-import com.quickwebframework.entity.impl.PluginControllerInfo;
-import com.quickwebframework.service.LogFactory;
-import com.quickwebframework.service.PluginService;
+import com.quickwebframework.entity.LogFactory;
+import com.quickwebframework.entity.MvcModelAndView;
+import com.quickwebframework.service.MvcFrameworkService;
+import com.quickwebframework.service.WebAppService;
 import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.service.WebSettingService;
-import com.quickwebframework.util.BundleUtil;
-import com.quickwebframework.util.FolderClassLoader;
-import com.quickwebframework.util.IoUtil;
-import com.quickwebframework.util.PluginPathMatcher;
-import com.quickwebframework.util.PluginUrlPathHelper;
+import com.quickwebframework.service.core.PluginService;
 
 public class DispatcherServlet {
 	private static Log log = LogFactory.getLog(DispatcherServlet.class);
 	// Bundle上下文
 	private BundleContext bundleContext;
-	// 插件名与ControllerService对应Map
-	private Map<String, PluginControllerInfo> bundleNamePluginControllerInfoMap;
-	// 视图渲染器
-	private ViewRender viewRender;
 
-	// 刷新渲染器
-	private void refreshViewRender() {
+	// 视图渲染服务
+	private ViewRenderService viewRenderService;
+
+	// 刷新渲染服务
+	private void refreshViewRenderService() {
 		ServiceReference viewRenderServiceReference = bundleContext
 				.getServiceReference(ViewRenderService.class.getName());
-		if (viewRenderServiceReference != null) {
-			ViewRenderService viewRenderService = (ViewRenderService) bundleContext
-					.getService(viewRenderServiceReference);
-			viewRender = viewRenderService.getViewRender();
+		if (viewRenderServiceReference == null) {
+			viewRenderService = null;
 		} else {
-			viewRender = null;
+			viewRenderService = (ViewRenderService) bundleContext
+					.getService(viewRenderServiceReference);
 		}
 	}
 
@@ -83,19 +62,47 @@ public class DispatcherServlet {
 				.getService(serviceReference);
 	}
 
+	// 注册过滤器，线程的服务
+	private PluginService pluginService;
+
+	private void refreshPluginService() {
+		ServiceReference serviceReference = bundleContext
+				.getServiceReference(PluginService.class.getName());
+		if (serviceReference == null) {
+			pluginService = null;
+			return;
+		}
+		pluginService = (PluginService) bundleContext
+				.getService(serviceReference);
+	}
+
+	// MVC框架服务
+	private MvcFrameworkService mvcFrameworkService;
+
+	private void refreshMvcFrameworkService() {
+		ServiceReference serviceReference = bundleContext
+				.getServiceReference(MvcFrameworkService.class.getName());
+		if (serviceReference == null) {
+			mvcFrameworkService = null;
+			return;
+		}
+		mvcFrameworkService = (MvcFrameworkService) bundleContext
+				.getService(serviceReference);
+	}
+
 	/**
 	 * 渲染视图
 	 * 
 	 * @return
 	 */
-	public void renderView(ServletContext servletContext,
-			PluginService pluginService, String viewName,
-			HttpServletRequest request, HttpServletResponse response) {
+	public void renderView(MvcModelAndView mav, HttpServletRequest request,
+			HttpServletResponse response) {
 		try {
-			if (viewRender != null) {
+			if (viewRenderService != null) {
 				// 渲染视图
-				viewRender.renderView(pluginService.getBundle()
-						.getSymbolicName(), viewName, request, response);
+				viewRenderService.renderView(mav.getWebAppService().getBundle()
+						.getSymbolicName(), mav.getViewName(), request,
+						response);
 			} else {
 				response.sendError(500,
 						"[com.quickwebframework.core.DispatcherServlet] cannot found ViewRender!");
@@ -109,36 +116,48 @@ public class DispatcherServlet {
 		this.bundleContext = bundleContext;
 
 		final Bundle currentBundle = bundleContext.getBundle();
-		bundleNamePluginControllerInfoMap = new HashMap<String, PluginControllerInfo>();
+
+		// 刷新视图渲染器
+		refreshViewRenderService();
+		// 刷新WEB设置服务
+		refreshWebSettingService();
+		// 刷新插件服务(注册过滤器，线程等)
+		refreshPluginService();
+		// 刷新MVC框架服务
+		refreshMvcFrameworkService();
 
 		try {
 			ServiceReference[] serviceReferences = bundleContext
-					.getServiceReferences(PluginService.class.getName(), null);
+					.getServiceReferences(WebAppService.class.getName(), null);
 			if (serviceReferences != null) {
 				for (ServiceReference serviceReference : serviceReferences) {
-					PluginService obj = (PluginService) bundleContext
+					WebAppService webAppService = (WebAppService) bundleContext
 							.getService(serviceReference);
-					initControllerService(obj);
+					mvcFrameworkService.addWebApp(webAppService);
 				}
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-		// 刷新视图渲染器
-		refreshViewRender();
-		// 刷新WEB设置服务
-		refreshWebSettingService();
 
 		bundleContext.addServiceListener(new ServiceListener() {
 			@Override
 			public void serviceChanged(ServiceEvent arg0) {
+				String serviceReferenceName = arg0.getServiceReference()
+						.toString();
 				// 如果视图渲染器服务改变，刷新视图渲染器
-				if (arg0.getServiceReference().toString()
-						.contains(ViewRenderService.class.getName())) {
-					refreshViewRender();
-				} else if (arg0.getServiceReference().toString()
+				if (serviceReferenceName.contains(ViewRenderService.class
+						.getName())) {
+					refreshViewRenderService();
+				} else if (serviceReferenceName
 						.contains(WebSettingService.class.getName())) {
 					refreshWebSettingService();
+				} else if (serviceReferenceName.contains(PluginService.class
+						.getName())) {
+					refreshPluginService();
+				} else if (serviceReferenceName
+						.contains(MvcFrameworkService.class.getName())) {
+					refreshMvcFrameworkService();
 				}
 
 				int serviceEventType = arg0.getType();
@@ -150,10 +169,10 @@ public class DispatcherServlet {
 					ServiceReference serviceReference = arg0
 							.getServiceReference();
 					Object obj = bundleContext.getService(serviceReference);
-					// 如果上服务不是ControllerService
-					if (!PluginService.class.isInstance(obj))
+					// 如果上服务不是WebAppService
+					if (!WebAppService.class.isInstance(obj))
 						return;
-					initControllerService((PluginService) obj);
+					mvcFrameworkService.addWebApp((WebAppService) obj);
 				} else if (serviceEventType == ServiceEvent.UNREGISTERING) {
 					log.info(String.format("[%s]插件的[%s]服务正在取消注册", arg0
 							.getServiceReference().getBundle()
@@ -168,192 +187,12 @@ public class DispatcherServlet {
 
 					Object obj = bundleContext.getService(serviceReference);
 					// 如果上服务不是ControllerService
-					if (!PluginService.class.isInstance(obj))
+					if (!WebAppService.class.isInstance(obj))
 						return;
-					uninitControllerService((PluginService) obj);
+					mvcFrameworkService.removeWebApp((WebAppService) obj);
 				}
 			}
 		});
-	}
-
-	private boolean initPluginControllerInfo(Bundle bundle,
-			PluginControllerInfo pluginControllerInfo) {
-
-		// 得到临时目录
-		String tmpFolderPath = System.getProperty("java.io.tmpdir");
-		tmpFolderPath = tmpFolderPath + File.separator
-				+ UUID.randomUUID().toString();
-
-		// 解压Bundle文件
-		BundleUtil.extractBundleFiles(bundle, tmpFolderPath);
-
-		// 初始化AnnotationConfigApplicationContext
-		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
-
-		// 复制Spring需要的资源文件
-		// 比如java/lang/Thread.class.file到临时目录/java/lang/Thread.class
-		try {
-			Bundle selfBundle = bundleContext.getBundle();
-
-			String classFilePath = "/java/lang/Thread.class";
-			InputStream inputStream = selfBundle
-					.getResource(
-							"/com/quickwebframework/resource" + classFilePath
-									+ ".file").openStream();
-			File threadClassFile = new File(tmpFolderPath + classFilePath);
-			threadClassFile.getParentFile().mkdirs();
-			OutputStream outputStream = new FileOutputStream(threadClassFile);
-			IoUtil.copyStream(inputStream, outputStream);
-			outputStream.close();
-			inputStream.close();
-
-			// 开始Spring扫描
-			FolderClassLoader folderClassLoader = new FolderClassLoader(
-					pluginControllerInfo.getControllerService()
-							.getClassLoader(), tmpFolderPath);
-			applicationContext.setClassLoader(folderClassLoader);
-			applicationContext.scan("*");
-			applicationContext.refresh();
-			applicationContext.start();
-		} catch (Exception ex) {
-			log.error("用Spring扫描插件时出错异常，插件启动失败！", ex);
-			// 停止插件
-			try {
-				bundle.stop();
-			} catch (Exception ex2) {
-			}
-			return false;
-		} finally {
-			// 删除临时目录文件
-			IoUtil.deleteFile(tmpFolderPath);
-		}
-
-		// 从ApplicationContext得到过滤器列表
-		Map<String, Filter> filterMap = applicationContext
-				.getBeansOfType(Filter.class);
-		pluginControllerInfo.getFilterList().addAll(filterMap.values());
-
-		// 从ApplicationContext得到线程列表
-		Map<String, Thread> threadMap = applicationContext
-				.getBeansOfType(Thread.class);
-		pluginControllerInfo.getThreadList().addAll(threadMap.values());
-		// 开启线程
-		for (Thread thread : pluginControllerInfo.getThreadList()) {
-			try {
-				thread.start();
-				log.info(String.format("已成功启动插件[%s]的线程[%s]！",
-						bundle.getSymbolicName(), thread));
-			} catch (Exception ex) {
-				log.error(String.format("启动插件[%s]的线程[%s]失败！",
-						bundle.getSymbolicName(), thread));
-			}
-		}
-
-		// 从ApplicationContext得到处理器列表
-		final Map<String, Object> handlerMap = applicationContext
-				.getBeansWithAnnotation(Controller.class);
-
-		Collection<Object> handlers = handlerMap.values();
-
-		if (handlers != null) {
-			for (Object handler : handlers) {
-				Class<?> controllerClazz = handler.getClass();
-				Method[] methods = controllerClazz.getMethods();
-				for (Method method : methods) {
-					// 查找RequestMapping注解
-					RequestMapping requestMapping = method
-							.getAnnotation(RequestMapping.class);
-					if (requestMapping == null)
-						continue;
-
-					for (String mappingUrl : requestMapping.value()) {
-						if (!mappingUrl.startsWith("/")) {
-							mappingUrl = "/" + mappingUrl;
-						}
-						mappingUrl = "/" + bundle.getSymbolicName()
-								+ mappingUrl;
-						pluginControllerInfo.getMappingUrlHandlerMap().put(
-								mappingUrl, handler);
-
-						StringBuilder sb = new StringBuilder();
-						RequestMethod[] requestMethods = requestMapping
-								.method();
-						if (requestMethods != null) {
-							for (RequestMethod requestMethod : requestMethods) {
-								sb.append(requestMethod.name());
-								sb.append(",");
-							}
-						}
-						if (sb.length() == 0)
-							sb.append("所有");
-						else
-							sb.setLength(sb.length() - 1);
-
-						log.info(String.format(
-								"映射内部URL路径[%s]的[%s]HTTP请求到处理器'%s'", mappingUrl,
-								sb.toString(), handler.getClass().getName()));
-
-						// 将处理器与对应的适配器放入映射中
-						if (!pluginControllerInfo.getHandlerAdapterMap()
-								.containsKey(handler)) {
-							AnnotationMethodHandlerAdapter adapter = new AnnotationMethodHandlerAdapter();
-							adapter.setPathMatcher(new PluginPathMatcher(bundle
-									.getSymbolicName()));
-							adapter.setUrlPathHelper(new PluginUrlPathHelper());
-							pluginControllerInfo.getHandlerAdapterMap().put(
-									handler, adapter);
-						}
-					}
-				}
-			}
-		}
-		return true;
-	}
-
-	private void initControllerService(PluginService controllerService) {
-		Bundle bundle = controllerService.getBundle();
-		String bundleName = bundle.getSymbolicName();
-		// 如果Map的键中有此插件名称
-		if (bundleNamePluginControllerInfoMap.containsKey(bundleName)) {
-			PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
-					.get(bundleName);
-			PluginService preControllerService = pluginControllerInfo
-					.getControllerService();
-			Bundle preBundle = preControllerService.getBundle();
-			if (preBundle.getState() == Bundle.ACTIVE)
-				return;
-			bundleNamePluginControllerInfoMap.remove(bundleName);
-		}
-
-		PluginControllerInfo pluginControllerInfo = new PluginControllerInfo(
-				controllerService);
-		if (initPluginControllerInfo(bundle, pluginControllerInfo)) {
-			bundleNamePluginControllerInfoMap.put(bundleName,
-					pluginControllerInfo);
-		}
-	}
-
-	private void uninitControllerService(PluginService controllerService) {
-		Bundle bundle = controllerService.getBundle();
-		String bundleName = bundle.getSymbolicName();
-
-		if (bundleNamePluginControllerInfoMap.containsKey(bundleName)) {
-			PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
-					.get(bundleName);
-			// 中断线程
-			for (Thread thread : pluginControllerInfo.getThreadList()) {
-				try {
-					thread.interrupt();
-					log.info(String.format("已成功向插件[%s]的线程[%s]中断命令！",
-							bundleName, thread));
-				} catch (Exception ex) {
-					log.error(String.format("向插件[%s]的线程[%s]中断命令失败！",
-							bundleName, thread));
-					ex.printStackTrace();
-				}
-			}
-		}
-		bundleNamePluginControllerInfoMap.remove(bundleName);
 	}
 
 	private void handleUrlNotFound(HttpServletRequest request,
@@ -373,43 +212,24 @@ public class DispatcherServlet {
 			HttpServletRequest req = new PluginHttpServletRequest(request);
 			HttpServletResponse rep = new PluginHttpServletResponse(response);
 
-			// 如果插件名称为null或Map中不存在此插件名称
-			if (bundleName == null
-					|| !bundleNamePluginControllerInfoMap
-							.containsKey(bundleName)) {
+			// 如果插件名称为null或空字符串
+			if (bundleName == null || bundleName.isEmpty()) {
 				handleUrlNotFound(req, rep);
 				return;
 			}
 
-			PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
-					.get(bundleName);
-
-			String mappingUrl = "/" + bundleName + "/" + methodName;
-
-			// 如果方法名称为null或Map中不存在此方法名称
-			if (methodName == null
-					|| !pluginControllerInfo.getMappingUrlHandlerMap()
-							.containsKey(mappingUrl)) {
-				handleUrlNotFound(req, rep);
-				return;
-			}
-
-			// 得到处理器对象
-			Object handler = pluginControllerInfo.getMappingUrlHandlerMap()
-					.get(mappingUrl);
-			// 得到该处理器对应的适配器
-			AnnotationMethodHandlerAdapter adapter = pluginControllerInfo
-					.getHandlerAdapterMap().get(handler);
 			try {
-				// 执行处理，得到模型与视图
-				ModelAndView mav = adapter.handle(req, rep, handler);
+				MvcModelAndView mav = mvcFrameworkService.handle(req, rep,
+						bundleName, methodName);
+				if (mav == null) {
+					handleUrlNotFound(req, rep);
+					return;
+				}
 				String viewName = mav.getViewName();
 
 				// 如果视图不为空
 				if (viewName != null) {
-					renderView(req.getSession().getServletContext(),
-							pluginControllerInfo.getControllerService(),
-							viewName, req, rep);
+					renderView(mav, req, rep);
 				}
 			} catch (Exception ex) {
 				if (webSettingService == null)
@@ -420,7 +240,7 @@ public class DispatcherServlet {
 				if (resolver == null)
 					throw ex;
 				// 解决处理器异常
-				resolver.resolveException(req, rep, handler, ex);
+				resolver.resolveException(req, rep, ex);
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -450,12 +270,11 @@ public class DispatcherServlet {
 	// 得到资源
 	public InputStream doGetResource(Object request, Object response,
 			String bundleName, String resourcePath) {
-		if (!bundleNamePluginControllerInfoMap.containsKey(bundleName)) {
+		WebAppService webAppService = mvcFrameworkService
+				.getWebAppService(bundleName);
+		if (webAppService == null)
 			return null;
-		}
-		return bundleNamePluginControllerInfoMap.get(bundleName)
-				.getControllerService().getClassLoader()
-				.getResourceAsStream(resourcePath);
+		return webAppService.getClassLoader().getResourceAsStream(resourcePath);
 	}
 
 	// 处理过滤器,返回值是是否继续处理其他的过滤器
@@ -465,13 +284,10 @@ public class DispatcherServlet {
 		HttpServletResponse rep = new PluginHttpServletResponse(response);
 		BooleanFilterChain booleanFilterChain = new BooleanFilterChain();
 
-		for (PluginControllerInfo pluginControllerInfo : bundleNamePluginControllerInfoMap
-				.values()) {
-			for (Filter filter : pluginControllerInfo.getFilterList()) {
-				filter.doFilter(req, rep, booleanFilterChain);
-				if (!booleanFilterChain.isContinueFilter)
-					return false;
-			}
+		for (Filter filter : pluginService.getFilterList()) {
+			filter.doFilter(req, rep, booleanFilterChain);
+			if (!booleanFilterChain.isContinueFilter)
+				return false;
 		}
 		return true;
 	}

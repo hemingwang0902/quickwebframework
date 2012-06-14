@@ -9,7 +9,9 @@ import org.osgi.framework.ServiceReference;
 import com.quickwebframework.core.DispatcherServlet;
 import com.quickwebframework.core.PluginServletContext;
 import com.quickwebframework.entity.Log;
-import com.quickwebframework.service.LogFactory;
+import com.quickwebframework.entity.LogFactory;
+import com.quickwebframework.service.core.PluginService;
+import com.quickwebframework.service.core.impl.PluginServiceImpl;
 import com.quickwebframework.util.BundleUtil;
 
 public class Activator implements BundleActivator {
@@ -63,6 +65,11 @@ public class Activator implements BundleActivator {
 		if (tmpObj != null) {
 			BundleUtil.bundleMethodUrlTemplate = tmpObj.toString();
 		}
+
+		// 注册PluginService
+		PluginService pluginService = new PluginServiceImpl(context);
+		context.registerService(PluginService.class.getName(), pluginService,
+				null);
 		// 注册DispatcherServlet对象为Service
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
 		context.registerService(DispatcherServlet.class.getName(),

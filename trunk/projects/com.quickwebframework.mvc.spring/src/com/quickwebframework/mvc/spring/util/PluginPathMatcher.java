@@ -1,4 +1,4 @@
-package com.quickwebframework.util;
+package com.quickwebframework.mvc.spring.util;
 
 import java.util.Comparator;
 import java.util.HashMap;

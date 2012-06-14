@@ -1,11 +1,10 @@
-package com.quickwebframework.service;
+package com.quickwebframework.entity;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
 
-import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.impl.DefaultLogImpl;
 
 public class LogFactory {

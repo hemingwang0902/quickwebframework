@@ -1,14 +1,27 @@
 package com.quickwebframework.service;
 
-import com.quickwebframework.entity.ViewRender;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
- * 视图渲染器服务接口
+ * 视图渲染服务
  * 
  * @author aaa
  * 
  */
 public interface ViewRenderService {
-	// 得到视图渲染器
-	public ViewRender getViewRender();
+	/**
+	 * 渲染视图
+	 * 
+	 * @param bundleName
+	 *            插件名称
+	 * @param viewName
+	 *            视图名称
+	 * @param request
+	 *            请求对象
+	 * @param response
+	 *            响应对象
+	 */
+	public void renderView(String bundleName, String viewName,
+			HttpServletRequest request, HttpServletResponse response);
 }

@@ -1,4 +1,4 @@
-package com.quickwebframework.util;
+package com.quickwebframework.mvc.spring.util;
 
 import javax.servlet.http.HttpServletRequest;
 

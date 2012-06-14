@@ -3,12 +3,12 @@ package com.quickwebframework.service;
 import org.osgi.framework.Bundle;
 
 /**
- * 控制器服务，由其他插件注册
+ * WEB应用服务，开发的插件如果有WEB功能，则应注册此服务
  * 
  * @author aaa
  * 
  */
-public interface PluginService {
+public interface WebAppService {
 	/**
 	 * 得到Bundle对象
 	 * 

@@ -17,13 +17,10 @@ public interface HandlerExceptionResolver {
 	 *            请求对象
 	 * @param response
 	 *            响应对象
-	 * @param handler
-	 *            发生异常的处理器
 	 * @param ex
 	 *            异常
 	 * @return
 	 */
 	public String resolveException(HttpServletRequest request,
-			HttpServletResponse response, Object handler, Exception ex)
-			throws Exception;
+			HttpServletResponse response, Exception ex) throws Exception;
 }

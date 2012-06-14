@@ -7,7 +7,7 @@ import java.io.Reader;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
-import com.quickwebframework.service.PluginService;
+import com.quickwebframework.service.WebAppService;
 
 import freemarker.cache.TemplateLoader;
 
@@ -58,14 +58,14 @@ public class PluginTemplateLoader implements TemplateLoader {
 		// 对视图名称进行处理(添加前后缀)
 		path = viewNamePrefix + path + viewNameSuffix;
 
-		PluginService pluginService = null;
+		WebAppService pluginService = null;
 		try {
 			ServiceReference[] serviceReferences = bundleContext
-					.getServiceReferences(PluginService.class.getName(), null);
+					.getServiceReferences(WebAppService.class.getName(), null);
 			for (ServiceReference serviceReference : serviceReferences) {
 				if (pluginName.equals(serviceReference.getBundle()
 						.getSymbolicName())) {
-					pluginService = (PluginService) bundleContext
+					pluginService = (WebAppService) bundleContext
 							.getService(serviceReference);
 					break;
 				}
@@ -118,12 +118,12 @@ public class PluginTemplateLoader implements TemplateLoader {
 	}
 
 	private static class PluginTemplateSource {
-		private final PluginService controllerService;
+		private final WebAppService controllerService;
 		private final String path;
 		private final long lastModified;
 		private final String pluginNameAndPathSplitString;
 
-		public PluginTemplateSource(PluginService controllerService,
+		public PluginTemplateSource(WebAppService controllerService,
 				String path, long lastModified,
 				String pluginNameAndPathSplitString) {
 			this.controllerService = controllerService;

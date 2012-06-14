@@ -2,15 +2,17 @@ package com.quickwebframework.viewrender.freemarker;
 
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.osgi.framework.BundleContext;
 
-import com.quickwebframework.entity.ViewRender;
 import com.quickwebframework.service.ViewRenderService;
 
 import freemarker.template.Configuration;
 
 public class ViewRenderServiceImpl implements ViewRenderService {
-	private ViewRender viewRender;
+	private FreemarkerViewRender viewRender;
 
 	public ViewRenderServiceImpl(BundleContext bundleContext,
 			Properties freeMarkerProp, Properties viewRenderProp) {
@@ -53,7 +55,9 @@ public class ViewRenderServiceImpl implements ViewRenderService {
 	}
 
 	@Override
-	public ViewRender getViewRender() {
-		return viewRender;
+	public void renderView(String bundleName, String viewName,
+			HttpServletRequest request, HttpServletResponse response) {
+		viewRender.renderView(bundleName, viewName, request, response);
 	}
+
 }

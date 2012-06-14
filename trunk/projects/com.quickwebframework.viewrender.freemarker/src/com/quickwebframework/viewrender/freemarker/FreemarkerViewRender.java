@@ -7,11 +7,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.quickwebframework.entity.ViewRender;
-
 import freemarker.template.Configuration;
 
-public class FreemarkerViewRender implements ViewRender {
+public class FreemarkerViewRender {
 
 	// Freemarker配置
 	private Configuration configuration;
@@ -26,7 +24,6 @@ public class FreemarkerViewRender implements ViewRender {
 		configuration.setTemplateLoader(pluginTemplateLoader);
 	}
 
-	@Override
 	public void renderView(String bundleName, String viewName,
 			HttpServletRequest request, HttpServletResponse response) {
 
