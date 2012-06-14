@@ -7,7 +7,6 @@ Bundle-Activator: com.quickwebframework.Activator
 Bundle-Vendor: aaaSoft
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- javax.servlet_3.0.0.jar,
  org.aopalliance_1.0.0.v200905130917.jar,
  org.apache.commons.logging_1.1.1.v201005080502.jar,
  org.springframework.aop_3.0.5.RELEASE.jar,
@@ -19,7 +18,8 @@ Bundle-ClassPath: .,
  org.springframework.jdbc_3.0.5.RELEASE.jar,
  org.springframework.transaction_3.0.5.RELEASE.jar,
  org.springframework.web_3.0.5.RELEASE.jar,
- org.springframework.web.servlet_3.0.5.RELEASE.jar
+ org.springframework.web.servlet_3.0.5.RELEASE.jar,
+ javax.servlet_2.5.0.jar
 Import-Package: javax.sql,
  javax.xml.transform,
  javax.xml.transform.dom,
@@ -32,10 +32,8 @@ Import-Package: javax.sql,
 Export-Package: com.quickwebframework.entity;uses:="javax.servlet.http",
  com.quickwebframework.service;uses:="javax.sql,com.quickwebframework.entity,org.osgi.framework",
  com.quickwebframework.util,
- javax.servlet;version="3.0.0";uses:="javax.servlet.descriptor,javax.servlet.annotation",
- javax.servlet.annotation;version="3.0.0";uses:="javax.servlet",
- javax.servlet.descriptor;version="3.0.0",
- javax.servlet.http;version="3.0.0";uses:="javax.servlet",
+ javax.servlet;version="2.5.0";uses:="javax.servlet.descriptor,javax.servlet.annotation", 
+ javax.servlet.http;version="2.5.0";uses:="javax.servlet",
  org.springframework.aop;version="3.0.5";uses:="org.springframework.core,org.aopalliance.intercept,org.aopalliance.aop",
  org.springframework.aop.aspectj;version="3.0.5";
   uses:="org.springframework.aop.support,

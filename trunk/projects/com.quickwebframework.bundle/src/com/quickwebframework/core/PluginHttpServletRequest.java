@@ -4,24 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
 
 @SuppressWarnings("unchecked")
 public class PluginHttpServletRequest extends MapperObject implements
@@ -300,67 +291,5 @@ public class PluginHttpServletRequest extends MapperObject implements
 	@Override
 	public boolean isUserInRole(String arg0) {
 		return (Boolean) invokeOrginObjectMethod(arg0);
-	}
-
-	@Override
-	public AsyncContext getAsyncContext() {
-		return (AsyncContext) invokeOrginObjectMethod();
-	}
-
-	@Override
-	public DispatcherType getDispatcherType() {
-		return (DispatcherType) invokeOrginObjectMethod();
-	}
-
-	@Override
-	public ServletContext getServletContext() {
-		return new PluginServletContext(invokeOrginObjectMethod());
-	}
-
-	@Override
-	public boolean isAsyncStarted() {
-		return (Boolean) invokeOrginObjectMethod();
-	}
-
-	@Override
-	public boolean isAsyncSupported() {
-		return (Boolean) invokeOrginObjectMethod();
-	}
-
-	@Override
-	public AsyncContext startAsync() throws IllegalStateException {
-		return (AsyncContext) invokeOrginObjectMethod();
-	}
-
-	@Override
-	public AsyncContext startAsync(ServletRequest arg0, ServletResponse arg1)
-			throws IllegalStateException {
-		return (AsyncContext) invokeOrginObjectMethod(arg0, arg1);
-	}
-
-	@Override
-	public boolean authenticate(HttpServletResponse arg0) throws IOException,
-			ServletException {
-		return (Boolean) invokeOrginObjectMethod(arg0);
-	}
-
-	@Override
-	public Part getPart(String arg0) throws IOException, ServletException {
-		return (Part) invokeOrginObjectMethod(arg0);
-	}
-
-	@Override
-	public Collection<Part> getParts() throws IOException, ServletException {
-		return (Collection<Part>) invokeOrginObjectMethod();
-	}
-
-	@Override
-	public void login(String arg0, String arg1) throws ServletException {
-		invokeOrginObjectMethod(arg0, arg1);
-	}
-
-	@Override
-	public void logout() throws ServletException {
-		invokeOrginObjectMethod();
 	}
 }

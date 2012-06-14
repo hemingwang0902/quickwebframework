@@ -407,7 +407,7 @@ public class DispatcherServlet {
 
 				// 如果视图不为空
 				if (viewName != null) {
-					renderView(req.getServletContext(),
+					renderView(req.getSession().getServletContext(),
 							pluginControllerInfo.getControllerService(),
 							viewName, req, rep);
 				}

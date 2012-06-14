@@ -2,14 +2,12 @@ package com.quickwebframework.core;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings("unchecked")
 public class PluginHttpServletResponse extends MapperObject implements
 		HttpServletResponse {
 
@@ -176,29 +174,4 @@ public class PluginHttpServletResponse extends MapperObject implements
 	public void setStatus(int arg0, String arg1) {
 		invokeOrginObjectMethod(arg0, arg1);
 	}
-
-	// =====================
-	// Servelt 3.0新增方法
-	// =====================
-
-	@Override
-	public String getHeader(String arg0) {
-		return (String) invokeOrginObjectMethod(arg0);
-	}
-
-	@Override
-	public Collection<String> getHeaderNames() {
-		return (Collection<String>) invokeOrginObjectMethod();
-	}
-
-	@Override
-	public Collection<String> getHeaders(String arg0) {
-		return (Collection<String>) invokeOrginObjectMethod(arg0);
-	}
-
-	@Override
-	public int getStatus() {
-		return (Integer) invokeOrginObjectMethod();
-	}
-
 }

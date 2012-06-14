@@ -6,7 +6,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 
-@SuppressWarnings({ "unchecked", "deprecation", "rawtypes" })
 public class PluginHttpSession extends MapperObject implements HttpSession {
 
 	public PluginHttpSession(Object orginObject) {
@@ -19,8 +18,8 @@ public class PluginHttpSession extends MapperObject implements HttpSession {
 	}
 
 	@Override
-	public Enumeration getAttributeNames() {
-		return (Enumeration) invokeOrginObjectMethod();
+	public Enumeration<?> getAttributeNames() {
+		return (Enumeration<?>) invokeOrginObjectMethod();
 	}
 
 	@Override
