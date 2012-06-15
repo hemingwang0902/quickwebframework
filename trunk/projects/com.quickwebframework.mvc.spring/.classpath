@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="org.springframework.transaction-3.1.1.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="org.aopalliance_1.0.0.v200905130917.jar"/>
 	<classpathentry exported="true" kind="lib" path="org.apache.commons.logging_1.1.1.v201005080502.jar"/>
 	<classpathentry exported="true" kind="lib" path="org.springframework.aop_3.0.5.RELEASE.jar"/>
