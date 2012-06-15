@@ -97,10 +97,9 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		// 初始化AnnotationConfigApplicationContext
 		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
 
-		// 复制Spring需要的资源文件
-		// 比如java/lang/Thread.class.file到临时目录/java/lang/Thread.class
 		try {
-			/*
+			// 复制Spring需要的资源文件
+			// 比如java/lang/Thread.class.file到临时目录/java/lang/Thread.class
 			String classFilePath = "/java/lang/Thread.class";
 			log.info("selfBundle.getSymbolicName:"
 					+ selfBundle.getSymbolicName());
@@ -113,11 +112,11 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 			IoUtil.copyStream(inputStream, outputStream);
 			outputStream.close();
 			inputStream.close();
-			 */
-			
+
 			// 开始Spring扫描
-			FolderClassLoader folderClassLoader = new FolderClassLoader( pluginControllerInfo.getWebAppService().getClass().getClassLoader(),
-					tmpFolderPath);
+			FolderClassLoader folderClassLoader = new FolderClassLoader(
+					pluginControllerInfo.getWebAppService().getClass()
+							.getClassLoader(), tmpFolderPath);
 			applicationContext.setClassLoader(folderClassLoader);
 			applicationContext.scan("*");
 			applicationContext.refresh();

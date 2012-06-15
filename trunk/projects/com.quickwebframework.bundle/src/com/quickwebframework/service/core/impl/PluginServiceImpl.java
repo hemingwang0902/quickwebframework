@@ -47,15 +47,16 @@ public class PluginServiceImpl implements PluginService {
 		bundleExtInfoMap = new HashMap<Bundle, BundleExtInfo>();
 		filterList = new ArrayList<Filter>();
 
-		this.bundleContext.removeBundleListener(new BundleListener() {
+		this.bundleContext.addBundleListener(new BundleListener() {
 
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
 				int eventType = arg0.getType();
 				// 如果插件的状态不是正在停止，则返回
-				if (eventType != BundleEvent.STOPPING)
+				if (!(eventType == BundleEvent.STOPPED || eventType == BundleEvent.STOPPING))
 					return;
 				Bundle bundle = arg0.getBundle();
+				String bundleName = bundle.getSymbolicName();
 				// 如果bundleExtInfoMap中没有这个Bundle，则返回
 				if (!bundleExtInfoMap.containsKey(bundle))
 					return;
@@ -64,11 +65,26 @@ public class PluginServiceImpl implements PluginService {
 
 				// 停止此插件的线程
 				for (Thread thread : bundleExtInfo.threadList) {
-					thread.interrupt();
+					String threadName = String.format(
+							"[Thread Id:%s ,Name:%s ,Class:%s ,Hashcode:%s]",
+							thread.getId(), thread.getName(), thread.getClass()
+									.getName(), Integer.toHexString(thread
+									.hashCode()));
+					try {
+						thread.interrupt();
+						log.info(String.format("已成功向插件[%s]的线程[%s]发送中断命令！",
+								bundleName, threadName));
+					} catch (Exception ex) {
+						log.error(String.format("向插件[%s]的线程[%s]发送中断命令失败！",
+								bundleName, threadName));
+						ex.printStackTrace();
+					}
 				}
 				// 移除此插件的过滤器
 				for (Filter filter : bundleExtInfo.fileterList) {
 					filterList.remove(filter);
+					log.info(String.format("已成功移除插件[%s]的过滤器[%s]！", bundleName,
+							filter));
 				}
 				// 从bundleExtInfoMap中移除此Bundle
 				bundleExtInfoMap.remove(bundle);
