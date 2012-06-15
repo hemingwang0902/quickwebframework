@@ -19,36 +19,16 @@ public class BundleAnnotationConfigApplicationContext extends
 		this.bundle = bundle;
 	}
 
-	public static List<String> getAllClassFilePathListInBundle(Bundle bundle,
-			String startPath) {
-		List<String> rtnList = new ArrayList<String>();
-		Enumeration<?> urlEnum = bundle.getEntryPaths(startPath);
-		while (urlEnum.hasMoreElements()) {
-			String url = (String) urlEnum.nextElement();
-
-			// 如果是class文件
-			if (url.endsWith(".class")) {
-				rtnList.add(url);
-			}
-			// 如果是目录
-			if (url.endsWith("/")) {
-				rtnList.addAll(getAllClassFilePathListInBundle(bundle, url));
-			}
-		}
-		return rtnList;
-	}
-
 	@Override
 	public Resource[] getResources(String path) {
 		List<Resource> resourceList = new ArrayList<Resource>();
 
 		// 如果是搜索所有包的所有class文件
 		if ("classpath*:*/**/*.class".contains(path)) {
-			List<String> filePathList = getAllClassFilePathListInBundle(bundle,
-					"");
-			for (String filePath : filePathList) {
-				URL url = bundle.getEntry(filePath);
-				resourceList.add(new UrlResource(url));
+			// 搜索Class文件
+			Enumeration<?> enume = bundle.findEntries("", "*.class", true);
+			while (enume.hasMoreElements()) {
+				resourceList.add(new UrlResource((URL) enume.nextElement()));
 			}
 			return resourceList.toArray(new Resource[0]);
 		} else {

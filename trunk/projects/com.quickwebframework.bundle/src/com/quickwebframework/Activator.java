@@ -24,6 +24,8 @@ public class Activator implements BundleActivator {
 		return context;
 	}
 
+	private PluginService pluginService;
+
 	private ServletContext getServletContext() {
 		ServiceReference servletContextServiceReference = null;
 		try {
@@ -67,7 +69,7 @@ public class Activator implements BundleActivator {
 		}
 
 		// 注册PluginService
-		PluginService pluginService = new PluginServiceImpl(context);
+		pluginService = new PluginServiceImpl(context);
 		context.registerService(PluginService.class.getName(), pluginService,
 				null);
 		// 注册DispatcherServlet对象为Service
@@ -87,6 +89,7 @@ public class Activator implements BundleActivator {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		log.info("Stoping [com.quickwebframework.bundle]...");
+		pluginService.whenBundleStoped(context.getBundle());
 		Activator.context = null;
 		log.info("Stoped [com.quickwebframework.bundle].");
 	}

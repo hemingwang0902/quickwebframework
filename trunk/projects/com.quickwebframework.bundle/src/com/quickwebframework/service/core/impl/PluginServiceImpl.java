@@ -11,6 +11,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
 
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
@@ -19,6 +21,7 @@ import com.quickwebframework.service.core.PluginService;
 public class PluginServiceImpl implements PluginService {
 	private static Log log = LogFactory.getLog(PluginServiceImpl.class);
 
+	private Bundle selfBundle;
 	private BundleContext bundleContext;
 	private Map<Bundle, BundleExtInfo> bundleExtInfoMap;
 
@@ -41,12 +44,59 @@ public class PluginServiceImpl implements PluginService {
 		}
 	}
 
+	// 当插件停止时
+	@Override
+	public void whenBundleStoped(Bundle bundle) {
+
+		// 如果停止的是框架插件
+		if (bundle.equals(selfBundle)) {
+			for (Bundle key : bundleExtInfoMap.keySet()) {
+				whenBundleStoped(key);
+			}
+		} else {
+			String bundleName = bundle.getSymbolicName();
+			// 如果bundleExtInfoMap中没有这个Bundle，则返回
+			if (!bundleExtInfoMap.containsKey(bundle))
+				return;
+
+			BundleExtInfo bundleExtInfo = getOrCreateBundleExtInfo(bundle);
+
+			// 停止此插件的线程
+			for (Thread thread : bundleExtInfo.threadList) {
+				String threadName = String.format(
+						"[Thread Id:%s ,Name:%s ,Class:%s ,Hashcode:%s]",
+						thread.getId(), thread.getName(), thread.getClass()
+								.getName(), Integer.toHexString(thread
+								.hashCode()));
+				try {
+					thread.interrupt();
+					log.info(String.format("已成功向插件[%s]的线程[%s]发送中断命令！",
+							bundleName, threadName));
+				} catch (Exception ex) {
+					log.error(String.format("向插件[%s]的线程[%s]发送中断命令失败！",
+							bundleName, threadName));
+					ex.printStackTrace();
+				}
+			}
+			// 移除此插件的过滤器
+			for (Filter filter : bundleExtInfo.fileterList) {
+				filterList.remove(filter);
+				log.info(String.format("已成功移除插件[%s]的过滤器[%s]！", bundleName,
+						filter));
+			}
+			// 从bundleExtInfoMap中移除此Bundle
+			bundleExtInfoMap.remove(bundle);
+		}
+	}
+
 	public PluginServiceImpl(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
+		this.selfBundle = bundleContext.getBundle();
 
 		bundleExtInfoMap = new HashMap<Bundle, BundleExtInfo>();
 		filterList = new ArrayList<Filter>();
 
+		// 添加OSGi插件监听器，当某插件停止时，停止此插件的线程，当com.quickwebframework.bundle插件停止时，停止所有线程
 		this.bundleContext.addBundleListener(new BundleListener() {
 
 			@Override
@@ -56,38 +106,7 @@ public class PluginServiceImpl implements PluginService {
 				if (!(eventType == BundleEvent.STOPPED || eventType == BundleEvent.STOPPING))
 					return;
 				Bundle bundle = arg0.getBundle();
-				String bundleName = bundle.getSymbolicName();
-				// 如果bundleExtInfoMap中没有这个Bundle，则返回
-				if (!bundleExtInfoMap.containsKey(bundle))
-					return;
-
-				BundleExtInfo bundleExtInfo = getOrCreateBundleExtInfo(bundle);
-
-				// 停止此插件的线程
-				for (Thread thread : bundleExtInfo.threadList) {
-					String threadName = String.format(
-							"[Thread Id:%s ,Name:%s ,Class:%s ,Hashcode:%s]",
-							thread.getId(), thread.getName(), thread.getClass()
-									.getName(), Integer.toHexString(thread
-									.hashCode()));
-					try {
-						thread.interrupt();
-						log.info(String.format("已成功向插件[%s]的线程[%s]发送中断命令！",
-								bundleName, threadName));
-					} catch (Exception ex) {
-						log.error(String.format("向插件[%s]的线程[%s]发送中断命令失败！",
-								bundleName, threadName));
-						ex.printStackTrace();
-					}
-				}
-				// 移除此插件的过滤器
-				for (Filter filter : bundleExtInfo.fileterList) {
-					filterList.remove(filter);
-					log.info(String.format("已成功移除插件[%s]的过滤器[%s]！", bundleName,
-							filter));
-				}
-				// 从bundleExtInfoMap中移除此Bundle
-				bundleExtInfoMap.remove(bundle);
+				whenBundleStoped(bundle);
 			}
 		});
 	}

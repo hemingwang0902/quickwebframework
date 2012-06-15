@@ -1,6 +1,7 @@
 package com.quickwebframework.service.core;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.Filter;
 
@@ -39,4 +40,11 @@ public interface PluginService {
 	 * @return
 	 */
 	public List<Filter> getFilterList();
+
+	/**
+	 * 当插件停止时执行的操作
+	 * 
+	 * @return
+	 */
+	public void whenBundleStoped(Bundle bundle);
 }

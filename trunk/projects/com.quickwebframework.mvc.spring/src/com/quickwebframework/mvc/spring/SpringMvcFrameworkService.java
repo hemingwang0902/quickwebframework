@@ -37,7 +37,6 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 
 	// Bundle上下文
 	private BundleContext bundleContext;
-	private Bundle selfBundle;
 	// 插件名与ControllerService对应Map
 	private Map<String, PluginControllerInfo> bundleNamePluginControllerInfoMap = new HashMap<String, PluginControllerInfo>();
 
@@ -57,7 +56,6 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 
 	public SpringMvcFrameworkService(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
-		selfBundle = bundleContext.getBundle();
 
 		// 刷新插件服务(注册过滤器，线程等)
 		refreshPluginService();

@@ -75,6 +75,26 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 		BundleContext bundleContext = QuickWebFrameworkLoaderListener
 				.getBundleContext();
 
+		if (bundleContext == null) {
+			System.out
+					.println("BundleContext is null,Current OSGi Framework's state is "
+							+ QuickWebFrameworkLoaderListener.getFramework()
+									.getState()
+							+ ",now trying to start OSGi Framework!"
+							+ "\n\nPS:UNINSTALLED = 1"
+							+ "\nINSTALLED = 2"
+							+ "\nRESOLVED = 4"
+							+ "\nSTARTING = 8"
+							+ "\nSTOPPING = 16" + "\nACTIVE = 32");
+			try {
+				QuickWebFrameworkLoaderListener.getFramework().start();
+				bundleContext = QuickWebFrameworkLoaderListener
+						.getBundleContext();
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+
 		Bundle[] bundles = bundleContext.getBundles();
 
 		StringBuilder sbPart0 = new StringBuilder();
