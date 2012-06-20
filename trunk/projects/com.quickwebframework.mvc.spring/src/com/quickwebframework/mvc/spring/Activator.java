@@ -3,6 +3,7 @@ package com.quickwebframework.mvc.spring;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import com.quickwebframework.service.DatabaseService;
 import com.quickwebframework.service.MvcFrameworkService;
 
 public class Activator implements BundleActivator {
@@ -28,6 +29,12 @@ public class Activator implements BundleActivator {
 				bundleContext);
 		bundleContext.registerService(MvcFrameworkService.class.getName(),
 				mvcFrameworkService, null);
+
+		// 注册为服务
+		TransactionDatabaseService transactionDatabaseService = new TransactionDatabaseService(
+				bundleContext);
+		bundleContext.registerService(DatabaseService.class.getName(),
+				transactionDatabaseService, null);
 	}
 
 	/*
