@@ -333,8 +333,8 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 
 					Bundle bundle = null;
 					for (Bundle tmpBundle : bundleContext.getBundles()) {
-						if (tmpBundle.getSymbolicName().equals(
-								bundleSymbolicName)) {
+						if (bundleSymbolicName.equals(tmpBundle
+								.getSymbolicName())) {
 							bundle = tmpBundle;
 							break;
 						}
