@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
@@ -20,12 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 import com.quickwebframework.web.util.IoUtil;
+import com.quickwebframework.web.fileupload.memory.MemoryFileItemFactory;
 import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 
 public class PluginManageServlet extends javax.servlet.http.HttpServlet {
@@ -218,7 +219,8 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 
 		// 如果Request是Multipart
 		if (isMultipart) {
-			FileItemFactory factory = new DiskFileItemFactory();
+			FileItemFactory factory = new MemoryFileItemFactory();
+
 			ServletFileUpload upload = new ServletFileUpload(factory);
 			List<?> items;
 			try {
@@ -266,23 +268,9 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 				}
 				FileItem pluginFile = formFileMap.get("pluginFile");
 
-				// 得到临时目录路径
-				String tmpFolderPath = System.getProperty("java.io.tmpdir");
-				// 插件随机文件路径
-				String randomFilePath = tmpFolderPath + File.separator
-						+ "pluginpkg_cache" + UUID.randomUUID().toString()
-						+ ".tmp";
-
-				File randomFile = new File(randomFilePath);
 				try {
-					pluginFile.write(randomFile);
-				} catch (Exception ex) {
-					throw new RuntimeException(ex);
-				}
-
-				try {
-					Bundle bundle = bundleContext.installBundle(randomFile
-							.toURI().toURL().toString());
+					Bundle bundle = bundleContext.installBundle(
+							pluginFile.getName(), pluginFile.getInputStream());
 					bundle.start();
 
 				} catch (Exception e) {
@@ -290,8 +278,6 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 					pushMessage(request, "安装插件时出错异常，" + e);
 					doGet(request, response);
 					return;
-				} finally {
-					randomFile.delete();
 				}
 			} else if ("updatePlugin".equals(mod)) {
 				if (!formFileMap.containsKey("pluginFile")) {
@@ -301,36 +287,31 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 				}
 				FileItem pluginFile = formFileMap.get("pluginFile");
 
-				// 得到临时目录路径
-				String tmpFolderPath = System.getProperty("java.io.tmpdir");
-				// 插件随机文件路径
-				String randomFilePath = tmpFolderPath + File.separator
-						+ "pluginpkg_cache" + UUID.randomUUID().toString()
-						+ ".tmp";
-
-				File randomFile = new File(randomFilePath);
-				try {
-					pluginFile.write(randomFile);
-				} catch (Exception ex) {
-					pushMessage(request, "上传文件时出错：" + ex);
-					doGet(request, response);
-					return;
-				}
 				try {
 					// 插件的符号名称
 					String bundleSymbolicName;
 
-					ZipFile pluginZipFile = null;
+					ZipInputStream zis = null;
 					try {
-						pluginZipFile = new ZipFile(randomFile);
-						ZipEntry manifestZipEntry = pluginZipFile
-								.getEntry("META-INF/MANIFEST.MF");
+						zis = new ZipInputStream(pluginFile.getInputStream());
+
+						ZipEntry manifestZipEntry = null;
+						while (true) {
+							ZipEntry zipEntry = zis.getNextEntry();
+							if (zipEntry == null)
+								break;
+							String zipEntryName = zipEntry.getName();
+							if (zipEntryName.equals("META-INF/MANIFEST.MF")) {
+								manifestZipEntry = zipEntry;
+								break;
+							}
+						}
 						if (manifestZipEntry == null) {
 							throw new RuntimeException(
 									"未找到META-INF/MANIFEST.MF文件");
 						}
-						InputStream manifestInputStream = pluginZipFile
-								.getInputStream(manifestZipEntry);
+
+						InputStream manifestInputStream = zis;
 
 						Properties manifestProp = new Properties();
 						manifestProp.load(manifestInputStream);
@@ -343,18 +324,12 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 						}
 					} catch (Exception ex) {
 						pushMessage(request, "读取清单文件时出错，" + ex);
-						if (pluginZipFile != null) {
-							try {
-								pluginZipFile.close();
-							} catch (Exception ex2) {
-							}
-						}
-						randomFile.delete();
 						doGet(request, response);
 						return;
 					}
-					// 关闭ZipFile
-					pluginZipFile.close();
+					if (zis != null) {
+						zis.close();
+					}
 
 					Bundle bundle = null;
 					for (Bundle tmpBundle : bundleContext.getBundles()) {
@@ -370,10 +345,7 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 						doGet(request, response);
 						return;
 					}
-
-					InputStream inputStream = new FileInputStream(randomFile);
-					bundle.update(inputStream);
-					inputStream.close();
+					bundle.update(pluginFile.getInputStream());
 				} catch (Exception e) {
 					e.printStackTrace();
 					pushMessage(request, "更新插件时异常，" + e);
@@ -385,7 +357,6 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 					doGet(request, response);
 					return;
 				} finally {
-					randomFile.delete();
 				}
 			}
 		} else {
