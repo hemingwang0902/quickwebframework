@@ -82,7 +82,11 @@ public class BundleAutoManageThread extends Thread {
 						if (preBundle == null) {
 							log.info("自动安装新插件：" + bundleName + "  "
 									+ bundleVersion);
-							bundleContext.installBundle(file.getName());
+							FileInputStream fileInputStream = new FileInputStream(
+									file);
+							bundleContext.installBundle(file.getName(),
+									fileInputStream);
+							fileInputStream.close();
 						}// 否则更新
 						else {
 							if (bundleVersion.compareTo(preBundle.getVersion()) > 0) {
