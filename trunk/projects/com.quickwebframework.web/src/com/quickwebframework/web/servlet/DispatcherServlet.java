@@ -31,19 +31,9 @@ public class DispatcherServlet extends HttpServlet {
 
 	@Override
 	public void init() {
-		ServletContext servletContext = getServletContext();
-		Properties quickWebFrameworkProperties = QuickWebFrameworkLoaderListener
-				.getQuickWebFrameworkProperties();
-
-		// 初始化插件视图Servlet
-		pluginViewDispatcherServlet = PluginViewDispatcherServlet.initServlet(
-				servletContext, quickWebFrameworkProperties);
-		// 初始化插件资源Servlet
-		pluginResourceDispatcherServlet = PluginResourceDispatcherServlet
-				.initServlet(servletContext, quickWebFrameworkProperties);
-		// 初始化插件管理Servlet
-		pluginManageServlet = PluginManageServlet.initServlet(servletContext,
-				quickWebFrameworkProperties);
+		pluginViewDispatcherServlet = QuickWebFrameworkLoaderListener.pluginViewDispatcherServlet;
+		pluginResourceDispatcherServlet = QuickWebFrameworkLoaderListener.pluginResourceDispatcherServlet;
+		pluginManageServlet = QuickWebFrameworkLoaderListener.pluginManageServlet;
 	}
 
 	@Override

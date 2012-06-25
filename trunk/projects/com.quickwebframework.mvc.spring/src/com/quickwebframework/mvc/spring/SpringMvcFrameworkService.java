@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +17,8 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -34,6 +38,7 @@ import com.quickwebframework.service.core.PluginService;
 public class SpringMvcFrameworkService implements MvcFrameworkService {
 
 	private static Log log = LogFactory.getLog(SpringMvcFrameworkService.class);
+	private PathMatcher pathMatcher = new AntPathMatcher();
 
 	// Bundle上下文
 	private BundleContext bundleContext;
@@ -214,15 +219,23 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		String mappingUrl = "/" + bundleName + "/" + methodName;
 
 		// 如果方法名称为null或Map中不存在此方法名称
-		if (methodName == null
-				|| !pluginControllerInfo.getMappingUrlHandlerMap().containsKey(
-						mappingUrl)) {
+		if (methodName == null)
 			return null;
+
+		// 正则匹配得到处理器对象
+		Object handler = null;
+		for (String urlTemplate : pluginControllerInfo
+				.getMappingUrlHandlerMap().keySet()) {
+			if (pathMatcher.match(urlTemplate, mappingUrl)) {
+				handler = pluginControllerInfo.getMappingUrlHandlerMap().get(
+						urlTemplate);
+				break;
+			}
 		}
 
-		// 得到处理器对象
-		Object handler = pluginControllerInfo.getMappingUrlHandlerMap().get(
-				mappingUrl);
+		if (handler == null)
+			return null;
+
 		// 得到该处理器对应的适配器
 		AnnotationMethodHandlerAdapter adapter = pluginControllerInfo
 				.getHandlerAdapterMap().get(handler);
@@ -230,6 +243,9 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		try {
 			// 执行处理，得到模型与视图
 			ModelAndView mav = adapter.handle(request, response, handler);
+			if (mav == null) {
+				return null;
+			}
 			MvcModelAndView mmav = new MvcModelAndView(mav.getViewName(),
 					mav.getModel(), pluginControllerInfo.getWebAppService());
 			return mmav;

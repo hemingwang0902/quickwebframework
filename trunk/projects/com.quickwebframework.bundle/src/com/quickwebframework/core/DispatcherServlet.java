@@ -207,7 +207,6 @@ public class DispatcherServlet {
 				MvcModelAndView mav = mvcFrameworkService.handle(req, rep,
 						bundleName, methodName);
 				if (mav == null) {
-					handleUrlNotFound(req, rep);
 					return;
 				}
 				String viewName = mav.getViewName();

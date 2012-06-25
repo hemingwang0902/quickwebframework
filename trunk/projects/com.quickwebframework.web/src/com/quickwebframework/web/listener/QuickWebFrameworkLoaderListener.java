@@ -15,6 +15,7 @@ import java.util.Properties;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -26,6 +27,10 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 
+import com.quickwebframework.web.servlet.PluginManageServlet;
+import com.quickwebframework.web.servlet.PluginResourceDispatcherServlet;
+import com.quickwebframework.web.servlet.PluginViewDispatcherServlet;
+
 public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 
 	public final static String CONST_DISPATCHER_SERVLET_CLASS_NAME = "com.quickwebframework.core.DispatcherServlet";
@@ -36,10 +41,6 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 
 	// QuickWebFramework的配置
 	private static Properties quickWebFrameworkProperties;
-
-	public static Properties getQuickWebFrameworkProperties() {
-		return quickWebFrameworkProperties;
-	}
 
 	private static Framework framework;
 
@@ -82,6 +83,11 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		dispatcherServletObject = getBundleContext().getService(
 				serviceReference);
 	}
+	
+	//相应的Servlet
+	public static HttpServlet pluginViewDispatcherServlet;
+	public static HttpServlet pluginResourceDispatcherServlet;
+	public static HttpServlet pluginManageServlet;
 
 	public void contextInitialized(ServletContextEvent arg0) {
 		ServletContext servletContext = arg0.getServletContext();
@@ -175,6 +181,16 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 			// Framework初始化
 			framework.init();
 
+			// 初始化插件视图Servlet
+			pluginViewDispatcherServlet = PluginViewDispatcherServlet.initServlet(
+					servletContext, quickWebFrameworkProperties);
+			// 初始化插件资源Servlet
+			pluginResourceDispatcherServlet = PluginResourceDispatcherServlet
+					.initServlet(servletContext, quickWebFrameworkProperties);
+			// 初始化插件管理Servlet
+			pluginManageServlet = PluginManageServlet.initServlet(servletContext,
+					quickWebFrameworkProperties);
+			
 			// 将ServletContext注册为服务
 			getBundleContext().registerService(ServletContext.class.getName(),
 					servletContext, null);

@@ -134,14 +134,13 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 
 				// 如果映射的URL是类似于 /view/*
 				if (urlMappingStyle == 1) {
-					if (!requestURI.endsWith("/"))
-						requestURI = requestURI + "/";
 					String otherString = requestURI.substring(contextPath
 							.length() + mapping.length() - 1);
 					String[] tmpArray = otherString.split("/");
 					if (tmpArray.length >= 2) {
 						bundleName = tmpArray[0];
-						methodName = tmpArray[1];
+						methodName = otherString
+								.substring(bundleName.length() + 1);
 					}
 				}
 				// 否则应该是类似于/view，只需要直接取出参数
