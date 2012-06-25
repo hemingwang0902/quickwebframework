@@ -58,7 +58,6 @@ public class DatabaseServiceImpl implements DatabaseService {
 					.equals(tmpDataSource.getClass().getName())) {
 				break;
 			}
-			return;
 		}
 		dataSource = tmpDataSource;
 
