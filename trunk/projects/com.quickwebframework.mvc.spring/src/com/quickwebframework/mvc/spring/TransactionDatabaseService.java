@@ -3,7 +3,6 @@ package com.quickwebframework.mvc.spring;
 import javax.sql.DataSource;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;

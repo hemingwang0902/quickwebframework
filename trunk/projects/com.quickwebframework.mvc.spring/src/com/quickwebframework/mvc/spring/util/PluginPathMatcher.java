@@ -1,7 +1,6 @@
 package com.quickwebframework.mvc.spring.util;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.util.AntPathMatcher;

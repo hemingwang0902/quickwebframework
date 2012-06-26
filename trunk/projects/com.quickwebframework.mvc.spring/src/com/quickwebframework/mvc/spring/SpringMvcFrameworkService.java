@@ -4,9 +4,6 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -210,6 +207,11 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		// 如果插件名称为null或Map中不存在此插件名称
 		if (bundleName == null
 				|| !bundleNamePluginControllerInfoMap.containsKey(bundleName)) {
+			try {
+				response.sendError(404, "名称为[" + bundleName + "]的插件不存在！");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 			return null;
 		}
 
@@ -219,8 +221,14 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		String mappingUrl = "/" + bundleName + "/" + methodName;
 
 		// 如果方法名称为null或Map中不存在此方法名称
-		if (methodName == null)
+		if (methodName == null) {
+			try {
+				response.sendError(404, "未找到方法名称！");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 			return null;
+		}
 
 		// 正则匹配得到处理器对象
 		Object handler = null;
@@ -233,8 +241,15 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 			}
 		}
 
-		if (handler == null)
+		if (handler == null) {
+			try {
+				response.sendError(404, "未找到插件名称为[" + bundleName + "]，方法名称为["
+						+ methodName + "]的处理器！");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 			return null;
+		}
 
 		// 得到该处理器对应的适配器
 		AnnotationMethodHandlerAdapter adapter = pluginControllerInfo
