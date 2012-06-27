@@ -26,7 +26,6 @@ import com.quickwebframework.proxy.PluginHttpServletResponse;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.WebAppService;
 import com.quickwebframework.service.ViewRenderService;
-import com.quickwebframework.service.WebSettingService;
 import com.quickwebframework.service.core.PluginService;
 
 public class DispatcherServlet {
@@ -49,21 +48,6 @@ public class DispatcherServlet {
 			viewRenderService = (ViewRenderService) bundleContext
 					.getService(viewRenderServiceReference);
 		}
-	}
-
-	// WEB设置服务
-	private WebSettingService webSettingService;
-
-	// 刷新WEB设置服务
-	private void refreshWebSettingService() {
-		ServiceReference serviceReference = bundleContext
-				.getServiceReference(WebSettingService.class.getName());
-		if (serviceReference == null) {
-			webSettingService = null;
-			return;
-		}
-		webSettingService = (WebSettingService) bundleContext
-				.getService(serviceReference);
 	}
 
 	// MVC框架服务
@@ -111,8 +95,6 @@ public class DispatcherServlet {
 
 		// 刷新视图渲染器
 		refreshViewRenderService();
-		// 刷新WEB设置服务
-		refreshWebSettingService();
 		// 刷新MVC框架服务
 		refreshMvcFrameworkService();
 
@@ -139,9 +121,6 @@ public class DispatcherServlet {
 				if (serviceReferenceName.contains(ViewRenderService.class
 						.getName())) {
 					refreshViewRenderService();
-				} else if (serviceReferenceName
-						.contains(WebSettingService.class.getName())) {
-					refreshWebSettingService();
 				} else if (serviceReferenceName
 						.contains(MvcFrameworkService.class.getName())) {
 					refreshMvcFrameworkService();
@@ -184,12 +163,11 @@ public class DispatcherServlet {
 
 	private void handleUrlNotFound(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		if (webSettingService == null
-				|| webSettingService.getUrlNotFoundHandleServlet() == null)
+		if (FrameworkContext.getUrlNotFoundHandleServlet() == null)
 			response.sendError(404, "URL " + request.getRequestURI()
 					+ " not found!");
 		else
-			webSettingService.getUrlNotFoundHandleServlet().service(request,
+			FrameworkContext.getUrlNotFoundHandleServlet().service(request,
 					response);
 	}
 
@@ -218,11 +196,9 @@ public class DispatcherServlet {
 					renderView(mav, req, rep);
 				}
 			} catch (Exception ex) {
-				if (webSettingService == null)
-					throw ex;
-
-				HandlerExceptionResolver resolver = webSettingService
+				HandlerExceptionResolver resolver = FrameworkContext
 						.getHandlerExceptionResolver();
+
 				if (resolver == null)
 					throw ex;
 				// 解决处理器异常
@@ -243,14 +219,13 @@ public class DispatcherServlet {
 	public void serviceRootUrl(Object request, Object response)
 			throws IOException, ServletException {
 		HttpServletResponse rep = new PluginHttpServletResponse(response);
-		if (webSettingService == null
-				|| webSettingService.getRootUrlHandleServlet() == null) {
+		if (FrameworkContext.getRootUrlHandleServlet() == null) {
 			rep.getWriter()
 					.write("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!</body></html>");
 			return;
 		}
 		HttpServletRequest req = new PluginHttpServletRequest(response);
-		webSettingService.getRootUrlHandleServlet().service(req, rep);
+		FrameworkContext.getRootUrlHandleServlet().service(req, rep);
 	}
 
 	// 得到资源
