@@ -18,12 +18,9 @@ public class BundleAutoManageThread extends Thread {
 	public static Logger log = Logger.getLogger(BundleAutoManageThread.class
 			.getName());
 
-	private BundleContext bundleContext;
 	public String bundleFolderPath;
 
-	public BundleAutoManageThread(BundleContext bundleContext,
-			String bundleFolderPath) {
-		this.bundleContext = bundleContext;
+	public BundleAutoManageThread(String bundleFolderPath) {
 		this.bundleFolderPath = bundleFolderPath;
 	}
 
@@ -32,7 +29,11 @@ public class BundleAutoManageThread extends Thread {
 		try {
 			while (true) {
 				Thread.sleep(1000);
-
+				BundleContext bundleContext = Activator.getContext();
+				if (bundleContext == null) {
+					continue;
+				}
+				
 				File folderInfo = new File(bundleFolderPath);
 				// 如果目录不存在
 				if (!folderInfo.exists() || !folderInfo.isDirectory())
@@ -110,6 +111,8 @@ public class BundleAutoManageThread extends Thread {
 								&& newBundle.getState() != Bundle.STARTING) {
 							newBundle.start();
 						}
+					} catch (IllegalStateException ex) {
+						continue;
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					} finally {

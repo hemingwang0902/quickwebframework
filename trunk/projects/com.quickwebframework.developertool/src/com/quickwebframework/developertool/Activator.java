@@ -28,8 +28,8 @@ public class Activator implements BundleActivator {
 					"Can't found property[web.root.dir] in system properties!");
 		}
 		// 初始化管理线程
-		bundleAutoManageThread = new BundleAutoManageThread(bundleContext,
-				webRootDir + "/WEB-INF/plugins");
+		bundleAutoManageThread = new BundleAutoManageThread(webRootDir
+				+ "/WEB-INF/plugins");
 		bundleAutoManageThread.start();
 		System.out.println("插件自动管理线程已启动，监听插件目录："
 				+ bundleAutoManageThread.bundleFolderPath);
@@ -42,8 +42,7 @@ public class Activator implements BundleActivator {
 	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
-		bundleAutoManageThread.interrupt();
 		Activator.context = null;
+		bundleAutoManageThread.interrupt();
 	}
-
 }
