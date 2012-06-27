@@ -83,8 +83,8 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		dispatcherServletObject = getBundleContext().getService(
 				serviceReference);
 	}
-	
-	//相应的Servlet
+
+	// 相应的Servlet
 	public static HttpServlet pluginViewDispatcherServlet;
 	public static HttpServlet pluginResourceDispatcherServlet;
 	public static HttpServlet pluginManageServlet;
@@ -182,15 +182,15 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 			framework.init();
 
 			// 初始化插件视图Servlet
-			pluginViewDispatcherServlet = PluginViewDispatcherServlet.initServlet(
-					servletContext, quickWebFrameworkProperties);
+			pluginViewDispatcherServlet = PluginViewDispatcherServlet
+					.initServlet(servletContext, quickWebFrameworkProperties);
 			// 初始化插件资源Servlet
 			pluginResourceDispatcherServlet = PluginResourceDispatcherServlet
 					.initServlet(servletContext, quickWebFrameworkProperties);
 			// 初始化插件管理Servlet
-			pluginManageServlet = PluginManageServlet.initServlet(servletContext,
-					quickWebFrameworkProperties);
-			
+			pluginManageServlet = PluginManageServlet.initServlet(
+					servletContext, quickWebFrameworkProperties);
+
 			// 将ServletContext注册为服务
 			getBundleContext().registerService(ServletContext.class.getName(),
 					servletContext, null);
@@ -213,6 +213,8 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 							servletContext.getRealPath(filePath), dict);
 				}
 			}
+			// 设置WEB根目录到系统配置中
+			System.setProperty("web.root.dir", servletContext.getRealPath("/"));
 
 			// Bundle监听器
 			getBundleContext().addBundleListener(new BundleListener() {
