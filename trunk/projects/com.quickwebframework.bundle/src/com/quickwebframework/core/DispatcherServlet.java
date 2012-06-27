@@ -21,6 +21,8 @@ import com.quickwebframework.entity.HandlerExceptionResolver;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
+import com.quickwebframework.proxy.PluginHttpServletRequest;
+import com.quickwebframework.proxy.PluginHttpServletResponse;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.WebAppService;
 import com.quickwebframework.service.ViewRenderService;

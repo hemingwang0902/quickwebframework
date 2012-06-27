@@ -7,9 +7,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.core.DispatcherServlet;
-import com.quickwebframework.core.PluginServletContext;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
+import com.quickwebframework.proxy.PluginServletContext;
 import com.quickwebframework.service.core.PluginService;
 import com.quickwebframework.service.core.impl.PluginServiceImpl;
 import com.quickwebframework.util.BundleUtil;

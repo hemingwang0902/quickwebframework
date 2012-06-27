@@ -84,7 +84,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		try {
 			// 开始Spring扫描
 			ClassLoader bundleClassLoader = pluginControllerInfo
-					.getWebAppService().getClass().getClassLoader();
+					.getWebAppService().getClassLoader();
 			applicationContext.setClassLoader(bundleClassLoader);
 			applicationContext.scan("*");
 			applicationContext.refresh();

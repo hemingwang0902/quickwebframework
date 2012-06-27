@@ -1,4 +1,4 @@
-package com.quickwebframework.core;
+package com.quickwebframework.proxy;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

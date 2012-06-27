@@ -1,4 +1,4 @@
-package com.quickwebframework.core;
+package com.quickwebframework.proxy;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
