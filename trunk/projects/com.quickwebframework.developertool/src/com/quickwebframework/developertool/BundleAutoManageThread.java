@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -12,15 +13,13 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.LogFactory;
-
 public class BundleAutoManageThread extends Thread {
 
-	public static Log log = LogFactory.getLog(BundleAutoManageThread.class);
+	public static Logger log = Logger.getLogger(BundleAutoManageThread.class
+			.getName());
 
 	private BundleContext bundleContext;
-	private String bundleFolderPath;
+	public String bundleFolderPath;
 
 	public BundleAutoManageThread(BundleContext bundleContext,
 			String bundleFolderPath) {
@@ -78,14 +77,15 @@ public class BundleAutoManageThread extends Thread {
 							}
 						}
 
+						Bundle newBundle = null;
 						// 如果之前没有此插件，则安装
 						if (preBundle == null) {
 							log.info("自动安装新插件：" + bundleName + "  "
 									+ bundleVersion);
 							FileInputStream fileInputStream = new FileInputStream(
 									file);
-							bundleContext.installBundle(file.getName(),
-									fileInputStream);
+							newBundle = bundleContext.installBundle(
+									file.getName(), fileInputStream);
 							fileInputStream.close();
 						}// 否则更新
 						else {
@@ -96,6 +96,7 @@ public class BundleAutoManageThread extends Thread {
 								FileInputStream fileInputStream = new FileInputStream(
 										file);
 								preBundle.update(fileInputStream);
+								newBundle = preBundle;
 								fileInputStream.close();
 							} else {
 								log.info("插件：" + bundleName + "的版本"
@@ -103,14 +104,20 @@ public class BundleAutoManageThread extends Thread {
 										+ preBundle.getVersion() + "，没有应用更新！");
 							}
 						}
+						// 尝试启动插件
+						if (newBundle != null
+								&& newBundle.getState() != Bundle.ACTIVE
+								&& newBundle.getState() != Bundle.STARTING) {
+							newBundle.start();
+						}
 					} catch (Exception ex) {
-						log.error(ex);
+						ex.printStackTrace();
 					} finally {
 						if (zipFile != null) {
 							try {
 								zipFile.close();
 							} catch (Exception ex) {
-								log.error(ex);
+								ex.printStackTrace();
 							}
 						}
 					}
