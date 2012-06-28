@@ -2,9 +2,7 @@ package com.quickwebframework.web.servlet;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Properties;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

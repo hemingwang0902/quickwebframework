@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 
+@SuppressWarnings("deprecation")
 public class PluginHttpSession extends MapperObject implements HttpSession {
 
 	public PluginHttpSession(Object orginObject) {

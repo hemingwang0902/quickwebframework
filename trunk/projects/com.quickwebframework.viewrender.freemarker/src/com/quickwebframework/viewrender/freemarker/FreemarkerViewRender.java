@@ -36,10 +36,9 @@ public class FreemarkerViewRender {
 		}
 		// 准备数据
 		Map<String, Object> root = new HashMap<String, Object>();
-		Enumeration<String> attributeNameEnumeration = request
-				.getAttributeNames();
+		Enumeration<?> attributeNameEnumeration = request.getAttributeNames();
 		while (attributeNameEnumeration.hasMoreElements()) {
-			String key = attributeNameEnumeration.nextElement();
+			String key = attributeNameEnumeration.nextElement().toString();
 			root.put(key, request.getAttribute(key));
 		}
 		try {
