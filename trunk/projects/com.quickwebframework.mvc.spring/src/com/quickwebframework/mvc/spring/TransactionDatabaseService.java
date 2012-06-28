@@ -47,6 +47,9 @@ public class TransactionDatabaseService implements DatabaseService {
 		} catch (Exception e) {
 			return;
 		}
+		if (serviceReferences == null) {
+			return;
+		}
 		log.info("准备刷新com.quickwebframework.mvc.spring.TransactionDatabaseService中的数据源");
 		for (ServiceReference serviceReference : serviceReferences) {
 			com.quickwebframework.service.DatabaseService databaseService = (com.quickwebframework.service.DatabaseService) bundleContext
