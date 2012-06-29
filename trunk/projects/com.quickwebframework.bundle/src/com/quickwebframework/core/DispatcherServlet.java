@@ -26,14 +26,11 @@ import com.quickwebframework.proxy.PluginHttpServletResponse;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.WebAppService;
 import com.quickwebframework.service.ViewRenderService;
-import com.quickwebframework.service.core.PluginService;
 
 public class DispatcherServlet {
 	private static Log log = LogFactory.getLog(DispatcherServlet.class);
 	// Bundle上下文
 	private BundleContext bundleContext;
-	// 注册过滤器，线程的服务
-	private PluginService pluginService;
 
 	// 视图渲染服务
 	private ViewRenderService viewRenderService;
@@ -86,10 +83,8 @@ public class DispatcherServlet {
 		}
 	}
 
-	public DispatcherServlet(final BundleContext bundleContext,
-			PluginService pluginService) {
+	public DispatcherServlet(final BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
-		this.pluginService = pluginService;
 
 		final Bundle currentBundle = bundleContext.getBundle();
 
@@ -245,7 +240,7 @@ public class DispatcherServlet {
 		HttpServletResponse rep = new PluginHttpServletResponse(response);
 		BooleanFilterChain booleanFilterChain = new BooleanFilterChain();
 
-		for (Filter filter : pluginService.getFilterList()) {
+		for (Filter filter : FrameworkContext.getFilterList()) {
 			filter.doFilter(req, rep, booleanFilterChain);
 			if (!booleanFilterChain.isContinueFilter)
 				return false;

@@ -10,7 +10,7 @@ public class Activator implements BundleActivator {
 
 	private static BundleContext context;
 
-	static BundleContext getContext() {
+	public static BundleContext getContext() {
 		return context;
 	}
 
@@ -25,8 +25,7 @@ public class Activator implements BundleActivator {
 		Activator.context = bundleContext;
 
 		// 注册为服务
-		MvcFrameworkService mvcFrameworkService = new SpringMvcFrameworkService(
-				bundleContext);
+		MvcFrameworkService mvcFrameworkService = new SpringMvcFrameworkService();
 		bundleContext.registerService(MvcFrameworkService.class.getName(),
 				mvcFrameworkService, null);
 

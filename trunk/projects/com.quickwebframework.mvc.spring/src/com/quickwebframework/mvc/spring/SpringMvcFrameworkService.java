@@ -9,10 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -21,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
+import com.quickwebframework.core.FrameworkContext;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
@@ -30,50 +27,14 @@ import com.quickwebframework.mvc.spring.util.PluginPathMatcher;
 import com.quickwebframework.mvc.spring.util.PluginUrlPathHelper;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.WebAppService;
-import com.quickwebframework.service.core.PluginService;
 
 public class SpringMvcFrameworkService implements MvcFrameworkService {
 
 	private static Log log = LogFactory.getLog(SpringMvcFrameworkService.class);
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
-	// Bundle上下文
-	private BundleContext bundleContext;
 	// 插件名与ControllerService对应Map
 	private Map<String, PluginControllerInfo> bundleNamePluginControllerInfoMap = new HashMap<String, PluginControllerInfo>();
-
-	// 注册过滤器，线程的服务
-	private PluginService pluginService;
-
-	private void refreshPluginService() {
-		ServiceReference serviceReference = bundleContext
-				.getServiceReference(PluginService.class.getName());
-		if (serviceReference == null) {
-			pluginService = null;
-			return;
-		}
-		pluginService = (PluginService) bundleContext
-				.getService(serviceReference);
-	}
-
-	public SpringMvcFrameworkService(BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
-
-		// 刷新插件服务(注册过滤器，线程等)
-		refreshPluginService();
-
-		bundleContext.addServiceListener(new ServiceListener() {
-			@Override
-			public void serviceChanged(ServiceEvent arg0) {
-				String serviceReferenceName = arg0.getServiceReference()
-						.toString();
-				// 如果插件服务改变，刷新插件服务
-				if (serviceReferenceName.contains(PluginService.class.getName())) {
-					refreshPluginService();
-				}
-			}
-		});
-	}
 
 	private boolean initPluginControllerInfo(Bundle bundle,
 			PluginControllerInfo pluginControllerInfo) {
@@ -103,14 +64,14 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		Map<String, Filter> filterMap = applicationContext
 				.getBeansOfType(Filter.class);
 		for (Filter filter : filterMap.values()) {
-			pluginService.addFilter(bundle, filter);
+			FrameworkContext.addFilter(bundle, filter);
 		}
 
 		// 从ApplicationContext得到线程列表
 		Map<String, Thread> threadMap = applicationContext
 				.getBeansOfType(Thread.class);
 		for (Thread thread : threadMap.values()) {
-			pluginService.addThread(bundle, thread);
+			FrameworkContext.addThread(bundle, thread);
 		}
 
 		// 从ApplicationContext得到处理器列表

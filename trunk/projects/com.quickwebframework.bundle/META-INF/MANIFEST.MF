@@ -24,8 +24,6 @@ Export-Package: com.quickwebframework,
  com.quickwebframework.filter,
  com.quickwebframework.proxy,
  com.quickwebframework.service;uses:="javax.sql,com.quickwebframework.entity,org.osgi.framework",
- com.quickwebframework.service.core,
- com.quickwebframework.service.core.impl,
  com.quickwebframework.util,
  javax.servlet;version="2.5.0";uses:="javax.servlet.descriptor,javax.servlet.annotation",
  javax.servlet.http;version="2.5.0";uses:="javax.servlet"

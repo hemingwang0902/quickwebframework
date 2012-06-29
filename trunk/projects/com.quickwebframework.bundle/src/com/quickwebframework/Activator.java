@@ -7,11 +7,10 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.core.DispatcherServlet;
+import com.quickwebframework.core.FrameworkContext;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.proxy.PluginServletContext;
-import com.quickwebframework.service.core.PluginService;
-import com.quickwebframework.service.core.impl.PluginServiceImpl;
 import com.quickwebframework.util.BundleUtil;
 
 public class Activator implements BundleActivator {
@@ -23,8 +22,6 @@ public class Activator implements BundleActivator {
 	public static BundleContext getContext() {
 		return context;
 	}
-
-	private PluginService pluginService;
 
 	private ServletContext getServletContext() {
 		ServiceReference servletContextServiceReference = null;
@@ -68,13 +65,11 @@ public class Activator implements BundleActivator {
 			BundleUtil.bundleMethodUrlTemplate = tmpObj.toString();
 		}
 
-		// 注册PluginService
-		pluginService = new PluginServiceImpl(context);
-		context.registerService(PluginService.class.getName(), pluginService,
-				null);
+		// 初始化FrameworkContext
+		FrameworkContext.init(context.getBundle());
+
 		// 注册DispatcherServlet对象为Service
-		DispatcherServlet dispatcherServlet = new DispatcherServlet(context,
-				pluginService);
+		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
 		context.registerService(DispatcherServlet.class.getName(),
 				dispatcherServlet, null);
 
@@ -89,7 +84,7 @@ public class Activator implements BundleActivator {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		log.info("Stoping [com.quickwebframework.bundle]...");
-		pluginService.whenBundleStoped(context.getBundle());
+		FrameworkContext.whenBundleStoped(context.getBundle());
 		Activator.context = null;
 		log.info("Stoped [com.quickwebframework.bundle].");
 	}
