@@ -216,8 +216,9 @@ public class DispatcherServlet {
 			throws IOException, ServletException {
 		HttpServletResponse rep = new PluginHttpServletResponse(response);
 		if (FrameworkContext.getRootUrlHandleServlet() == null) {
+			rep.setContentType("text/html;charset=utf-8");
 			rep.getWriter()
-					.write("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!</body></html>");
+					.write("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!</body></html>");
 			return;
 		}
 		HttpServletRequest req = new PluginHttpServletRequest(response);
