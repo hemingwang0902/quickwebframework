@@ -2,6 +2,7 @@ package com.quickwebframework.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -226,11 +227,17 @@ public class DispatcherServlet {
 	// 得到资源
 	public InputStream doGetResource(Object request, Object response,
 			String bundleName, String resourcePath) throws IOException {
+		if (mvcFrameworkService == null)
+			return null;
+		
 		WebAppService webAppService = mvcFrameworkService
 				.getWebAppService(bundleName);
 		if (webAppService == null)
 			return null;
-		return webAppService.getBundle().getResource(resourcePath).openStream();
+		URL resourceUrl = webAppService.getBundle().getResource(resourcePath);
+		if (resourceUrl == null)
+			return null;
+		return resourceUrl.openStream();
 	}
 
 	// 处理过滤器,返回值是是否继续处理其他的过滤器
