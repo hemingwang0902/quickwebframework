@@ -23,3 +23,5 @@ Export-Package: com.quickwebframework.core,
  javax.servlet,
  javax.servlet.http
 Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: javax.servlet_2.5.0.jar,
+ .
