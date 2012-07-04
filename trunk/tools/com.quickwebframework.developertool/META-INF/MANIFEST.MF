@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DeveloperTool for QuickWebFramework
+Bundle-SymbolicName: com.quickwebframework.developertool
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.quickwebframework.developertool.Activator
+Bundle-Vendor: aaaSoft
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: org.osgi.framework;version="1.3.0"
