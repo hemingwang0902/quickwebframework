@@ -13,8 +13,8 @@ public class PluginControllerInfo {
 
 	// 控制器服务
 	private WebAppService webAppService;
-	// 方法名称列表
-	private List<String> methodNameList;
+	// URL列表
+	private List<String> urlList;
 	// 映射URL与处理器对象映射
 	private Map<String, Object> mappingUrlHandlerMap;
 	// 处理器与适配器映射
@@ -22,7 +22,7 @@ public class PluginControllerInfo {
 
 	public PluginControllerInfo(WebAppService webAppService) {
 		this.webAppService = webAppService;
-		methodNameList = new ArrayList<String>();
+		urlList = new ArrayList<String>();
 		mappingUrlHandlerMap = new HashMap<String, Object>();
 		handlerAdapterMap = new HashMap<Object, AnnotationMethodHandlerAdapter>();
 	}
@@ -31,12 +31,12 @@ public class PluginControllerInfo {
 		return webAppService;
 	}
 
-	public List<String> getMethodNameList() {
-		return methodNameList;
+	public List<String> getUrlList() {
+		return urlList;
 	}
 
-	public void setMethodNameList(List<String> methodNameList) {
-		this.methodNameList = methodNameList;
+	public void setUrlList(List<String> urlList) {
+		this.urlList = urlList;
 	}
 
 	/**

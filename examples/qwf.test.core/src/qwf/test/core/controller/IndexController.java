@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.quickwebframework.core.Activator;
 import com.quickwebframework.service.MvcFrameworkService;
-import com.quickwebframework.util.BundleUtil;
 
 @Controller
 public class IndexController {
@@ -32,19 +31,8 @@ public class IndexController {
 				.getService(sr);
 
 		// 得到插件名称与方法名称列表的MAP
-		Map<String, List<String>> map = mvcFrameworkService
-				.getBundleNameMethodNameListMap();
-
-		// 插件名称与URL列表的MAP
-		Map<String, List<String>> bundleNameUrlListMap = new HashMap<String, List<String>>();
-		for (String key : map.keySet()) {
-			List<String> methodNameList = map.get(key);
-			List<String> urlList = new ArrayList<String>();
-			for (String methodName : methodNameList) {
-				urlList.add(BundleUtil.getBundleMethodUrl(key, methodName));
-			}
-			bundleNameUrlListMap.put(key, urlList);
-		}
+		Map<String, List<String>> bundleNameUrlListMap = mvcFrameworkService
+				.getBundleNameUrlListMap();
 		request.setAttribute("bundleNameUrlListMap", bundleNameUrlListMap);
 		return "index";
 	}
