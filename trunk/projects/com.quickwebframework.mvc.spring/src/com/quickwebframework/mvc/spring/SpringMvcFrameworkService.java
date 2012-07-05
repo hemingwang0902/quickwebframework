@@ -1,8 +1,10 @@
 package com.quickwebframework.mvc.spring;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
@@ -92,6 +94,10 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 						continue;
 
 					for (String mappingUrl : requestMapping.value()) {
+						String methodName = mappingUrl;
+						pluginControllerInfo.getMethodNameList()
+								.add(methodName);
+
 						if (!mappingUrl.startsWith("/")) {
 							mappingUrl = "/" + mappingUrl;
 						}
@@ -160,6 +166,28 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		if (pluginControllerInfo == null)
 			return null;
 		return pluginControllerInfo.getWebAppService();
+	}
+
+	@Override
+	public List<String> getAllUrlList() {
+		List<String> list = new ArrayList<String>();
+
+		Map<String, List<String>> map = getBundleNameMethodNameListMap();
+		for (String key : map.keySet()) {
+			list.addAll(map.get(key));
+		}
+		return list;
+	}
+
+	@Override
+	public Map<String, List<String>> getBundleNameMethodNameListMap() {
+		Map<String, List<String>> rtnMap = new HashMap<String, List<String>>();
+		for (String key : bundleNamePluginControllerInfoMap.keySet()) {
+			PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
+					.get(key);
+			rtnMap.put(key, pluginControllerInfo.getMethodNameList());
+		}
+		return rtnMap;
 	}
 
 	@Override

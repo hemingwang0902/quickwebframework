@@ -1,5 +1,8 @@
 package com.quickwebframework.service;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,6 +35,20 @@ public interface MvcFrameworkService {
 	 * @return
 	 */
 	public WebAppService getWebAppService(String bundleName);
+
+	/**
+	 * 得到所有的URL列表
+	 * 
+	 * @return
+	 */
+	public List<String> getAllUrlList();
+
+	/**
+	 * 得到插件名称与方法名称列表的Map
+	 * 
+	 * @return
+	 */
+	public Map<String, List<String>> getBundleNameMethodNameListMap();
 
 	/**
 	 * 处理HTTP请求
