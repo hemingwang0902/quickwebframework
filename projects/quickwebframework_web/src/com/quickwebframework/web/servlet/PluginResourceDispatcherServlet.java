@@ -161,11 +161,12 @@ public class PluginResourceDispatcherServlet extends
 							.length() + mapping.length() - 1);
 					String[] tmpArray = otherString.split("/");
 					if (tmpArray.length < 2) {
-						response.sendError(404);
+						response.sendError(404, "参数数量不正确！");
 						return;
 					}
 					bundleName = tmpArray[0];
-					resourcePath = tmpArray[1];
+					resourcePath = otherString
+							.substring(bundleName.length() + 1);
 				}
 				// 否则映射的URL是类似于 /resource，只需要直接取出参数
 				else {
@@ -183,7 +184,8 @@ public class PluginResourceDispatcherServlet extends
 				// 如果请求的资源路径没有后缀，则不允许访问
 				if (!resourcePath.contains(".")) {
 					// 返回400 Bad Request
-					response.sendError(400);
+					response.sendError(400, "请求的资源[" + resourcePath
+							+ "]未包括后缀，不允许访问！");
 					return;
 				}
 				String[] tmpArray = resourcePath.split("\\.");
@@ -191,7 +193,8 @@ public class PluginResourceDispatcherServlet extends
 				// 如果此扩展名不在被允许访问的列表内
 				if (!allowMimeMap.containsKey(extension)) {
 					// 返回403 Forbidden
-					response.sendError(403);
+					response.sendError(403, "扩展名[" + extension
+							+ "]不在被允许访问的扩展名列表中！");
 					return;
 				}
 
@@ -202,7 +205,8 @@ public class PluginResourceDispatcherServlet extends
 
 				// 如果资源未找到
 				if (inputStream == null) {
-					response.sendError(404);
+					response.sendError(404, "在插件[" + bundleName + "]中未找到资源["
+							+ resourcePath + "]！");
 					return;
 				}
 
