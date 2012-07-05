@@ -44,11 +44,11 @@ public interface MvcFrameworkService {
 	public List<String> getAllUrlList();
 
 	/**
-	 * 得到插件名称与方法名称列表的Map
+	 * 得到插件名称与URL列表的Map
 	 * 
 	 * @return
 	 */
-	public Map<String, List<String>> getBundleNameMethodNameListMap();
+	public Map<String, List<String>> getBundleNameUrlListMap();
 
 	/**
 	 * 处理HTTP请求

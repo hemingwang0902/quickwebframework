@@ -29,6 +29,7 @@ import com.quickwebframework.mvc.spring.util.PluginPathMatcher;
 import com.quickwebframework.mvc.spring.util.PluginUrlPathHelper;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.WebAppService;
+import com.quickwebframework.util.BundleUtil;
 
 public class SpringMvcFrameworkService implements MvcFrameworkService {
 
@@ -94,15 +95,17 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 						continue;
 
 					for (String mappingUrl : requestMapping.value()) {
+						String bundleName = bundle.getSymbolicName();
 						String methodName = mappingUrl;
-						pluginControllerInfo.getMethodNameList()
-								.add(methodName);
+
+						pluginControllerInfo.getUrlList().add(
+								BundleUtil.getBundleMethodUrl(bundleName,
+										methodName));
 
 						if (!mappingUrl.startsWith("/")) {
 							mappingUrl = "/" + mappingUrl;
 						}
-						mappingUrl = "/" + bundle.getSymbolicName()
-								+ mappingUrl;
+						mappingUrl = "/" + bundleName + mappingUrl;
 						pluginControllerInfo.getMappingUrlHandlerMap().put(
 								mappingUrl, handler);
 
@@ -172,7 +175,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	public List<String> getAllUrlList() {
 		List<String> list = new ArrayList<String>();
 
-		Map<String, List<String>> map = getBundleNameMethodNameListMap();
+		Map<String, List<String>> map = getBundleNameUrlListMap();
 		for (String key : map.keySet()) {
 			list.addAll(map.get(key));
 		}
@@ -180,12 +183,12 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	}
 
 	@Override
-	public Map<String, List<String>> getBundleNameMethodNameListMap() {
+	public Map<String, List<String>> getBundleNameUrlListMap() {
 		Map<String, List<String>> rtnMap = new HashMap<String, List<String>>();
 		for (String key : bundleNamePluginControllerInfoMap.keySet()) {
 			PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
 					.get(key);
-			rtnMap.put(key, pluginControllerInfo.getMethodNameList());
+			rtnMap.put(key, pluginControllerInfo.getUrlList());
 		}
 		return rtnMap;
 	}
