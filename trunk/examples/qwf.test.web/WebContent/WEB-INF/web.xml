@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+	<context-param>
+		<param-name>quickwebframeworkConfigLocation</param-name>
+		<param-value>/WEB-INF/quickwebframework.properties</param-value>
+	</context-param>
+	<!-- QuickWebFramework框架加载监听器 -->
+	<listener>
+		<listener-class>com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener</listener-class>
+	</listener>
+	<!-- QuickWebFramework分发Servlet -->
+	<servlet>
+		<servlet-name>dispatcherServlet</servlet-name>
+		<servlet-class>com.quickwebframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dispatcherServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	<!-- QuickWebFramework过滤器 -->
+	<filter>
+		<filter-name>commonFilter</filter-name>
+		<filter-class>com.quickwebframework.web.filter.CommonFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>commonFilter</filter-name>
+		<servlet-name>dispatcherServlet</servlet-name>
+	</filter-mapping>
+
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+</web-app>

@@ -158,8 +158,15 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		}
 		// 配置Map
 		Map<String, String> osgiFrameworkConfigMap = new HashMap<String, String>();
-		osgiFrameworkConfigMap.put("org.osgi.framework.storage",
-				servletContext.getRealPath("WEB-INF/plugin"));
+
+		// 配置缓存保存路径
+		String osgiFrameworkStorage = quickWebFrameworkProperties
+				.getProperty("quickwebframework.osgiFrameworkStorage");
+		if (osgiFrameworkStorage != null) {
+			osgiFrameworkConfigMap.put("org.osgi.framework.storage",
+					servletContext.getRealPath(osgiFrameworkStorage));
+		}
+
 		// 读取固定配置
 		String osgiFrameworkFactoryConfig = quickWebFrameworkProperties
 				.getProperty("quickwebframework.osgiFrameworkFactoryConfig");
@@ -233,7 +240,7 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 			});
 
 			framework.start();
-
+			System.out.println("启动OSGi Framework成功！");
 		} catch (BundleException e) {
 			throw new RuntimeException("启动OSGi Framework失败！", e);
 		}
@@ -243,6 +250,7 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		try {
 			if (framework != null)
 				framework.stop();
+			System.out.println("停止OSGi Framework成功！");
 		} catch (BundleException e) {
 			throw new RuntimeException("停止OSGi Framework失败！", e);
 		}
