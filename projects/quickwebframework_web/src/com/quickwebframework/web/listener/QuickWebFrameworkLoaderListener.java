@@ -1,6 +1,7 @@
 package com.quickwebframework.web.listener;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,12 +12,15 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpServlet;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
@@ -24,12 +28,14 @@ import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 
 import com.quickwebframework.web.servlet.PluginManageServlet;
 import com.quickwebframework.web.servlet.PluginResourceDispatcherServlet;
 import com.quickwebframework.web.servlet.PluginViewDispatcherServlet;
+import com.quickwebframework.web.thread.BundleAutoManageThread;
 
 public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 
@@ -162,9 +168,10 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		// 配置缓存保存路径
 		String osgiFrameworkStorage = quickWebFrameworkProperties
 				.getProperty("quickwebframework.osgiFrameworkStorage");
+		osgiFrameworkStorage = servletContext.getRealPath(osgiFrameworkStorage);
 		if (osgiFrameworkStorage != null) {
 			osgiFrameworkConfigMap.put("org.osgi.framework.storage",
-					servletContext.getRealPath(osgiFrameworkStorage));
+					osgiFrameworkStorage);
 		}
 
 		// 读取固定配置
@@ -241,6 +248,11 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 
 			framework.start();
 			System.out.println("启动OSGi Framework成功！");
+
+			// 扫描插件目录，看是否有插件需要自动安装
+			Thread trdBundleAutoManage = new BundleAutoManageThread(
+					framework.getBundleContext(), osgiFrameworkStorage);
+			trdBundleAutoManage.start();
 		} catch (BundleException e) {
 			throw new RuntimeException("启动OSGi Framework失败！", e);
 		}
