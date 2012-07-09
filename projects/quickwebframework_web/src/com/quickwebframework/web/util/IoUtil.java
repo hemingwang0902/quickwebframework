@@ -37,7 +37,6 @@ public class IoUtil {
 
 	public static void copyStream(InputStream input, OutputStream output,
 			int bufferSize) throws IOException {
-		long position = 0;
 		byte[] buffer = new byte[bufferSize];
 
 		int currentReadSize;
@@ -53,7 +52,6 @@ public class IoUtil {
 
 			int readCount = input.read(buffer, 0, currentReadSize);
 			output.write(buffer, 0, readCount);
-			position += readCount;
 		} while (true);
 	}
 
