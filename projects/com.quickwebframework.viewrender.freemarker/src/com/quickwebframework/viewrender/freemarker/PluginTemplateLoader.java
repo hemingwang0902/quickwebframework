@@ -7,6 +7,7 @@ import java.io.Reader;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.quickwebframework.core.FrameworkContext;
 import com.quickwebframework.service.WebAppService;
 
 import freemarker.cache.TemplateLoader;
@@ -57,22 +58,9 @@ public class PluginTemplateLoader implements TemplateLoader {
 		String path = tmpArray[1];
 		// 对视图名称进行处理(添加前后缀)
 		path = viewNamePrefix + path + viewNameSuffix;
+		
+		WebAppService pluginService = FrameworkContext.mvcFrameworkService.getWebAppService(pluginName);
 
-		WebAppService pluginService = null;
-		try {
-			ServiceReference<?>[] serviceReferences = bundleContext
-					.getServiceReferences(WebAppService.class.getName(), null);
-			for (ServiceReference<?> serviceReference : serviceReferences) {
-				if (pluginName.equals(serviceReference.getBundle()
-						.getSymbolicName())) {
-					pluginService = (WebAppService) bundleContext
-							.getService(serviceReference);
-					break;
-				}
-			}
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
 		if (pluginService == null) {
 			throw new RuntimeException(String.format(
 					"Can't found plugin[%s],template [%s] load failure.",

@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
@@ -33,32 +35,27 @@ public class DispatcherServlet {
 	// Bundle上下文
 	private BundleContext bundleContext;
 
-	// 视图渲染服务
-	private ViewRenderService viewRenderService;
-
 	// 刷新渲染服务
 	private void refreshViewRenderService() {
 		ServiceReference<?> viewRenderServiceReference = bundleContext
 				.getServiceReference(ViewRenderService.class.getName());
 		if (viewRenderServiceReference == null) {
-			viewRenderService = null;
+			FrameworkContext.viewRenderService = null;
 		} else {
-			viewRenderService = (ViewRenderService) bundleContext
+			FrameworkContext.viewRenderService = (ViewRenderService) bundleContext
 					.getService(viewRenderServiceReference);
 		}
 	}
 
-	// MVC框架服务
-	private MvcFrameworkService mvcFrameworkService;
-
+	// 刷新MVC框架服务
 	private void refreshMvcFrameworkService() {
 		ServiceReference<?> serviceReference = bundleContext
 				.getServiceReference(MvcFrameworkService.class.getName());
 		if (serviceReference == null) {
-			mvcFrameworkService = null;
+			FrameworkContext.mvcFrameworkService = null;
 			return;
 		}
-		mvcFrameworkService = (MvcFrameworkService) bundleContext
+		FrameworkContext.mvcFrameworkService = (MvcFrameworkService) bundleContext
 				.getService(serviceReference);
 	}
 
@@ -70,9 +67,9 @@ public class DispatcherServlet {
 	public void renderView(MvcModelAndView mav, HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			if (viewRenderService != null) {
+			if (FrameworkContext.viewRenderService != null) {
 				// 渲染视图
-				viewRenderService.renderView(mav.getWebAppService().getBundle()
+				FrameworkContext.viewRenderService.renderView(mav.getWebAppService().getBundle()
 						.getSymbolicName(), mav.getViewName(), request,
 						response);
 			} else {
@@ -94,20 +91,23 @@ public class DispatcherServlet {
 		// 刷新MVC框架服务
 		refreshMvcFrameworkService();
 
-		try {
-			ServiceReference<?>[] serviceReferences = bundleContext
-					.getServiceReferences(WebAppService.class.getName(), null);
-			if (serviceReferences != null) {
-				for (ServiceReference<?> serviceReference : serviceReferences) {
-					WebAppService webAppService = (WebAppService) bundleContext
-							.getService(serviceReference);
-					mvcFrameworkService.addWebApp(webAppService);
+		bundleContext.addBundleListener(new BundleListener() {
+			@Override
+			public void bundleChanged(BundleEvent arg0) {
+				Bundle bundle = arg0.getBundle();
+				String bundleName = bundle.getSymbolicName();
+				int bundleEventType = arg0.getType();
+				// 如果是正在停止
+				if (bundleEventType == BundleEvent.STOPPING) {
+					WebAppService webAppService = FrameworkContext.mvcFrameworkService
+							.getWebAppService(bundleName);
+					if (webAppService != null) {
+						FrameworkContext.mvcFrameworkService.removeWebApp(webAppService);
+					}
 				}
 			}
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-
+		});
+		
 		bundleContext.addServiceListener(new ServiceListener() {
 			@Override
 			public void serviceChanged(ServiceEvent arg0) {
@@ -127,14 +127,6 @@ public class DispatcherServlet {
 					log.info(String.format("[%s]插件的[%s]服务已注册", arg0
 							.getServiceReference().getBundle()
 							.getSymbolicName(), arg0.getServiceReference()));
-
-					ServiceReference<?> serviceReference = arg0
-							.getServiceReference();
-					Object obj = bundleContext.getService(serviceReference);
-					// 如果上服务不是WebAppService
-					if (!WebAppService.class.isInstance(obj))
-						return;
-					mvcFrameworkService.addWebApp((WebAppService) obj);
 				} else if (serviceEventType == ServiceEvent.UNREGISTERING) {
 					log.info(String.format("[%s]插件的[%s]服务正在取消注册", arg0
 							.getServiceReference().getBundle()
@@ -146,12 +138,6 @@ public class DispatcherServlet {
 					// 如果卸载的插件就是自己
 					if (currentBundle.equals(serviceReference.getBundle()))
 						return;
-
-					Object obj = bundleContext.getService(serviceReference);
-					// 如果上服务不是ControllerService
-					if (!WebAppService.class.isInstance(obj))
-						return;
-					mvcFrameworkService.removeWebApp((WebAppService) obj);
 				}
 			}
 		});
@@ -180,7 +166,7 @@ public class DispatcherServlet {
 			}
 
 			try {
-				MvcModelAndView mav = mvcFrameworkService.handle(req, rep,
+				MvcModelAndView mav = FrameworkContext.mvcFrameworkService.handle(req, rep,
 						bundleName, methodName);
 				if (mav == null) {
 					return;
@@ -228,10 +214,10 @@ public class DispatcherServlet {
 	// 得到资源
 	public InputStream doGetResource(Object request, Object response,
 			String bundleName, String resourcePath) throws IOException {
-		if (mvcFrameworkService == null)
+		if (FrameworkContext.mvcFrameworkService == null)
 			return null;
-		
-		WebAppService webAppService = mvcFrameworkService
+
+		WebAppService webAppService = FrameworkContext.mvcFrameworkService
 				.getWebAppService(bundleName);
 		if (webAppService == null)
 			return null;

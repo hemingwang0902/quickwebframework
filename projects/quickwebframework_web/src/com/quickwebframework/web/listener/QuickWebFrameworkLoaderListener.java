@@ -245,8 +245,7 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 			System.out.println("启动OSGi Framework成功！");
 
 			// 扫描插件目录，看是否有插件需要自动安装
-			Thread trdBundleAutoManage = new BundleAutoManageThread(
-					framework.getBundleContext(), osgiFrameworkStorage);
+			Thread trdBundleAutoManage = new BundleAutoManageThread(osgiFrameworkStorage);
 			trdBundleAutoManage.start();
 		} catch (BundleException e) {
 			throw new RuntimeException("启动OSGi Framework失败！", e);
