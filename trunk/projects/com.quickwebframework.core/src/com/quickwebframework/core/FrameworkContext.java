@@ -17,12 +17,19 @@ import org.osgi.framework.BundleListener;
 import com.quickwebframework.entity.HandlerExceptionResolver;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
+import com.quickwebframework.service.MvcFrameworkService;
+import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.service.WebAppService;
 
 public abstract class FrameworkContext {
 	private static Log log = LogFactory.getLog(FrameworkContext.class);
 	// 核心Bundle
 	private static Bundle coreBundle;
+	
+	// MVC框架服务
+	public static MvcFrameworkService mvcFrameworkService;
+	// 视图渲染服务
+	public static ViewRenderService viewRenderService;
 
 	// 根URL处理Servlet
 	private static HttpServlet rootUrlHandleServlet;
@@ -98,7 +105,7 @@ public abstract class FrameworkContext {
 		final ClassLoader currentClassLoader = bundleActivator.getClass()
 				.getClassLoader();
 
-		bundleContext.registerService(WebAppService.class.getName(),
+		FrameworkContext.mvcFrameworkService.addWebApp(
 				new WebAppService() {
 					@Override
 					public Bundle getBundle() {
@@ -109,7 +116,8 @@ public abstract class FrameworkContext {
 					public ClassLoader getClassLoader() {
 						return currentClassLoader;
 					}
-				}, null);
+				});
+		
 		log.info("插件[" + currentBundle.getSymbolicName() + "]注册为Web App.");
 	}
 

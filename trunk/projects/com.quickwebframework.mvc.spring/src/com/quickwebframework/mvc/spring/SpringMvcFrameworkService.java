@@ -1,6 +1,7 @@
 package com.quickwebframework.mvc.spring;
 
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
+import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -25,6 +30,7 @@ import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
 import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
 import com.quickwebframework.mvc.spring.util.BundleAnnotationConfigApplicationContext;
+import com.quickwebframework.mvc.spring.util.BundleGenericXmlApplicationContext;
 import com.quickwebframework.mvc.spring.util.PluginPathMatcher;
 import com.quickwebframework.mvc.spring.util.PluginUrlPathHelper;
 import com.quickwebframework.service.MvcFrameworkService;
@@ -39,28 +45,61 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	// 插件名与ControllerService对应Map
 	private Map<String, PluginControllerInfo> bundleNamePluginControllerInfoMap = new HashMap<String, PluginControllerInfo>();
 
-	private boolean initPluginControllerInfo(Bundle bundle,
+	private void initPluginControllerInfo(Bundle bundle,
 			PluginControllerInfo pluginControllerInfo) {
-		// 初始化AnnotationConfigApplicationContext
-		BundleAnnotationConfigApplicationContext applicationContext = new BundleAnnotationConfigApplicationContext(
-				bundle);
 
-		try {
-			// 开始Spring扫描
-			ClassLoader bundleClassLoader = pluginControllerInfo
-					.getWebAppService().getClassLoader();
-			applicationContext.setClassLoader(bundleClassLoader);
-			applicationContext.scan("*");
-			applicationContext.refresh();
-			applicationContext.start();
-		} catch (Exception ex) {
-			log.error("用Spring扫描插件时出错异常，插件启动失败！", ex);
-			// 停止插件
+		// 检查插件的根路径下面是否有applicationContext.xml文件
+		URL applicationContextUrl = bundle
+				.getResource("applicationContext.xml");
+
+		ApplicationContext applicationContext = null;
+		ClassLoader bundleClassLoader = pluginControllerInfo.getWebAppService()
+				.getClassLoader();
+		// 如果有，则让Spring加载这个xml文件
+		if (applicationContextUrl != null) {
 			try {
-				bundle.stop();
-			} catch (Exception ex2) {
+				BundleGenericXmlApplicationContext bundleGenericXmlApplicationContext = new BundleGenericXmlApplicationContext(
+						bundle);
+				bundleGenericXmlApplicationContext
+						.setNamespaceHandlerResolver(new DefaultNamespaceHandlerResolver(
+								this.getClass().getClassLoader()));
+				bundleGenericXmlApplicationContext
+						.setClassLoader(bundleClassLoader);
+				bundleGenericXmlApplicationContext.load(new UrlResource(
+						applicationContextUrl));
+				bundleGenericXmlApplicationContext.refresh();
+				bundleGenericXmlApplicationContext.start();
+				applicationContext = bundleGenericXmlApplicationContext;
+			} catch (Exception ex) {
+				log.error("Spring加载applicationContext时出错异常，插件启动失败！", ex);
+				try {
+					bundle.stop();
+				} catch (BundleException e) {
+					e.printStackTrace();
+				}
 			}
-			return false;
+		}
+		// 否则扫描插件的所有文件
+		else {
+			// 初始化AnnotationConfigApplicationContext
+			BundleAnnotationConfigApplicationContext bundleAnnotationConfigApplicationContext = new BundleAnnotationConfigApplicationContext(
+					bundle);
+			try {
+				// 开始Spring扫描
+				bundleAnnotationConfigApplicationContext
+						.setClassLoader(bundleClassLoader);
+				bundleAnnotationConfigApplicationContext.scan("*");
+				bundleAnnotationConfigApplicationContext.refresh();
+				bundleAnnotationConfigApplicationContext.start();
+				applicationContext = bundleAnnotationConfigApplicationContext;
+			} catch (Exception ex) {
+				log.error("用Spring扫描插件时出错异常，插件启动失败！", ex);
+				try {
+					bundle.stop();
+				} catch (BundleException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		// 从ApplicationContext得到过滤器列表
@@ -141,7 +180,6 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 				}
 			}
 		}
-		return true;
 	}
 
 	@Override

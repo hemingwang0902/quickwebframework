@@ -12,16 +12,14 @@ import java.util.zip.ZipFile;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
 
+import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
+
 public class BundleAutoManageThread extends Thread {
-	private BundleContext bundleContext;
 	public String bundleFolderPath;
 
-	public BundleAutoManageThread(BundleContext bundleContext,
-			String bundleFolderPath) {
-		this.bundleContext = bundleContext;
+	public BundleAutoManageThread(String bundleFolderPath) {
 		this.bundleFolderPath = bundleFolderPath;
 	}
 
@@ -32,6 +30,8 @@ public class BundleAutoManageThread extends Thread {
 			System.out.println("插件目录：" + bundleFolderPath);
 			while (true) {
 				Thread.sleep(1000);
+				BundleContext bundleContext = QuickWebFrameworkLoaderListener
+						.getBundleContext();
 				if (bundleContext == null) {
 					continue;
 				}
@@ -93,7 +93,7 @@ public class BundleAutoManageThread extends Thread {
 							fileInputStream.close();
 						}// 否则更新
 						else {
-							if (bundleVersion.compareTo(preBundle.getVersion()) > 0) {
+							if (bundleVersion.compareTo(preBundle.getVersion()) >= 0) {
 								System.out.println("自动将插件：" + bundleName
 										+ " 由 " + preBundle.getVersion()
 										+ "更新到" + bundleVersion);
@@ -104,15 +104,19 @@ public class BundleAutoManageThread extends Thread {
 								fileInputStream.close();
 							} else {
 								System.out.println("插件：" + bundleName + "的版本"
-										+ bundleVersion + "未大于已安装的版本"
+										+ bundleVersion + "小于已安装的版本"
 										+ preBundle.getVersion() + "，没有应用更新！");
 							}
 						}
 						// 尝试启动插件
 						if (newBundle != null) {
-							newBundleList.add(newBundle);
+							try {
+								newBundleList.add(newBundle);
+							} catch (Exception ex) {
+							}
 						}
 					} catch (IllegalStateException ex) {
+						ex.printStackTrace();
 						continue;
 					} catch (Exception ex) {
 						ex.printStackTrace();
@@ -137,7 +141,7 @@ public class BundleAutoManageThread extends Thread {
 								&& newBundle.getState() != Bundle.STARTING) {
 							try {
 								newBundle.start();
-							} catch (BundleException e) {
+							} catch (Exception e) {
 								isAllBundleStartSuccess = false;
 							}
 						}
@@ -153,7 +157,7 @@ public class BundleAutoManageThread extends Thread {
 							&& newBundle.getState() != Bundle.STARTING) {
 						try {
 							newBundle.start();
-						} catch (BundleException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
@@ -161,6 +165,8 @@ public class BundleAutoManageThread extends Thread {
 			}
 		} catch (InterruptedException e) {
 			System.out.println("quickwebframework_web:插件自动管理线程接到线程中止命令，线程已终止！");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }
