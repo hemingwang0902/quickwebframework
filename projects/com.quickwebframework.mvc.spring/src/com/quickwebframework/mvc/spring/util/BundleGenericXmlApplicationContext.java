@@ -1,28 +1,23 @@
 package com.quickwebframework.mvc.spring.util;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-
 import org.osgi.framework.Bundle;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.core.io.support.ResourcePatternResolver;
 
 public class BundleGenericXmlApplicationContext extends
 		GenericApplicationContext {
 
+	private final BundleResourceResolver resolver;
 	private final XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(
 			this);
 	private Bundle bundle;
 
 	public BundleGenericXmlApplicationContext(Bundle bundle) {
 		this.bundle = bundle;
+		resolver = new BundleResourceResolver(this.bundle);
 	}
 
 	/**
@@ -82,35 +77,6 @@ public class BundleGenericXmlApplicationContext extends
 
 	@Override
 	public Resource[] getResources(String path) {
-
-		String centerPath = null;
-
-		// 如果是寻找所有的classpath
-		if (path.startsWith(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX)) {
-			centerPath = path
-					.substring(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
-							.length());
-
-			if (centerPath.startsWith("*")) {
-				centerPath = "/";
-			} else {
-				centerPath = centerPath.substring(0, centerPath.indexOf("*"));
-			}
-		} else if (path
-				.startsWith(ResourcePatternResolver.CLASSPATH_URL_PREFIX)) {
-			throw new RuntimeException("暂未实现的path:" + path);
-		} else {
-			throw new RuntimeException("未知的path:" + path);
-		}
-
-		List<Resource> resourceList = new ArrayList<Resource>();
-		// 搜索Class文件
-		Enumeration<?> enume = bundle.findEntries(centerPath, "*.class", true);
-		if (enume == null)
-			return null;
-		while (enume.hasMoreElements()) {
-			resourceList.add(new UrlResource((URL) enume.nextElement()));
-		}
-		return resourceList.toArray(new Resource[0]);
+		return resolver.getResources(path);
 	}
 }
