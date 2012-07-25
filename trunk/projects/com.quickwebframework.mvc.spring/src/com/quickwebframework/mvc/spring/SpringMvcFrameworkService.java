@@ -185,18 +185,21 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	@Override
 	public boolean addWebApp(WebAppService webAppService) {
 		Bundle bundle = webAppService.getBundle();
+		String bundleName = bundle.getSymbolicName();
+
 		PluginControllerInfo pluginControllerInfo = new PluginControllerInfo(
 				webAppService);
 		initPluginControllerInfo(bundle, pluginControllerInfo);
-		bundleNamePluginControllerInfoMap.put(bundle.getSymbolicName(),
-				pluginControllerInfo);
+		bundleNamePluginControllerInfoMap.put(bundleName, pluginControllerInfo);
+		log.info("插件[" + bundleName + "]已注册为Spring MVC的Web App.");
 		return true;
 	}
 
 	@Override
 	public boolean removeWebApp(WebAppService webAppService) {
-		bundleNamePluginControllerInfoMap.remove(webAppService.getBundle()
-				.getSymbolicName());
+		String bundleName = webAppService.getBundle().getSymbolicName();
+		bundleNamePluginControllerInfoMap.remove(bundleName);
+		log.info("插件[" + bundleName + "]注册在Spring MVC的Web App已经移除！");
 		return true;
 	}
 

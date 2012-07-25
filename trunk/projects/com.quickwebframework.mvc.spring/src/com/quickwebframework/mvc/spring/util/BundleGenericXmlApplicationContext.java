@@ -12,6 +12,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 public class BundleGenericXmlApplicationContext extends
 		GenericApplicationContext {
@@ -81,18 +82,35 @@ public class BundleGenericXmlApplicationContext extends
 
 	@Override
 	public Resource[] getResources(String path) {
-		List<Resource> resourceList = new ArrayList<Resource>();
 
-		// 如果是搜索所有包的所有class文件
-		if ("classpath*:*/**/*.class".contains(path)) {
-			// 搜索Class文件
-			Enumeration<?> enume = bundle.findEntries("", "*.class", true);
-			while (enume.hasMoreElements()) {
-				resourceList.add(new UrlResource((URL) enume.nextElement()));
+		String centerPath = null;
+
+		// 如果是寻找所有的classpath
+		if (path.startsWith(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX)) {
+			centerPath = path
+					.substring(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+							.length());
+
+			if (centerPath.startsWith("*")) {
+				centerPath = "/";
+			} else {
+				centerPath = centerPath.substring(0, centerPath.indexOf("*"));
 			}
-			return resourceList.toArray(new Resource[0]);
+		} else if (path
+				.startsWith(ResourcePatternResolver.CLASSPATH_URL_PREFIX)) {
+			throw new RuntimeException("暂未实现的path:" + path);
 		} else {
-			throw new RuntimeException("还未遇到此ClassPath! + " + path);
+			throw new RuntimeException("未知的path:" + path);
 		}
+
+		List<Resource> resourceList = new ArrayList<Resource>();
+		// 搜索Class文件
+		Enumeration<?> enume = bundle.findEntries(centerPath, "*.class", true);
+		if (enume == null)
+			return null;
+		while (enume.hasMoreElements()) {
+			resourceList.add(new UrlResource((URL) enume.nextElement()));
+		}
+		return resourceList.toArray(new Resource[0]);
 	}
 }
