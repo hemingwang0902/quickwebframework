@@ -69,9 +69,9 @@ public class DispatcherServlet {
 		try {
 			if (FrameworkContext.viewRenderService != null) {
 				// 渲染视图
-				FrameworkContext.viewRenderService.renderView(mav.getWebAppService().getBundle()
-						.getSymbolicName(), mav.getViewName(), request,
-						response);
+				FrameworkContext.viewRenderService.renderView(mav
+						.getWebAppService().getBundle().getSymbolicName(),
+						mav.getViewName(), request, response);
 			} else {
 				response.sendError(500,
 						"[com.quickwebframework.core.DispatcherServlet] cannot found ViewRender!");
@@ -99,15 +99,18 @@ public class DispatcherServlet {
 				int bundleEventType = arg0.getType();
 				// 如果是已经停止
 				if (bundleEventType == BundleEvent.STOPPED) {
+					if (FrameworkContext.mvcFrameworkService == null)
+						return;
 					WebAppService webAppService = FrameworkContext.mvcFrameworkService
 							.getWebAppService(bundleName);
 					if (webAppService != null) {
-						FrameworkContext.mvcFrameworkService.removeWebApp(webAppService);
+						FrameworkContext.mvcFrameworkService
+								.removeWebApp(webAppService);
 					}
 				}
 			}
 		});
-		
+
 		bundleContext.addServiceListener(new ServiceListener() {
 			@Override
 			public void serviceChanged(ServiceEvent arg0) {
@@ -166,8 +169,8 @@ public class DispatcherServlet {
 			}
 
 			try {
-				MvcModelAndView mav = FrameworkContext.mvcFrameworkService.handle(req, rep,
-						bundleName, methodName);
+				MvcModelAndView mav = FrameworkContext.mvcFrameworkService
+						.handle(req, rep, bundleName, methodName);
 				if (mav == null) {
 					return;
 				}
