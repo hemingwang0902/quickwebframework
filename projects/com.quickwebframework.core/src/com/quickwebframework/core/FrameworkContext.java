@@ -25,7 +25,7 @@ public abstract class FrameworkContext {
 	private static Log log = LogFactory.getLog(FrameworkContext.class);
 	// 核心Bundle
 	private static Bundle coreBundle;
-	
+
 	// MVC框架服务
 	public static MvcFrameworkService mvcFrameworkService;
 	// 视图渲染服务
@@ -105,20 +105,17 @@ public abstract class FrameworkContext {
 		final ClassLoader currentClassLoader = bundleActivator.getClass()
 				.getClassLoader();
 
-		FrameworkContext.mvcFrameworkService.addWebApp(
-				new WebAppService() {
-					@Override
-					public Bundle getBundle() {
-						return currentBundle;
-					}
+		FrameworkContext.mvcFrameworkService.addWebApp(new WebAppService() {
+			@Override
+			public Bundle getBundle() {
+				return currentBundle;
+			}
 
-					@Override
-					public ClassLoader getClassLoader() {
-						return currentClassLoader;
-					}
-				});
-		
-		log.info("插件[" + currentBundle.getSymbolicName() + "]注册为Web App.");
+			@Override
+			public ClassLoader getClassLoader() {
+				return currentClassLoader;
+			}
+		});
 	}
 
 	// 插件扩展信息类

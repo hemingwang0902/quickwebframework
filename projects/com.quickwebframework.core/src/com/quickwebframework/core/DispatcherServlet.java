@@ -97,8 +97,8 @@ public class DispatcherServlet {
 				Bundle bundle = arg0.getBundle();
 				String bundleName = bundle.getSymbolicName();
 				int bundleEventType = arg0.getType();
-				// 如果是正在停止
-				if (bundleEventType == BundleEvent.STOPPING) {
+				// 如果是已经停止
+				if (bundleEventType == BundleEvent.STOPPED) {
 					WebAppService webAppService = FrameworkContext.mvcFrameworkService
 							.getWebAppService(bundleName);
 					if (webAppService != null) {
