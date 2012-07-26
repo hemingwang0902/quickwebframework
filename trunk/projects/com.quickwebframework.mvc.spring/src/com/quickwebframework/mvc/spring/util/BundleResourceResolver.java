@@ -3,7 +3,9 @@ package com.quickwebframework.mvc.spring.util;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
@@ -63,51 +65,88 @@ public class BundleResourceResolver {
 		return resourceList;
 	}
 
-	// 得到Bundle依赖Bundle的资源
-	private List<Resource> doGetBundleRequiredResources(Bundle currentBundle) {
+	// 得到Bundle导入包的资源
+	private List<Resource> doGetImportPackageResource() {
 		List<Resource> resourceList = new ArrayList<Resource>();
-		// 先扫描依赖的Bundle
-		Bundle[] reuiredBundles = BundleUtil
-				.getBundleRequiredBundles(currentBundle);
-		if (reuiredBundles != null) {
-			for (Bundle requireBundle : reuiredBundles) {
-				// 递归处理依赖的依赖
-				doGetBundleRequiredResources(requireBundle);
-				// 处理reuiredBundles中的资源
-				String[] requireBundleExportPackages = BundleUtil
-						.getBundleExportPackageList(requireBundle, true);
-				if (requireBundleExportPackages == null)
-					continue;
-				for (int i = 0; i < requireBundleExportPackages.length; i++) {
-					// 将.替换成/，用于资源搜索
-					requireBundleExportPackages[i] = requireBundleExportPackages[i]
-							.replace('.', '/');
-				}
+		String[] importPackages = BundleUtil
+				.getBundleImportPackagePackageList(bundle);
+		if (importPackages != null) {
+			Bundle[] allBundles = bundle.getBundleContext().getBundles();
 
+			List<String> importPackageList = new ArrayList<String>();
+			for (String key : importPackages)
+				importPackageList.add(key);
+
+			Map<Bundle, List<String>> bundleClassPathListMap = new HashMap<Bundle, List<String>>();
+
+			for (Bundle bundle : allBundles) {
+				String[] bundleExportPackageInfos = BundleUtil
+						.getBundleExportPackageList(bundle, false);
+				for (String bundleExportPackageInfo : bundleExportPackageInfos) {
+					// 已找到对应Bundle的路径列表
+					List<String> foundClassPathList = new ArrayList<String>();
+					for (String importPackage : importPackageList) {
+						if (bundleExportPackageInfo.startsWith(importPackage)) {
+							List<String> bundleClassPathList = null;
+							if (bundleClassPathListMap.containsKey(bundle)) {
+								bundleClassPathList = bundleClassPathListMap
+										.get(bundle);
+							} else {
+								bundleClassPathList = new ArrayList<String>();
+								bundleClassPathListMap.put(bundle,
+										bundleClassPathList);
+							}
+							String classPath = importPackage.split(",")[0];
+							classPath = "/" + classPath.replace('.', '/');
+							bundleClassPathList.add(classPath);
+							foundClassPathList.add(importPackage);
+						}
+					}
+					for (String importPackage : foundClassPathList) {
+						importPackageList.remove(importPackage);
+					}
+					if (importPackageList.isEmpty())
+						break;
+				}
+				if (importPackageList.isEmpty())
+					break;
+			}
+
+			for (Bundle bundle : bundleClassPathListMap.keySet()) {
+				String[] classPaths = bundleClassPathListMap.get(bundle)
+						.toArray(new String[0]);
 				List<Resource> requireBundleResource = doJustGetBundleClassResources(
-						requireBundle, requireBundleExportPackages, false);
+						bundle, classPaths, false);
 				if (requireBundleResource == null)
 					continue;
 				resourceList.addAll(requireBundleResource);
 			}
 		}
-		// 然后扫描导入的包
-		String[] importPackages = BundleUtil
-				.getBundleImportPackagePackageList(currentBundle);
-		if (importPackages != null) {
-			Bundle[] allBundles = currentBundle.getBundleContext().getBundles();
-			for (String importPackage : importPackages) {
-				Bundle importPackageBundle = BundleUtil
-						.getBundleByExportPackage(allBundles, importPackage);
+		return resourceList;
+	}
 
-				if (importPackageBundle == null)
+	// 得到Bundle依赖Bundle的资源
+	private List<Resource> doGetBundleRequiredResources() {
+		List<Resource> resourceList = new ArrayList<Resource>();
+
+		// 得到当前Bundle依赖的Bundles
+		Bundle[] reuiredBundles = BundleUtil.getBundleRequiredBundles(bundle);
+		if (reuiredBundles != null) {
+			for (Bundle requireBundle : reuiredBundles) {
+				// 处理reuiredBundles中的资源
+				String[] requireBundleExportPackages = BundleUtil
+						.getBundleExportPackageList(requireBundle, true);
+
+				if (requireBundleExportPackages == null)
 					continue;
 
-				String justPackageName = importPackage.split(",")[0];
-				justPackageName = justPackageName.replace('.', '/');
-
+				for (int i = 0; i < requireBundleExportPackages.length; i++) {
+					// 将.替换成/，用于资源搜索
+					requireBundleExportPackages[i] = requireBundleExportPackages[i]
+							.replace('.', '/');
+				}
 				List<Resource> requireBundleResource = doJustGetBundleClassResources(
-						importPackageBundle, justPackageName, false);
+						requireBundle, requireBundleExportPackages, false);
 				if (requireBundleResource == null)
 					continue;
 				resourceList.addAll(requireBundleResource);
@@ -144,9 +183,11 @@ public class BundleResourceResolver {
 			throw new RuntimeException("未知的path:" + path);
 		}
 
-		List<Resource> resourceList = doGetBundleRequiredResources(bundle);
-		resourceList.addAll(doJustGetBundleClassResources(bundle, centerPath,
-				true));
+		List<Resource> resourceList = doJustGetBundleClassResources(bundle,
+				centerPath, true);
+		resourceList.addAll(doGetImportPackageResource());
+		resourceList.addAll(doGetBundleRequiredResources());
+
 		return resourceList.toArray(new Resource[0]);
 	}
 }
