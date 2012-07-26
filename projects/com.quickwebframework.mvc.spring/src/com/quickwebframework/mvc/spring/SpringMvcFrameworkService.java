@@ -31,6 +31,7 @@ import com.quickwebframework.entity.MvcModelAndView;
 import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
 import com.quickwebframework.mvc.spring.util.BundleAnnotationConfigApplicationContext;
 import com.quickwebframework.mvc.spring.util.BundleGenericXmlApplicationContext;
+import com.quickwebframework.mvc.spring.util.BundleScanner;
 import com.quickwebframework.mvc.spring.util.PluginPathMatcher;
 import com.quickwebframework.mvc.spring.util.PluginUrlPathHelper;
 import com.quickwebframework.service.MvcFrameworkService;
@@ -41,6 +42,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 
 	private static Log log = LogFactory.getLog(SpringMvcFrameworkService.class);
 	private PathMatcher pathMatcher = new AntPathMatcher();
+	private BundleScanner scanner = new BundleScanner();
 
 	// 插件名与ControllerService对应Map
 	private Map<String, PluginControllerInfo> bundleNamePluginControllerInfoMap = new HashMap<String, PluginControllerInfo>();
@@ -48,60 +50,9 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	private void initPluginControllerInfo(Bundle bundle,
 			PluginControllerInfo pluginControllerInfo) {
 
-		// 检查插件的根路径下面是否有applicationContext.xml文件
-		URL applicationContextUrl = bundle
-				.getResource("applicationContext.xml");
-
-		ApplicationContext applicationContext = null;
 		ClassLoader bundleClassLoader = pluginControllerInfo.getWebAppService()
-				.getClassLoader();
-		// 如果有，则让Spring加载这个xml文件
-		if (applicationContextUrl != null) {
-			try {
-				BundleGenericXmlApplicationContext bundleGenericXmlApplicationContext = new BundleGenericXmlApplicationContext(
-						bundle);
-				bundleGenericXmlApplicationContext
-						.setNamespaceHandlerResolver(new DefaultNamespaceHandlerResolver(
-								this.getClass().getClassLoader()));
-				bundleGenericXmlApplicationContext
-						.setClassLoader(bundleClassLoader);
-				bundleGenericXmlApplicationContext.load(new UrlResource(
-						applicationContextUrl));
-				bundleGenericXmlApplicationContext.refresh();
-				bundleGenericXmlApplicationContext.start();
-				applicationContext = bundleGenericXmlApplicationContext;
-			} catch (Exception ex) {
-				log.error("Spring加载applicationContext时出错异常，插件启动失败！", ex);
-				try {
-					bundle.stop();
-				} catch (BundleException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		// 否则扫描插件的所有文件
-		else {
-			// 初始化AnnotationConfigApplicationContext
-			BundleAnnotationConfigApplicationContext bundleAnnotationConfigApplicationContext = new BundleAnnotationConfigApplicationContext(
-					bundle);
-			try {
-				// 开始Spring扫描
-				bundleAnnotationConfigApplicationContext
-						.setClassLoader(bundleClassLoader);
-				bundleAnnotationConfigApplicationContext.scan("*");
-				bundleAnnotationConfigApplicationContext.refresh();
-				bundleAnnotationConfigApplicationContext.start();
-				applicationContext = bundleAnnotationConfigApplicationContext;
-			} catch (Exception ex) {
-				log.error("用Spring扫描插件时出错异常，插件启动失败！", ex);
-				try {
-					bundle.stop();
-				} catch (BundleException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
+				.getClassLoader();		
+		ApplicationContext applicationContext = scanner.scan(bundle, bundleClassLoader);
 		// 从ApplicationContext得到过滤器列表
 		Map<String, Filter> filterMap = applicationContext
 				.getBeansOfType(Filter.class);

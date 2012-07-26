@@ -56,7 +56,11 @@ public class BundleAutoManageThread extends Thread {
 				for (File file : files) {
 					ZipFile zipFile = null;
 					try {
-						zipFile = new ZipFile(file);
+						try {
+							zipFile = new ZipFile(file);
+						} catch (Exception ex) {
+							continue;
+						}
 						ZipEntry zipEntry = zipFile
 								.getEntry("META-INF/MANIFEST.MF");
 						if (zipEntry == null || zipEntry.isDirectory())

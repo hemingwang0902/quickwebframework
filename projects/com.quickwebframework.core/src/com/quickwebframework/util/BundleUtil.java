@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.framework.Bundle;
 
@@ -37,6 +40,90 @@ public class BundleUtil {
 			}
 		}
 		return rtnList;
+	}
+
+	/**
+	 * 得到Bundle的header映射
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public static Map<String, String> getBundleHeadersMap(Bundle bundle) {
+		Dictionary<String, String> headersDict = bundle.getHeaders();
+		Map<String, String> headersMap = new HashMap<String, String>();
+		Enumeration<String> keyEnumeration = headersDict.keys();
+		while (keyEnumeration.hasMoreElements()) {
+			String key = keyEnumeration.nextElement();
+			headersMap.put(key, headersDict.get(key));
+		}
+		return headersMap;
+	}
+
+	/**
+	 * 从MANIFEST.MF文件中的Require-Bundle的一行得到Bundle
+	 * 
+	 * @param bundles
+	 * @param bundlePropertyLine
+	 * @return
+	 */
+	public static Bundle resloveRequireBundleLineInManifest(Bundle[] bundles,
+			String bundlePropertyLine) {
+		String[] tmpArray = bundlePropertyLine.split(";");
+		String requireBundleName = tmpArray[0];
+
+		Bundle requireBundle = null;
+		for (Bundle tmpBundle : bundles) {
+			if (tmpBundle.getSymbolicName().equals(requireBundleName)) {
+				// 暂不考虑版本匹配问题,以后要考虑
+				requireBundle = tmpBundle;
+				break;
+			}
+		}
+		return requireBundle;
+	}
+
+	/**
+	 * 得到Bundle需要的其他Bundle数组
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public static Bundle[] getBundleRequiredBundles(Bundle bundle) {
+		Map<String, String> headersMap = BundleUtil.getBundleHeadersMap(bundle);
+		List<Bundle> bundleList = new ArrayList<Bundle>();
+		// 如果有引用其他的Bundle
+		if (headersMap.containsKey("Require-Bundle")) {
+			String requireBundlesString = headersMap.get("Require-Bundle");
+			String[] requireBundleArray = requireBundlesString.split(",");
+
+			Bundle[] allBundle = bundle.getBundleContext().getBundles();
+
+			for (String requireBundleLine : requireBundleArray) {
+				Bundle requireBundle = resloveRequireBundleLineInManifest(
+						allBundle, requireBundleLine);
+				bundleList.add(requireBundle);
+			}
+		}
+		return bundleList.toArray(new Bundle[0]);
+	}
+
+	/**
+	 * 得到Bundle的导出包名列表
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public static String[] getBundleExportPackageList(Bundle bundle) {
+		Map<String, String> headersMap = BundleUtil.getBundleHeadersMap(bundle);
+		List<String> list = new ArrayList<String>();
+		if (headersMap.containsKey("Export-Package")) {
+			String exportPackagesString = headersMap.get("Export-Package");
+			String[] exportPackageLineArray = exportPackagesString.split(",");
+			for (String exportPackageLine : exportPackageLineArray) {
+				list.add(exportPackageLine.split(";")[0]);
+			}
+		}
+		return list.toArray(new String[0]);
 	}
 
 	/**
