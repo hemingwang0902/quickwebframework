@@ -28,14 +28,37 @@ public class BundleResourceResolver {
 
 	private List<Resource> doJustGetBundleClassResources(
 			Bundle toGetResourceBundle, String path, boolean recurse) {
+		return doJustGetBundleClassResources(toGetResourceBundle,
+				new String[] { path }, recurse);
+	}
+
+	private List<Resource> doJustGetBundleClassResources(
+			Bundle toGetResourceBundle, String[] paths, boolean recurse) {
+
 		List<Resource> resourceList = new ArrayList<Resource>();
 		// 搜索Class文件
-		Enumeration<?> enume = toGetResourceBundle.findEntries(path, "*.class",
-				recurse);
+		Enumeration<?> enume = toGetResourceBundle.findEntries("", "*.class",
+				true);
 		if (enume == null)
 			return null;
 		while (enume.hasMoreElements()) {
-			resourceList.add(new UrlResource((URL) enume.nextElement()));
+			URL url = (URL) enume.nextElement();
+			String urlPath = url.getPath();
+			for (String path : paths) {
+				if (!path.startsWith("/"))
+					path = "/" + path;
+				if (urlPath.startsWith(path)) {
+					// 如果不遍历子路径,且后面还有目录
+					if (!recurse) {
+						String subPath = urlPath.substring(path.length());
+						if (subPath.startsWith("/"))
+							subPath = subPath.substring(1);
+						if (subPath.contains("/"))
+							continue;
+					}
+					resourceList.add(new UrlResource(url));
+				}
+			}
 		}
 		return resourceList;
 	}
@@ -52,19 +75,42 @@ public class BundleResourceResolver {
 				doGetBundleRequiredResources(requireBundle);
 				// 处理reuiredBundles中的资源
 				String[] requireBundleExportPackages = BundleUtil
-						.getBundleExportPackageList(requireBundle);
+						.getBundleExportPackageList(requireBundle, true);
 				if (requireBundleExportPackages == null)
 					continue;
-				for (String requireBundleExportPackage : requireBundleExportPackages) {
+				for (int i = 0; i < requireBundleExportPackages.length; i++) {
 					// 将.替换成/，用于资源搜索
-					requireBundleExportPackage = requireBundleExportPackage
+					requireBundleExportPackages[i] = requireBundleExportPackages[i]
 							.replace('.', '/');
-					List<Resource> requireBundleResource = doJustGetBundleClassResources(
-							requireBundle, requireBundleExportPackage, false);
-					if (requireBundleResource == null)
-						continue;
-					resourceList.addAll(requireBundleResource);
 				}
+
+				List<Resource> requireBundleResource = doJustGetBundleClassResources(
+						requireBundle, requireBundleExportPackages, false);
+				if (requireBundleResource == null)
+					continue;
+				resourceList.addAll(requireBundleResource);
+			}
+		}
+		// 然后扫描导入的包
+		String[] importPackages = BundleUtil
+				.getBundleImportPackagePackageList(currentBundle);
+		if (importPackages != null) {
+			Bundle[] allBundles = currentBundle.getBundleContext().getBundles();
+			for (String importPackage : importPackages) {
+				Bundle importPackageBundle = BundleUtil
+						.getBundleByExportPackage(allBundles, importPackage);
+
+				if (importPackageBundle == null)
+					continue;
+
+				String justPackageName = importPackage.split(",")[0];
+				justPackageName = justPackageName.replace('.', '/');
+
+				List<Resource> requireBundleResource = doJustGetBundleClassResources(
+						importPackageBundle, justPackageName, false);
+				if (requireBundleResource == null)
+					continue;
+				resourceList.addAll(requireBundleResource);
 			}
 		}
 		return resourceList;

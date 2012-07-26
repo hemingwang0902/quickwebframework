@@ -108,17 +108,60 @@ public class BundleUtil {
 	}
 
 	/**
-	 * 得到Bundle的导出包名列表
+	 * 得到Bundle的导入包名列表(返回值包括版本信息)
 	 * 
 	 * @param bundle
 	 * @return
 	 */
-	public static String[] getBundleExportPackageList(Bundle bundle) {
+	public static String[] getBundleImportPackagePackageList(Bundle bundle) {
+		Map<String, String> headersMap = BundleUtil.getBundleHeadersMap(bundle);
+		if (headersMap.containsKey("Import-Package")) {
+			String exportPackagesString = headersMap.get("Import-Package");
+			return exportPackagesString.split(",");
+		}
+		return null;
+	}
+
+	/**
+	 * 根据导出包名找到Bundle
+	 * 
+	 * @param bundles
+	 * @param packageName
+	 * @return
+	 */
+	public static Bundle getBundleByExportPackage(Bundle[] bundles,
+			String packageName) {
+		for (Bundle bundle : bundles) {
+			String[] exportPackageInfos = getBundleExportPackageList(bundle,
+					false);
+			for (String exportPackageInfo : exportPackageInfos) {
+				if (exportPackageInfo.startsWith(packageName)) {
+					return bundle;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 得到Bundle的导出包名列表
+	 * 
+	 * @param bundle
+	 * @param justIncludePackageName
+	 *            是否只包含包的名字部分，而不包含后面的版本等信息
+	 * @return
+	 */
+	public static String[] getBundleExportPackageList(Bundle bundle,
+			boolean justIncludePackageName) {
 		Map<String, String> headersMap = BundleUtil.getBundleHeadersMap(bundle);
 		List<String> list = new ArrayList<String>();
 		if (headersMap.containsKey("Export-Package")) {
 			String exportPackagesString = headersMap.get("Export-Package");
 			String[] exportPackageLineArray = exportPackagesString.split(",");
+			// 如果不只包含包名
+			if (!justIncludePackageName) {
+				return exportPackageLineArray;
+			}
 			for (String exportPackageLine : exportPackageLineArray) {
 				list.add(exportPackageLine.split(";")[0]);
 			}
