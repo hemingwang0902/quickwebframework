@@ -1,11 +1,5 @@
 package qwf.test.core;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -27,13 +21,13 @@ public class Activator implements BundleActivator {
 		Activator.context = bundleContext;
 
 		FrameworkContext.registerWebApp(this, bundleContext);
-		FrameworkContext.setRootUrlHandleServlet(new RootUrlHandleServlet());
+		//FrameworkContext.setRootUrlHandleServlet(new RootUrlHandleServlet());
 		log.info("qwf.test.core插件已启动!");
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
 		Activator.context = null;
-		FrameworkContext.setRootUrlHandleServlet(null);
+		//FrameworkContext.setRootUrlHandleServlet(null);
 		log.info("qwf.test.core插件已停止!");
 	}
 
