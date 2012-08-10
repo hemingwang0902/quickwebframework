@@ -3,6 +3,8 @@ package com.quickwebframework.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -206,8 +208,23 @@ public class DispatcherServlet {
 		HttpServletResponse rep = new PluginHttpServletResponse(response);
 		if (FrameworkContext.getRootUrlHandleServlet() == null) {
 			rep.setContentType("text/html;charset=utf-8");
-			rep.getWriter()
-					.write("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!</body></html>");
+			StringBuilder sb = new StringBuilder();
+			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
+			if (FrameworkContext.mvcFrameworkService != null) {
+				Map<String, List<String>> map = FrameworkContext.mvcFrameworkService
+						.getBundleNameUrlListMap();
+				sb.append("<table>");
+				for (String bundleName : map.keySet()) {
+					sb.append("<tr><td><b>" + bundleName + "</b></td></tr>");
+					for (String url : map.get(bundleName)) {
+						sb.append("<tr><td><a style=\"margin-left:20px\" href=\"" + url + "\">" + url
+								+ "</a></td></tr>");
+					}
+				}
+				sb.append("</table>");
+			}
+			sb.append("</body></html>");
+			rep.getWriter().write(sb.toString());
 			return;
 		}
 		HttpServletRequest req = new PluginHttpServletRequest(response);
