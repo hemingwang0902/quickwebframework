@@ -5,10 +5,12 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -30,6 +32,7 @@ import org.osgi.framework.launch.FrameworkFactory;
 import com.quickwebframework.web.servlet.PluginManageServlet;
 import com.quickwebframework.web.servlet.PluginResourceDispatcherServlet;
 import com.quickwebframework.web.servlet.PluginViewDispatcherServlet;
+import com.quickwebframework.web.servlet.QwfServlet;
 import com.quickwebframework.web.thread.BundleAutoManageThread;
 
 public class QuickWebFrameworkLoaderListener implements ServletContextListener {
@@ -86,9 +89,7 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 	}
 
 	// 相应的Servlet
-	public static HttpServlet pluginViewDispatcherServlet;
-	public static HttpServlet pluginResourceDispatcherServlet;
-	public static HttpServlet pluginManageServlet;
+	public static List<QwfServlet> qwfServletList = new ArrayList<QwfServlet>();
 
 	public void contextInitialized(ServletContextEvent arg0) {
 		ServletContext servletContext = arg0.getServletContext();
@@ -190,16 +191,26 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 			// Framework初始化
 			framework.init();
 
+			QwfServlet tmpServlet = null;
 			// 初始化插件视图Servlet
-			pluginViewDispatcherServlet = PluginViewDispatcherServlet
-					.initServlet(servletContext, quickWebFrameworkProperties);
-			// 初始化插件资源Servlet
-			pluginResourceDispatcherServlet = PluginResourceDispatcherServlet
-					.initServlet(servletContext, quickWebFrameworkProperties);
-			// 初始化插件管理Servlet
-			pluginManageServlet = PluginManageServlet.initServlet(
+			tmpServlet = PluginViewDispatcherServlet.initServlet(
 					servletContext, quickWebFrameworkProperties);
-
+			if (tmpServlet != null) {
+				qwfServletList.add(tmpServlet);
+			}
+			// 初始化插件资源Servlet
+			tmpServlet = PluginResourceDispatcherServlet.initServlet(
+					servletContext, quickWebFrameworkProperties);
+			if (tmpServlet != null) {
+				qwfServletList.add(tmpServlet);
+			}
+			// 初始化插件管理Servlet
+			tmpServlet = PluginManageServlet.initServlet(servletContext,
+					quickWebFrameworkProperties);
+			if (tmpServlet != null) {
+				qwfServletList.add(tmpServlet);
+			}
+			
 			// 将ServletContext注册为服务
 			getBundleContext().registerService(ServletContext.class.getName(),
 					servletContext, null);
@@ -245,7 +256,8 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 			System.out.println("启动OSGi Framework成功！");
 
 			// 扫描插件目录，看是否有插件需要自动安装
-			Thread trdBundleAutoManage = new BundleAutoManageThread(osgiFrameworkStorage);
+			Thread trdBundleAutoManage = new BundleAutoManageThread(
+					osgiFrameworkStorage);
 			trdBundleAutoManage.start();
 		} catch (BundleException e) {
 			throw new RuntimeException("启动OSGi Framework失败！", e);

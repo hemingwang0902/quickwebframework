@@ -14,11 +14,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.quickwebframework.web.util.IoUtil;
 import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 
-public class PluginResourceDispatcherServlet extends
-		javax.servlet.http.HttpServlet {
+public class PluginResourceDispatcherServlet extends QwfServlet {
 
 	private static final long serialVersionUID = 9199739683584454735L;
 
@@ -30,6 +31,9 @@ public class PluginResourceDispatcherServlet extends
 
 	// 默认允许的MIME
 	private final static String DEFAULT_ALLOW_MIME = ".js=application/x-javascript;.txt=text/plain;.htm=text/html;.html=text/html;.jpg=image/jpeg;.png=image/png";
+
+	// URL映射风格.1:/view/[插件名称]/[路径] 2:/[插件名称]/view/[路径] 3:/view?bn=[插件名称]&mn=[路径]
+	private static int urlMappingStyle = 0;
 
 	private String mapping;
 	private String bundleNameParameterName;
@@ -84,7 +88,7 @@ public class PluginResourceDispatcherServlet extends
 	}
 
 	// 初始化插件资源Servlet
-	public static HttpServlet initServlet(ServletContext servletContext,
+	public static QwfServlet initServlet(ServletContext servletContext,
 			Properties quickWebFrameworkProperties) {
 		// 添加插件资源Servlet
 		PluginResourceDispatcherServlet pluginResourceDispatcherServlet = new PluginResourceDispatcherServlet();
@@ -126,7 +130,55 @@ public class PluginResourceDispatcherServlet extends
 		pluginResourceDispatcherServlet
 				.setResourcePathPrefix(quickWebFrameworkProperties
 						.getProperty(PluginResourceDispatcherServlet.RESOURCE_PATH_PREFIX_PROPERTY_KEY));
+
+		// 如果映射的URL是类似于 */view/
+		if (pluginResourceDispatcherServlet.mapping.startsWith("*")) {
+			urlMappingStyle = 1;
+		}
+		// 如果映射的URL是类似于 /view/*
+		else if (pluginResourceDispatcherServlet.mapping.endsWith("*")) {
+			urlMappingStyle = 2;
+		}
+		// 否则应该是类似于/view，只需要直接取出参数
+		else {
+			urlMappingStyle = 3;
+			if (StringUtils
+					.isEmpty(pluginResourceDispatcherServlet.bundleNameParameterName)) {
+				throw new RuntimeException(
+						"在QuickWebFramework的配置文件中未找到配置项:[quickwebframework.pluginResourceServlet.bundleNameParameterName]");
+			}
+			if (StringUtils
+					.isEmpty(pluginResourceDispatcherServlet.resourcePathParameterName)) {
+				throw new RuntimeException(
+						"在QuickWebFramework的配置文件中未找到配置项:[quickwebframework.pluginResourceServlet.resourcePathParameterName]");
+			}
+		}
+
 		return pluginResourceDispatcherServlet;
+	}
+
+	@Override
+	public boolean isUrlMatch(String requestUrlWithoutContextPath) {
+		if (urlMappingStyle == 1) {
+			String[] tmpArray = StringUtils.split(requestUrlWithoutContextPath,
+					"/");
+			if (tmpArray.length < 2) {
+				return false;
+			}
+			String keyword = mapping.replace("*", "").replace("/", "");
+			return tmpArray[1].equals(keyword);
+		} else if (urlMappingStyle == 2) {
+			String[] tmpArray = StringUtils.split(requestUrlWithoutContextPath,
+					"/");
+			if (tmpArray.length < 2) {
+				return false;
+			}
+			return requestUrlWithoutContextPath.startsWith(mapping.replace("*",
+					""));
+		} else if (urlMappingStyle == 3) {
+			return requestUrlWithoutContextPath.startsWith(mapping);
+		}
+		return false;
 	}
 
 	// 处理HTTP方法
@@ -155,25 +207,35 @@ public class PluginResourceDispatcherServlet extends
 				String contextPath = request.getContextPath();
 				String requestURI = request.getRequestURI();
 
+				// 如果映射的URL是类似于 */resource/
+				if (urlMappingStyle == 1) {
+					String otherString = requestURI.substring(contextPath
+							.length());
+					String[] tmpArray = StringUtils.split(otherString, "/");
+					if (tmpArray.length >= 2) {
+						bundleName = tmpArray[0];
+						resourcePath = otherString.substring(bundleName
+								.length() + mapping.length());
+					}
+				}
 				// 如果映射的URL是类似于 /resource/*
-				if (mapping.endsWith("*")) {
+				else if (urlMappingStyle == 2) {
 					String otherString = requestURI.substring(contextPath
 							.length() + mapping.length() - 1);
-					String[] tmpArray = otherString.split("/");
-					if (tmpArray.length < 2) {
-						response.sendError(404, "参数数量不正确！");
-						return;
+					String[] tmpArray = StringUtils.split(otherString, "/");
+					if (tmpArray.length >= 2) {
+						bundleName = tmpArray[0];
+						resourcePath = otherString.substring(bundleName
+								.length() + 1);
 					}
-					bundleName = tmpArray[0];
-					resourcePath = otherString
-							.substring(bundleName.length() + 1);
 				}
-				// 否则映射的URL是类似于 /resource，只需要直接取出参数
-				else {
+				// 如果映射的URL是类似于 /resource，只需要直接取出参数
+				else if (urlMappingStyle == 3) {
 					bundleName = request.getParameter(bundleNameParameterName);
 					resourcePath = request
 							.getParameter(resourcePathParameterName);
 				}
+
 				// 如果有统一前缀，则添加统一前缀
 				if (resourcePathPrefix != null && !resourcePathPrefix.isEmpty()) {
 					resourcePath = resourcePathPrefix + resourcePath;

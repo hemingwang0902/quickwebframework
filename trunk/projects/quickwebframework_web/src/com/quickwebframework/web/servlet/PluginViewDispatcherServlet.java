@@ -4,13 +4,14 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 
-public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet {
+public class PluginViewDispatcherServlet extends QwfServlet {
 
 	private static final long serialVersionUID = -148988758320673145L;
 
@@ -22,7 +23,8 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 	public static final String ARG_METHOD_NAME = "com.quickwebframework.util.ARG_METHOD_NAME";
 	public static final String BUNDLE_METHOD_URL_TEMPLATE = "com.quickwebframework.util.BUNDLE_METHOD_URL_TEMPLATE";
 
-	// URL映射风格.1:/view/[插件名称]/[方法名称] 2:/view?bn=[插件名称]&mn=[方法名称]
+	// URL映射风格.1:/view/[插件名称]/[方法名称] 2:/[插件名称]/view/[方法名称]
+	// 3:/view?bn=[插件名称]&mn=[方法名称]
 	private static int urlMappingStyle = 0;
 
 	private String mapping;
@@ -42,7 +44,7 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 	}
 
 	// 初始化插件视图Servlet
-	public static HttpServlet initServlet(ServletContext servletContext,
+	public static QwfServlet initServlet(ServletContext servletContext,
 			Properties quickWebFrameworkProperties) {
 		// 添加插件视图Servlet
 		PluginViewDispatcherServlet pluginViewDispatcherServlet = new PluginViewDispatcherServlet();
@@ -61,16 +63,37 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 						.getProperty(PluginViewDispatcherServlet.METHOD_NAME_PARAMETER_NAME_PROPERTY_KEY));
 
 		String urlTemplate = null;
-		// 如果映射的URL是类似于 /view/*
-		if (pluginViewDispatcherServlet.mapping.endsWith("*")) {
+		// 如果映射的URL是类似于 */view/
+		if (pluginViewDispatcherServlet.mapping.startsWith("*")) {
 			urlMappingStyle = 1;
-			urlTemplate = pluginViewDispatcherServlet.mapping.substring(0,
-					pluginViewDispatcherServlet.mapping.length() - 1 - 1)
+			String keyword = pluginViewDispatcherServlet.mapping.replace("*",
+					"").replace("/", "");
+			urlTemplate = "/" + servletContext.getContextPath() + "/%s/"
+					+ keyword + "/%s";
+			urlTemplate = urlTemplate.replace("//", "/");
+		}
+		// 如果映射的URL是类似于 /view/*
+		else if (pluginViewDispatcherServlet.mapping.endsWith("*")) {
+			urlMappingStyle = 2;
+			String keyword = pluginViewDispatcherServlet.mapping.replace("*",
+					"").replace("/", "");
+			urlTemplate = "/" + servletContext.getContextPath() + "/" + keyword
 					+ "/%s/%s";
+			urlTemplate = urlTemplate.replace("//", "/");
 		}
 		// 否则应该是类似于/view，只需要直接取出参数
 		else {
-			urlMappingStyle = 2;
+			urlMappingStyle = 3;
+			if (StringUtils
+					.isEmpty(pluginViewDispatcherServlet.bundleNameParameterName)) {
+				throw new RuntimeException(
+						"在QuickWebFramework的配置文件中未找到配置项:[quickwebframework.pluginViewServlet.bundleNameParameterName]");
+			}
+			if (StringUtils
+					.isEmpty(pluginViewDispatcherServlet.methodNameParameterName)) {
+				throw new RuntimeException(
+						"在QuickWebFramework的配置文件中未找到配置项:[quickwebframework.pluginViewServlet.methodNameParameterName]");
+			}
 			urlTemplate = pluginViewDispatcherServlet.mapping + "?"
 					+ pluginViewDispatcherServlet.bundleNameParameterName
 					+ "=%s&"
@@ -83,6 +106,35 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 		servletContext.setAttribute(BUNDLE_METHOD_URL_TEMPLATE, urlTemplate);
 
 		return pluginViewDispatcherServlet;
+	}
+
+	@Override
+	public boolean isUrlMatch(String requestUrlWithoutContextPath) {
+		// 如果是根URL
+		if (requestUrlWithoutContextPath.equals("/")) {
+			return true;
+		}
+
+		if (urlMappingStyle == 1) {
+			String[] tmpArray = StringUtils.split(requestUrlWithoutContextPath,
+					"/");
+			if (tmpArray.length < 2) {
+				return false;
+			}
+			String keyword = mapping.replace("*", "").replace("/", "");
+			return tmpArray[1].equals(keyword);
+		} else if (urlMappingStyle == 2) {
+			String[] tmpArray = StringUtils.split(requestUrlWithoutContextPath,
+					"/");
+			if (tmpArray.length < 2) {
+				return false;
+			}
+			return requestUrlWithoutContextPath.startsWith(mapping.replace("*",
+					""));
+		} else if (urlMappingStyle == 3) {
+			return requestUrlWithoutContextPath.startsWith(mapping);
+		}
+		return false;
 	}
 
 	// 处理HTTP方法
@@ -132,19 +184,30 @@ public class PluginViewDispatcherServlet extends javax.servlet.http.HttpServlet 
 
 				// 得到bundleName和methodName
 
-				// 如果映射的URL是类似于 /view/*
+				// 如果映射的URL是类似于 */view/
 				if (urlMappingStyle == 1) {
 					String otherString = requestURI.substring(contextPath
+							.length());
+					String[] tmpArray = StringUtils.split(otherString, "/");
+					if (tmpArray.length >= 2) {
+						bundleName = tmpArray[0];
+						methodName = otherString.substring(bundleName.length()
+								+ mapping.length());
+					}
+				}
+				// 否则如果是类似于/view/*
+				else if (urlMappingStyle == 2) {
+					String otherString = requestURI.substring(contextPath
 							.length() + mapping.length() - 1);
-					String[] tmpArray = otherString.split("/");
+					String[] tmpArray = StringUtils.split(otherString, "/");
 					if (tmpArray.length >= 2) {
 						bundleName = tmpArray[0];
 						methodName = otherString
 								.substring(bundleName.length() + 1);
 					}
 				}
-				// 否则应该是类似于/view，只需要直接取出参数
-				else if (urlMappingStyle == 2) {
+				// 否则如果是类似于/view，只需要直接取出参数
+				else if (urlMappingStyle == 3) {
 					bundleName = request.getParameter(bundleNameParameterName);
 					methodName = request.getParameter(methodNameParameterName);
 				}

@@ -25,7 +25,7 @@ import com.quickwebframework.web.util.IoUtil;
 import com.quickwebframework.web.fileupload.memory.MemoryFileItemFactory;
 import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 
-public class PluginManageServlet extends javax.servlet.http.HttpServlet {
+public class PluginManageServlet extends QwfServlet {
 	/**
 	 * 
 	 */
@@ -34,6 +34,8 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 
 	// 模板字符串
 	private String templateString;
+	// 映射的URL
+	private static String mapping;
 
 	public PluginManageServlet() {
 		try {
@@ -53,17 +55,22 @@ public class PluginManageServlet extends javax.servlet.http.HttpServlet {
 	}
 
 	// 初始化插件管理Servlet
-	public static HttpServlet initServlet(ServletContext servletContext,
+	public static QwfServlet initServlet(ServletContext servletContext,
 			Properties quickWebFrameworkProperties) {
 
-		String pluginManageDispatcherServletMapping = quickWebFrameworkProperties
+		mapping = quickWebFrameworkProperties
 				.getProperty(PluginManageServlet.MAPPING_PROPERTY_KEY);
-		if (pluginManageDispatcherServletMapping == null)
+		if (mapping == null)
 			return null;
 
 		// 添加插件管理Servlet
 		PluginManageServlet pluginManageServlet = new PluginManageServlet();
 		return pluginManageServlet;
+	}
+
+	@Override
+	public boolean isUrlMatch(String requestUrlWithoutContextPath) {
+		return requestUrlWithoutContextPath.equals(mapping);
 	}
 
 	@Override
