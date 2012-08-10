@@ -23,21 +23,16 @@ public class DispatcherServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = -5801185453706962742L;
 
-	private HttpServlet pluginViewDispatcherServlet;
-	private HttpServlet pluginResourceDispatcherServlet;
-	private HttpServlet pluginManageServlet;
-
 	@Override
 	public void init() {
-		pluginViewDispatcherServlet = QuickWebFrameworkLoaderListener.pluginViewDispatcherServlet;
-		pluginResourceDispatcherServlet = QuickWebFrameworkLoaderListener.pluginResourceDispatcherServlet;
-		pluginManageServlet = QuickWebFrameworkLoaderListener.pluginManageServlet;
 	}
 
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			String requestURI = request.getRequestURI();
+			requestURI = requestURI
+					.substring(request.getContextPath().length());
 
 			// 保护WEB-INF中的文件
 			if (requestURI.startsWith("/WEB-INF")) {
@@ -45,22 +40,11 @@ public class DispatcherServlet extends HttpServlet {
 				return;
 			}
 
-			// 如果是视图
-			if (requestURI.equals("/") || requestURI.startsWith("/view/")) {
-				pluginViewDispatcherServlet.service(request, response);
-				return;
-			}
-
-			// 如果是资源
-			if (requestURI.startsWith("/resource/")) {
-				pluginResourceDispatcherServlet.service(request, response);
-				return;
-			}
-
-			// 如果是插件管理页面
-			if (requestURI.equals("/qwf/index")) {
-				pluginManageServlet.service(request, response);
-				return;
+			for (QwfServlet tmpServlet : QuickWebFrameworkLoaderListener.qwfServletList) {
+				if (tmpServlet.isUrlMatch(requestURI)) {
+					tmpServlet.service(request, response);
+					return;
+				}
 			}
 
 			InputStream inputStream = getServletContext().getResourceAsStream(
