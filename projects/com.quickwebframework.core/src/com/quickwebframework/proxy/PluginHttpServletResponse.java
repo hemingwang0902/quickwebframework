@@ -42,7 +42,7 @@ public class PluginHttpServletResponse extends MapperObject implements
 
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
-		return (ServletOutputStream) invokeOrginObjectMethod();
+		return new PluginServletOutputStream(invokeOrginObjectMethod());
 	}
 
 	@Override
