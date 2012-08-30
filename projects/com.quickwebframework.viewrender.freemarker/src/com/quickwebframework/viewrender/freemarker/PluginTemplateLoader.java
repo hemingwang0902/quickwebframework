@@ -3,9 +3,9 @@ package com.quickwebframework.viewrender.freemarker;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.net.URL;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.core.FrameworkContext;
 import com.quickwebframework.service.WebAppService;
@@ -58,8 +58,9 @@ public class PluginTemplateLoader implements TemplateLoader {
 		String path = tmpArray[1];
 		// 对视图名称进行处理(添加前后缀)
 		path = viewNamePrefix + path + viewNameSuffix;
-		
-		WebAppService pluginService = FrameworkContext.mvcFrameworkService.getWebAppService(pluginName);
+
+		WebAppService pluginService = FrameworkContext.mvcFrameworkService
+				.getWebAppService(pluginName);
 
 		if (pluginService == null) {
 			throw new RuntimeException(String.format(
@@ -83,8 +84,10 @@ public class PluginTemplateLoader implements TemplateLoader {
 
 		InputStream inputStream = null;
 		try {
-			inputStream = pluginTemplateSource.controllerService.getBundle()
-					.getResource(pluginTemplateSource.path).openStream();
+			URL resourceURL = pluginTemplateSource.controllerService
+					.getBundle().getResource(pluginTemplateSource.path);
+			if (resourceURL != null)
+				inputStream = resourceURL.openStream();
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
