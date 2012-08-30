@@ -25,6 +25,8 @@ public abstract class FrameworkContext {
 	private static Log log = LogFactory.getLog(FrameworkContext.class);
 	// 核心Bundle
 	private static Bundle coreBundle;
+	// 插件名称插件Map
+	private static Map<String, Bundle> bundleNameBundleMap = new HashMap<String, Bundle>();
 
 	// MVC框架服务
 	public static MvcFrameworkService mvcFrameworkService;
@@ -84,13 +86,31 @@ public abstract class FrameworkContext {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
 				int eventType = arg0.getType();
-				// 如果插件的状态不是正在停止，则返回
-				if (!(eventType == BundleEvent.STOPPED || eventType == BundleEvent.STOPPING))
-					return;
 				Bundle bundle = arg0.getBundle();
-				whenBundleStoped(bundle);
+				String bundleName = bundle.getSymbolicName();
+
+				// 如果插件已经启动
+				if (eventType == BundleEvent.STARTED) {
+					bundleNameBundleMap.put(bundleName, bundle);
+				}
+				// 如果插件的状态是正在停止或已经停止
+				else if (eventType == BundleEvent.STOPPED
+						|| eventType == BundleEvent.STOPPING) {
+					if (bundleNameBundleMap.containsKey(bundleName)) {
+						bundleNameBundleMap.remove(bundleName);
+					}
+					whenBundleStoped(bundle);
+				}
 			}
 		});
+	}
+
+	// 根据插件名称得到Bundle
+	public static Bundle getBundleByName(String bundleName) {
+		if (bundleNameBundleMap.containsKey(bundleName)) {
+			return bundleNameBundleMap.get(bundleName);
+		}
+		return null;
 	}
 
 	/**

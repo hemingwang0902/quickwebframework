@@ -15,7 +15,7 @@ public class Activator implements BundleActivator {
 
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
-		FrameworkContext.registerWebApp(this, bundleContext);
+		//FrameworkContext.registerWebApp(this, bundleContext);
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
