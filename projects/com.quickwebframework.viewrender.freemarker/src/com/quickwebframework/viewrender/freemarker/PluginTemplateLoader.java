@@ -5,10 +5,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 import com.quickwebframework.core.FrameworkContext;
-import com.quickwebframework.service.WebAppService;
 
 import freemarker.cache.TemplateLoader;
 
@@ -59,17 +59,16 @@ public class PluginTemplateLoader implements TemplateLoader {
 		// 对视图名称进行处理(添加前后缀)
 		path = viewNamePrefix + path + viewNameSuffix;
 
-		WebAppService pluginService = FrameworkContext.mvcFrameworkService
-				.getWebAppService(pluginName);
+		Bundle bundle = FrameworkContext.getBundleByName(pluginName);
 
-		if (pluginService == null) {
+		if (bundle == null) {
 			throw new RuntimeException(String.format(
 					"Can't found plugin[%s],template [%s] load failure.",
 					pluginName, name));
 		}
 
-		return new PluginTemplateSource(pluginService, path, pluginService
-				.getBundle().getLastModified(), pluginNameAndPathSplitString);
+		return new PluginTemplateSource(bundle, path, bundle.getLastModified(),
+				pluginNameAndPathSplitString);
 	}
 
 	@Override
@@ -84,19 +83,18 @@ public class PluginTemplateLoader implements TemplateLoader {
 
 		InputStream inputStream = null;
 		try {
-			URL resourceURL = pluginTemplateSource.controllerService
-					.getBundle().getResource(pluginTemplateSource.path);
+			URL resourceURL = pluginTemplateSource.bundle
+					.getResource(pluginTemplateSource.path);
 			if (resourceURL != null)
 				inputStream = resourceURL.openStream();
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 		if (inputStream == null) {
-			throw new IOException("Template file ["
-					+ pluginTemplateSource.path
+			throw new IOException("Template file [" + pluginTemplateSource.path
 					+ "] not exist in ["
-					+ pluginTemplateSource.controllerService.getBundle()
-							.getSymbolicName() + "] plugin.");
+					+ pluginTemplateSource.bundle.getSymbolicName()
+					+ "] plugin.");
 		}
 		java.io.BufferedReader reader = new java.io.BufferedReader(
 				new java.io.InputStreamReader(inputStream, encoding));
@@ -108,15 +106,14 @@ public class PluginTemplateLoader implements TemplateLoader {
 	}
 
 	private static class PluginTemplateSource {
-		private final WebAppService controllerService;
+		private final Bundle bundle;
 		private final String path;
 		private final long lastModified;
 		private final String pluginNameAndPathSplitString;
 
-		public PluginTemplateSource(WebAppService controllerService,
-				String path, long lastModified,
-				String pluginNameAndPathSplitString) {
-			this.controllerService = controllerService;
+		public PluginTemplateSource(Bundle bundle, String path,
+				long lastModified, String pluginNameAndPathSplitString) {
+			this.bundle = bundle;
 			this.path = path;
 			this.lastModified = lastModified;
 			this.pluginNameAndPathSplitString = pluginNameAndPathSplitString;
@@ -125,8 +122,7 @@ public class PluginTemplateLoader implements TemplateLoader {
 		public boolean equals(Object obj) {
 			if (obj instanceof PluginTemplateSource) {
 				PluginTemplateSource pluginTemplateSource = (PluginTemplateSource) obj;
-				return controllerService
-						.equals(pluginTemplateSource.controllerService)
+				return bundle.equals(pluginTemplateSource.bundle)
 						&& path.equals(pluginTemplateSource.path)
 						&& lastModified == pluginTemplateSource.lastModified;
 			}
@@ -134,8 +130,8 @@ public class PluginTemplateLoader implements TemplateLoader {
 		}
 
 		public int hashCode() {
-			return (controllerService.getBundle().getSymbolicName()
-					+ pluginNameAndPathSplitString + path).hashCode();
+			return (bundle.getSymbolicName() + pluginNameAndPathSplitString + path)
+					.hashCode();
 		}
 	}
 }

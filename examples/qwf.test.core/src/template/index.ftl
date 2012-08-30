@@ -3,6 +3,7 @@
 		<title>qwf.test.core index</title>
 	</head>
 	<body>
+		<#include "qwf.test.calculator:test">
 		<p>Hello,this is a test bundle for QuickWebFramework!</p>
 <#list bundleNameUrlListMap?keys as bundleName>
 		<div>
