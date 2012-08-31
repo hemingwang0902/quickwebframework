@@ -59,6 +59,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 			return;
 		}
 
+		if (serviceReferences == null)
+			return;
+
 		log.info("准备刷新com.quickwebframework.db.orm.quickorm.service.impl.DatabaseServiceImpl中的数据源");
 		for (ServiceReference<?> serviceReference : serviceReferences) {
 			com.quickwebframework.service.DatabaseService databaseService = (com.quickwebframework.service.DatabaseService) bundleContext

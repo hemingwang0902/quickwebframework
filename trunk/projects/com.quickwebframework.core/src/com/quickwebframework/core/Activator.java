@@ -56,7 +56,7 @@ public class Activator implements BundleActivator {
 		Activator.context = context;
 		LogFactory.setBundleContext(context);
 		log = LogFactory.getLog(Activator.class);
-		log.info("Starting [com.quickwebframework.bundle]...");
+		log.info("Starting [com.quickwebframework.core]...");
 
 		// 设置插件方法URL模板
 		ServletContext servletContext = getServletContext();
@@ -83,10 +83,10 @@ public class Activator implements BundleActivator {
 	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		log.info("Stoping [com.quickwebframework.bundle]...");
+		log.info("Stoping [com.quickwebframework.core]...");
 		FrameworkContext.whenBundleStoped(context.getBundle());
 		Activator.context = null;
-		log.info("Stoped [com.quickwebframework.bundle].");
+		log.info("Stoped [com.quickwebframework.core].");
 	}
 
 }
