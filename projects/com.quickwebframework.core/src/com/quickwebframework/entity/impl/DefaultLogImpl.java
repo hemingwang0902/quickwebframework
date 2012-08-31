@@ -45,13 +45,17 @@ public class DefaultLogImpl implements Log {
 	private Log getServiceLog(String name) {
 		if (bundleContext == null)
 			return null;
-		ServiceReference<?> serviceReference = bundleContext
-				.getServiceReference(LogService.class.getName());
-		if (serviceReference == null)
+		try {
+			ServiceReference<?> serviceReference = bundleContext
+					.getServiceReference(LogService.class.getName());
+			if (serviceReference == null)
+				return null;
+			LogService logService = (LogService) bundleContext
+					.getService(serviceReference);
+			return logService.getLog(name);
+		} catch (Exception ex) {
 			return null;
-		LogService logService = (LogService) bundleContext
-				.getService(serviceReference);
-		return logService.getLog(name);
+		}
 	}
 
 	@Override
