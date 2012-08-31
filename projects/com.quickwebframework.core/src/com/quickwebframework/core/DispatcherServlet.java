@@ -39,26 +39,33 @@ public class DispatcherServlet {
 
 	// 刷新渲染服务
 	private void refreshViewRenderService() {
-		ServiceReference<?> viewRenderServiceReference = bundleContext
-				.getServiceReference(ViewRenderService.class.getName());
-		if (viewRenderServiceReference == null) {
-			FrameworkContext.viewRenderService = null;
-		} else {
-			FrameworkContext.viewRenderService = (ViewRenderService) bundleContext
-					.getService(viewRenderServiceReference);
+		try {
+			ServiceReference<?> viewRenderServiceReference = bundleContext
+					.getServiceReference(ViewRenderService.class.getName());
+			if (viewRenderServiceReference == null) {
+				FrameworkContext.viewRenderService = null;
+			} else {
+				FrameworkContext.viewRenderService = (ViewRenderService) bundleContext
+						.getService(viewRenderServiceReference);
+			}
+		} catch (Exception ex) {
 		}
 	}
 
 	// 刷新MVC框架服务
 	private void refreshMvcFrameworkService() {
-		ServiceReference<?> serviceReference = bundleContext
-				.getServiceReference(MvcFrameworkService.class.getName());
-		if (serviceReference == null) {
-			FrameworkContext.mvcFrameworkService = null;
+		try {
+			ServiceReference<?> serviceReference = bundleContext
+					.getServiceReference(MvcFrameworkService.class.getName());
+			if (serviceReference == null) {
+				FrameworkContext.mvcFrameworkService = null;
+				return;
+			}
+			FrameworkContext.mvcFrameworkService = (MvcFrameworkService) bundleContext
+					.getService(serviceReference);
+		} catch (Exception ex) {
 			return;
 		}
-		FrameworkContext.mvcFrameworkService = (MvcFrameworkService) bundleContext
-				.getService(serviceReference);
 	}
 
 	/**
@@ -217,8 +224,8 @@ public class DispatcherServlet {
 				for (String bundleName : map.keySet()) {
 					sb.append("<tr><td><b>" + bundleName + "</b></td></tr>");
 					for (String url : map.get(bundleName)) {
-						sb.append("<tr><td><a style=\"margin-left:20px\" href=\"" + url + "\">" + url
-								+ "</a></td></tr>");
+						sb.append("<tr><td><a style=\"margin-left:20px\" href=\""
+								+ url + "\">" + url + "</a></td></tr>");
 					}
 				}
 				sb.append("</table>");

@@ -46,7 +46,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 			serviceReferences = bundleContext.getServiceReferences(
 					com.quickwebframework.service.DatabaseService.class
 							.getName(), null);
-		} catch (InvalidSyntaxException e) {
+		} catch (Exception e) {
 			return;
 		}
 		log.info("准备刷新com.quickwebframework.db.orm.spring.jdbc.service.impl.DatabaseServiceImpl中的数据源");

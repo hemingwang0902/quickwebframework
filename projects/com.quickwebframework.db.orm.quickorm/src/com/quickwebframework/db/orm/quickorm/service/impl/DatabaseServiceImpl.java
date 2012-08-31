@@ -55,7 +55,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 			serviceReferences = bundleContext.getServiceReferences(
 					com.quickwebframework.service.DatabaseService.class
 							.getName(), null);
-		} catch (InvalidSyntaxException e) {
+		} catch (Exception e) {
 			return;
 		}
 

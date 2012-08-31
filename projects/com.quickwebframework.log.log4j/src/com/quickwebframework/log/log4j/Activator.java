@@ -48,14 +48,20 @@ public class Activator implements BundleActivator {
 	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		Properties prop = new Properties();
-		prop.setProperty("log4j.rootLogger", "INFO,C");
-		prop.setProperty("log4j.appender.C", "org.apache.log4j.ConsoleAppender");
-		prop.setProperty("log4j.appender.C.layout",
-				"org.apache.log4j.PatternLayout");
-		prop.setProperty("log4j.appender.C.layout.ConversionPattern",
-				"%-d{yyyy-MM-dd HH:mm:ss,SSS} [%c]-[%p] %m%n");
+		try {
+			Properties prop = new Properties();
+			prop.setProperty("log4j.rootLogger", "INFO,C");
+			prop.setProperty("log4j.appender.C",
+					"org.apache.log4j.ConsoleAppender");
+			prop.setProperty("log4j.appender.C.layout",
+					"org.apache.log4j.PatternLayout");
+			prop.setProperty("log4j.appender.C.layout.ConversionPattern",
+					"%-d{yyyy-MM-dd HH:mm:ss,SSS} [%c]-[%p] %m%n");
 
-		PropertyConfigurator.configure(prop);
+			PropertyConfigurator.configure(prop);
+		} catch (Exception ex) {
+			System.out
+					.println("[Info]com.quickwebframework.log.log4j的Activator在Stop时出现异常。");
+		}
 	}
 }
