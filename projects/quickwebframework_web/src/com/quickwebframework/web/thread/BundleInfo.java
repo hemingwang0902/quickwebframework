@@ -16,7 +16,12 @@ public class BundleInfo {
 	private String bundleFilePath;
 	private String bundleName;
 	private Version bundleVersion;
+	// 需要的Bundle名称列表
 	private List<String> requireBundleNameList;
+	// 导入的包列表
+	private List<String> importPackageList;
+	// 导出的包列表
+	private List<String> exportPackageList;
 
 	private Properties getBundleManifestProperties(InputStream inputStream)
 			throws IOException {
@@ -36,6 +41,8 @@ public class BundleInfo {
 
 	public BundleInfo(InputStream inputStream) throws IOException {
 		requireBundleNameList = new ArrayList<String>();
+		importPackageList = new ArrayList<String>();
+		exportPackageList = new ArrayList<String>();
 
 		Properties prop = getBundleManifestProperties(inputStream);
 
@@ -43,22 +50,54 @@ public class BundleInfo {
 		bundleName = prop.getProperty("Bundle-SymbolicName");
 		bundleVersion = Version
 				.parseVersion(prop.getProperty("Bundle-Version"));
+
+		// 需要的Bundle
 		String requireBundleAllString = prop.getProperty("Require-Bundle");
-
 		if (requireBundleAllString != null) {
-			String[] requireBundleVersionStringArray = requireBundleAllString
-					.split(",");
-			for (String requireBundleVersionString : requireBundleVersionStringArray) {
-				requireBundleVersionString = requireBundleVersionString.trim();
+			String[] lineArray = requireBundleAllString.split(",");
+			for (String line : lineArray) {
+				line = line.trim();
 
-				String requireBundleName = null;
-				if (requireBundleVersionString.contains(";")) {
-					requireBundleName = requireBundleVersionString.split(";")[0]
-							.trim();
+				String tmpName = null;
+				if (line.contains(";")) {
+					tmpName = line.split(";")[0].trim();
 				} else {
-					requireBundleName = requireBundleVersionString;
+					tmpName = line;
 				}
-				requireBundleNameList.add(requireBundleName);
+				requireBundleNameList.add(tmpName);
+			}
+		}
+
+		// 导入的包
+		String importPackageAllString = prop.getProperty("Import-Package");
+		if (importPackageAllString != null) {
+			String[] lineArray = importPackageAllString.split(",");
+			for (String line : lineArray) {
+				line = line.trim();
+
+				String tmpName = null;
+				if (line.contains(";")) {
+					tmpName = line.split(";")[0].trim();
+				} else {
+					tmpName = line;
+				}
+				importPackageList.add(tmpName);
+			}
+		}
+		// 导出的包
+		String exportPackageAllString = prop.getProperty("Export-Package");
+		if (exportPackageAllString != null) {
+			String[] lineArray = exportPackageAllString.split(",");
+			for (String line : lineArray) {
+				line = line.trim();
+
+				String tmpName = null;
+				if (line.contains(";")) {
+					tmpName = line.split(";")[0].trim();
+				} else {
+					tmpName = line;
+				}
+				exportPackageList.add(tmpName);
 			}
 		}
 	}
@@ -95,4 +134,19 @@ public class BundleInfo {
 		this.requireBundleNameList = requireBundleNameList;
 	}
 
+	public List<String> getImportPackageList() {
+		return importPackageList;
+	}
+
+	public void setImportPackageList(List<String> importPackageList) {
+		this.importPackageList = importPackageList;
+	}
+
+	public List<String> getExportPackageList() {
+		return exportPackageList;
+	}
+
+	public void setExportPackageList(List<String> exportPackageList) {
+		this.exportPackageList = exportPackageList;
+	}
 }
