@@ -86,32 +86,80 @@ public class BundleAutoManageThread extends Thread {
 	private void orderBundleInstallList(List<BundleInfo> list) {
 		// 用于查询
 		List<String> bundleNameList = getBundleNameList(list);
+		// 导出包名与Bundle名对应Map
+		Map<String, String> exportPackageBundleNameMap = new HashMap<String, String>();
+		for (BundleInfo bundleInfo : list) {
+			for (String exportPackage : bundleInfo.getExportPackageList()) {
+				exportPackageBundleNameMap.put(exportPackage,
+						bundleInfo.getBundleName());
+			}
+		}
 
+		// 开始排序
 		for (int i = 0; i < list.size();) {
 			// 是否有对象移动
 			boolean isItemMoved = false;
 
 			BundleInfo bundleInfo = list.get(i);
+
+			// 根据Import-Package排序
+			for (String importPackage : bundleInfo.getImportPackageList()) {
+				// 如果导入的包不在要安装的插件的导出包列表中，则忽略
+				if (!exportPackageBundleNameMap.containsKey(importPackage))
+					continue;
+				String importPackageBelongBundleName = exportPackageBundleNameMap
+						.get(importPackage);
+				int importPackageBelongBundleIndex = bundleNameList
+						.indexOf(importPackageBelongBundleName);
+
+				// 如果需要的包在此包后面，则移动到前面
+				if (importPackageBelongBundleIndex > i) {
+					BundleInfo importPackageBelongBundle = list
+							.get(importPackageBelongBundleIndex);
+					list.remove(importPackageBelongBundleIndex);
+					list.add(i, importPackageBelongBundle);
+
+					bundleNameList = getBundleNameList(list);
+					isItemMoved = true;
+					i++;
+					System.out
+							.println(String
+									.format("安装/更新顺序自动计算算法：因为插件[%s]导入了插件[%s]的包[%s]，所以将插件[%s]移动到[%s]前面。",
+											bundleInfo.getBundleName(),
+											importPackageBelongBundleName,
+											importPackage,
+											importPackageBelongBundleName,
+											bundleInfo.getBundleName()));
+				}
+
+			}
+
+			// 根据Require-Bundle排序
 			for (String requireBundleName : bundleInfo
 					.getRequireBundleNameList()) {
-				// 如果依赖的包不在要安装的插件列表中，则忽略
+				// 如果依赖的Bundle不在要安装的插件列表中，则忽略
 				if (!bundleNameList.contains(requireBundleName))
 					continue;
 
 				int requireBundleIndex = bundleNameList
 						.indexOf(requireBundleName);
-				BundleInfo requireBundleInfo = list.get(requireBundleIndex);
 
 				// 如果需要的包在此包后面，则移动到前面
 				if (requireBundleIndex > i) {
+					BundleInfo requireBundleInfo = list.get(requireBundleIndex);
 					list.remove(requireBundleIndex);
 					list.add(i, requireBundleInfo);
 
 					bundleNameList = getBundleNameList(list);
 					isItemMoved = true;
 					i++;
-					System.out.println("安装/更新顺序自动计算算法：将插件 " + requireBundleName
-							+ " 移动到 " + bundleInfo.getBundleName() + " 前面。");
+					System.out
+							.println(String
+									.format("安装/更新顺序自动计算算法：因为插件[%s]需要插件[%s]，所以将插件[%s]移动到[%s]前面。",
+											bundleInfo.getBundleName(),
+											requireBundleName,
+											requireBundleName,
+											bundleInfo.getBundleName()));
 				}
 			}
 			if (isItemMoved) {
