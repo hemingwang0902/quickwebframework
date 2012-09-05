@@ -102,6 +102,36 @@ public class BundleAutoManageThread extends Thread {
 
 			BundleInfo bundleInfo = list.get(i);
 
+
+			// 根据Require-Bundle排序
+			for (String requireBundleName : bundleInfo
+					.getRequireBundleNameList()) {
+				// 如果依赖的Bundle不在要安装的插件列表中，则忽略
+				if (!bundleNameList.contains(requireBundleName))
+					continue;
+
+				int requireBundleIndex = bundleNameList
+						.indexOf(requireBundleName);
+
+				// 如果需要的包在此包后面，则移动到前面
+				if (requireBundleIndex > i) {
+					BundleInfo requireBundleInfo = list.get(requireBundleIndex);
+					list.remove(requireBundleIndex);
+					list.add(i, requireBundleInfo);
+
+					bundleNameList = getBundleNameList(list);
+					isItemMoved = true;
+					i++;
+					System.out
+							.println(String
+									.format("安装/更新顺序自动计算算法：因为插件[%s]需要插件[%s]，所以将插件[%s]移动到[%s]前面。",
+											bundleInfo.getBundleName(),
+											requireBundleName,
+											requireBundleName,
+											bundleInfo.getBundleName()));
+				}
+			}
+			
 			// 根据Import-Package排序
 			for (String importPackage : bundleInfo.getImportPackageList()) {
 				// 如果导入的包不在要安装的插件的导出包列表中，则忽略
@@ -132,35 +162,6 @@ public class BundleAutoManageThread extends Thread {
 											bundleInfo.getBundleName()));
 				}
 
-			}
-
-			// 根据Require-Bundle排序
-			for (String requireBundleName : bundleInfo
-					.getRequireBundleNameList()) {
-				// 如果依赖的Bundle不在要安装的插件列表中，则忽略
-				if (!bundleNameList.contains(requireBundleName))
-					continue;
-
-				int requireBundleIndex = bundleNameList
-						.indexOf(requireBundleName);
-
-				// 如果需要的包在此包后面，则移动到前面
-				if (requireBundleIndex > i) {
-					BundleInfo requireBundleInfo = list.get(requireBundleIndex);
-					list.remove(requireBundleIndex);
-					list.add(i, requireBundleInfo);
-
-					bundleNameList = getBundleNameList(list);
-					isItemMoved = true;
-					i++;
-					System.out
-							.println(String
-									.format("安装/更新顺序自动计算算法：因为插件[%s]需要插件[%s]，所以将插件[%s]移动到[%s]前面。",
-											bundleInfo.getBundleName(),
-											requireBundleName,
-											requireBundleName,
-											bundleInfo.getBundleName()));
-				}
 			}
 			if (isItemMoved) {
 				i = 0;
