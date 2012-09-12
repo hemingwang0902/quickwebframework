@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,13 +23,16 @@ import org.osgi.framework.Version;
 import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 
 public class BundleAutoManageThread extends Thread {
+
+	public final static String METAINF_FILE_PATH = "META-INF/MANIFEST.MF";
+
 	public String bundleFolderPath;
 
 	public BundleAutoManageThread(String bundleFolderPath) {
 		this.bundleFolderPath = bundleFolderPath;
 	}
 
-	private void installOrUpdateBundle(BundleContext bundleContext,
+	private Bundle installOrUpdateBundle(BundleContext bundleContext,
 			BundleInfo bundleInfo) throws BundleException, IOException {
 		String bundleName = bundleInfo.getBundleName();
 		Version bundleVersion = bundleInfo.getBundleVersion();
@@ -53,6 +57,7 @@ public class BundleAutoManageThread extends Thread {
 		}// 否则更新
 		else {
 			if (bundleVersion.compareTo(preBundle.getVersion()) >= 0) {
+				preBundle.stop();
 				System.out.println("自动将插件：" + bundleName + " 由 "
 						+ preBundle.getVersion() + "更新到" + bundleVersion);
 				FileInputStream fileInputStream = new FileInputStream(file);
@@ -64,13 +69,7 @@ public class BundleAutoManageThread extends Thread {
 						+ "小于已安装的版本" + preBundle.getVersion() + "，没有应用更新！");
 			}
 		}
-		// 尝试启动插件
-		if (newBundle != null) {
-			try {
-				newBundle.start();
-			} catch (Exception ex) {
-			}
-		}
+		return newBundle;
 	}
 
 	// 得到Bundle名称列表(主要是为了得到最新的list中的顺序)
@@ -102,7 +101,6 @@ public class BundleAutoManageThread extends Thread {
 
 			BundleInfo bundleInfo = list.get(i);
 
-
 			// 根据Require-Bundle排序
 			for (String requireBundleName : bundleInfo
 					.getRequireBundleNameList()) {
@@ -131,7 +129,7 @@ public class BundleAutoManageThread extends Thread {
 											bundleInfo.getBundleName()));
 				}
 			}
-			
+
 			// 根据Import-Package排序
 			for (String importPackage : bundleInfo.getImportPackageList()) {
 				// 如果导入的包不在要安装的插件的导出包列表中，则忽略
@@ -209,8 +207,7 @@ public class BundleAutoManageThread extends Thread {
 						} catch (Exception ex) {
 							continue;
 						}
-						ZipEntry zipEntry = zipFile
-								.getEntry("META-INF/MANIFEST.MF");
+						ZipEntry zipEntry = zipFile.getEntry(METAINF_FILE_PATH);
 						if (zipEntry == null || zipEntry.isDirectory())
 							continue;
 						InputStream inputStream = zipFile
@@ -233,15 +230,51 @@ public class BundleAutoManageThread extends Thread {
 				}
 				// 排出安装顺序
 				orderBundleInstallList(bundleInfoList);
-				// 按照顺序安装并启动
+
+				// 按照顺序安装，注意:此处只是安装并不启动插件
 				for (int i = 0; i < bundleInfoList.size(); i++) {
 					BundleInfo bundleInfo = bundleInfoList.get(i);
-					System.out.println(i + ":" + bundleInfo.getBundleName());
 					installOrUpdateBundle(bundleContext, bundleInfo);
 				}
+
 				// 删除这些jar文件
 				for (File file : files) {
 					file.delete();
+				}
+
+				// 排出启动或刷新顺序
+				List<BundleInfo> shouldStartBundleInfoList = getShouldRereshBundleInfoList(bundleInfoList);
+				orderBundleInstallList(shouldStartBundleInfoList);
+				// 按照逆序停止Bundle
+				for (int i = 0; i < shouldStartBundleInfoList.size(); i++) {
+					BundleInfo bundleInfo = shouldStartBundleInfoList
+							.get(shouldStartBundleInfoList.size() - i - 1);
+					String bundleName = bundleInfo.getBundleName();
+					Bundle bundle = getBundleByName(bundleName);
+					if (bundle.getState() == Bundle.ACTIVE) {
+						System.out.println(String.format(
+								"插件自动安装线程：根据依赖关系准备停止[%s]插件！", bundleName));
+						bundle.stop();
+					}
+				}
+				// 按照顺序启动或重启Bundle
+				for (int i = 0; i < shouldStartBundleInfoList.size(); i++) {
+					BundleInfo bundleInfo = shouldStartBundleInfoList.get(i);
+					String bundleName = bundleInfo.getBundleName();
+					Bundle bundle = getBundleByName(bundleName);
+					if (bundle == null) {
+						System.out.println(String
+								.format("插件自动安装线程警告：在OSGi容器中未发现名称为[%s]的插件！",
+										bundleName));
+						continue;
+					}
+					if (bundle.getState() == Bundle.ACTIVE) {
+						System.out.println(String.format(
+								"插件自动安装线程警告：[%s]插件在启动之前，已经是启动状态！", bundleName));
+					}
+					System.out.println(String.format("插件自动安装线程：准备启动[%s]插件！",
+							bundleName));
+					bundle.start();
 				}
 			}
 		} catch (InterruptedException e) {
@@ -249,5 +282,106 @@ public class BundleAutoManageThread extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	// 根据名称得到Bundle
+	private Bundle getBundleByName(String bundleName) {
+		BundleContext bundleContext = QuickWebFrameworkLoaderListener
+				.getBundleContext();
+		if (bundleContext == null) {
+			return null;
+		}
+		Bundle[] bundles = bundleContext.getBundles();
+		for (Bundle bundle : bundles) {
+			if (bundle.getSymbolicName().equals(bundleName))
+				return bundle;
+		}
+		return null;
+	}
+
+	// 得到OSGi容器中已安装的全部插件的信息列表
+	private List<BundleInfo> getAllBundleInfoList() {
+		BundleContext bundleContext = QuickWebFrameworkLoaderListener
+				.getBundleContext();
+		if (bundleContext == null) {
+			return null;
+		}
+
+		List<BundleInfo> list = new ArrayList<BundleInfo>();
+
+		Bundle[] bundles = bundleContext.getBundles();
+		for (Bundle bundle : bundles) {
+			try {
+				URL url = bundle.getResource(METAINF_FILE_PATH);
+				InputStream inputStream = url.openStream();
+				list.add(new BundleInfo(inputStream));
+			} catch (Exception ex) {
+				System.out.println(String.format(
+						"插件自动安装线程警告：读取插件[%s]的资源文件[%s]时出错，原因：[%s]",
+						bundle.getSymbolicName(), METAINF_FILE_PATH, ex));
+			}
+		}
+		return list;
+	}
+
+	// 得到应该刷新的Bundle
+	private List<BundleInfo> getShouldRereshBundleInfoList(
+			List<BundleInfo> installedBundleInfoList) {
+		// 已安装全部插件信息列表
+		List<BundleInfo> allBundleInfoList = getAllBundleInfoList();
+		// 已安装全部插件信息Map
+		Map<String, BundleInfo> allBundleInfoMap = new HashMap<String, BundleInfo>();
+		for (BundleInfo bundleInfo : allBundleInfoList) {
+			allBundleInfoMap.put(bundleInfo.getBundleName(), bundleInfo);
+		}
+
+		// 应该刷新的插件名称列表
+		List<String> shouldRefreshBundleNameList = new ArrayList<String>();
+		// 应该刷新的插件信息列表
+		List<BundleInfo> shouldRefreshBundleInfoList = new ArrayList<BundleInfo>();
+
+		for (BundleInfo bundleInfo : installedBundleInfoList) {
+			shouldRefreshBundleNameList.add(bundleInfo.getBundleName());
+			shouldRefreshBundleInfoList.add(bundleInfo);
+		}
+
+		for (int i = 0; i < shouldRefreshBundleInfoList.size(); i++) {
+			BundleInfo bundleInfo = shouldRefreshBundleInfoList.get(i);
+			String bundleName = bundleInfo.getBundleName();
+			List<String> bundleExportPackageList = bundleInfo
+					.getExportPackageList();
+
+			// 搜索全部的Bundle
+			for (BundleInfo tmpBundleInfo : allBundleInfoList) {
+				boolean isTrue = false;
+
+				String tmpBundleName = tmpBundleInfo.getBundleName();
+
+				// 如果满足Require-Bundle依赖关系
+				if (tmpBundleInfo.getRequireBundleNameList().contains(
+						bundleName)) {
+					isTrue = true;
+				}
+				// 否则如果满足Import-Package依赖关系
+				else {
+					List<String> tmpBundleInfoImportPackageList = tmpBundleInfo
+							.getImportPackageList();
+					for (String tmpBundleInfoImportPackage : tmpBundleInfoImportPackageList) {
+						if (bundleExportPackageList
+								.contains(tmpBundleInfoImportPackage)) {
+							isTrue = true;
+							break;
+						}
+					}
+				}
+				// 如果满足依赖关系，并且未加入应该刷新的列表中
+				if (isTrue
+						&& !shouldRefreshBundleNameList.contains(tmpBundleName)) {
+					shouldRefreshBundleNameList.add(tmpBundleName);
+					shouldRefreshBundleInfoList.add(tmpBundleInfo);
+				}
+			}
+		}
+		return shouldRefreshBundleInfoList;
 	}
 }

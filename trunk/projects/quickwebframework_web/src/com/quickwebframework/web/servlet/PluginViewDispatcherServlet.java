@@ -1,6 +1,8 @@
 package com.quickwebframework.web.servlet;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
@@ -144,8 +146,11 @@ public class PluginViewDispatcherServlet extends QwfServlet {
 			Object dispatcherServletObject = QuickWebFrameworkLoaderListener
 					.getDispatcherServletObject();
 			if (dispatcherServletObject == null) {
-				response.getWriter()
-						.write("<html><head><title>Powered by QuickWebFramework</title></head><body><p>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!</p><p>You haven't install [com.quickwebframework.bundle] plugin to QuickWebFramework!</p></body></html>");
+				response.setContentType("text/html;charset=utf-8");
+				StringBuilder sb = new StringBuilder();
+				sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
+				sb.append("</body></html>");
+				response.getWriter().write(sb.toString());
 				return;
 			}
 			// dispatcherServlet的类
