@@ -1,4 +1,4 @@
-package com.quickwebframework.util;
+package com.quickwebframework.web.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,8 +18,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
-
-import com.quickwebframework.entity.BundleInfo;
 
 /**
  * 插件辅助类
