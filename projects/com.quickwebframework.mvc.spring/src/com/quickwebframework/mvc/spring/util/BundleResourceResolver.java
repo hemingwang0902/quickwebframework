@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+import com.quickwebframework.entity.BundleInfo;
 import com.quickwebframework.util.BundleUtil;
 
 /**
@@ -23,9 +24,11 @@ import com.quickwebframework.util.BundleUtil;
 public class BundleResourceResolver {
 
 	private Bundle bundle;
+	private BundleInfo bundleInfo;
 
 	public BundleResourceResolver(Bundle bundle) {
 		this.bundle = bundle;
+		bundleInfo = BundleUtil.getBundleInfo(bundle);
 	}
 
 	private List<Resource> doJustGetBundleClassResources(
@@ -68,21 +71,19 @@ public class BundleResourceResolver {
 	// 得到Bundle导入包的资源
 	private List<Resource> doGetImportPackageResource() {
 		List<Resource> resourceList = new ArrayList<Resource>();
-		String[] importPackages = BundleUtil
-				.getBundleImportPackagePackageList(bundle);
-		if (importPackages != null) {
-			Bundle[] allBundles = bundle.getBundleContext().getBundles();
 
-			List<String> importPackageList = new ArrayList<String>();
-			for (String key : importPackages)
-				importPackageList.add(key);
+		List<String> importPackageList = new ArrayList<String>(
+				bundleInfo.getImportPackageList());
+		List<String> exportPackageList = new ArrayList<String>(
+				bundleInfo.getExportPackageList());
+
+		if (importPackageList != null) {
+			Bundle[] allBundles = bundle.getBundleContext().getBundles();
 
 			Map<Bundle, List<String>> bundleClassPathListMap = new HashMap<Bundle, List<String>>();
 
 			for (Bundle bundle : allBundles) {
-				String[] bundleExportPackageInfos = BundleUtil
-						.getBundleExportPackageList(bundle, false);
-				for (String bundleExportPackageInfo : bundleExportPackageInfos) {
+				for (String bundleExportPackageInfo : exportPackageList) {
 					// 已找到对应Bundle的路径列表
 					List<String> foundClassPathList = new ArrayList<String>();
 					for (String importPackage : importPackageList) {
@@ -129,16 +130,24 @@ public class BundleResourceResolver {
 	private List<Resource> doGetBundleRequiredResources() {
 		List<Resource> resourceList = new ArrayList<Resource>();
 
-		// 得到当前Bundle依赖的Bundles
-		Bundle[] reuiredBundles = BundleUtil.getBundleRequiredBundles(bundle);
-		if (reuiredBundles != null) {
-			for (Bundle requireBundle : reuiredBundles) {
-				// 处理reuiredBundles中的资源
-				String[] requireBundleExportPackages = BundleUtil
-						.getBundleExportPackageList(requireBundle, true);
+		List<String> requiredBundleNameList = bundleInfo
+				.getRequireBundleNameList();
+		if (requiredBundleNameList != null && !requiredBundleNameList.isEmpty()) {
+			for (String requireBundleName : requiredBundleNameList) {
+				Bundle requireBundle = BundleUtil.getBundleByName(
+						bundle.getBundleContext(), requireBundleName);
 
-				if (requireBundleExportPackages == null)
+				BundleInfo requireBundleInfo = BundleUtil
+						.getBundleInfo(requireBundle);
+				// 处理reuiredBundles中的资源
+				List<String> requireBundleExportPackageList = requireBundleInfo
+						.getExportPackageList();
+				if (requireBundleExportPackageList == null
+						|| requireBundleExportPackageList.isEmpty())
 					continue;
+
+				String[] requireBundleExportPackages = requireBundleExportPackageList
+						.toArray(new String[0]);
 
 				for (int i = 0; i < requireBundleExportPackages.length; i++) {
 					// 将.替换成/，用于资源搜索
@@ -152,6 +161,7 @@ public class BundleResourceResolver {
 				resourceList.addAll(requireBundleResource);
 			}
 		}
+		// 得到当前Bundle依赖的Bundles
 		return resourceList;
 	}
 
