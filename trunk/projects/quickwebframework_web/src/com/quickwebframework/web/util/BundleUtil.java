@@ -18,6 +18,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
+import org.osgi.framework.wiring.FrameworkWiring;
 
 /**
  * 插件辅助类
@@ -162,6 +163,8 @@ public class BundleUtil {
 		} finally {
 			if (bundleInputStreams != null && bundleInputStreams.length > 0) {
 				for (InputStream bundleInputStream : bundleInputStreams) {
+					if (bundleInputStream == null)
+						continue;
 					try {
 						bundleInputStream.close();
 					} catch (IOException e) {
@@ -200,6 +203,21 @@ public class BundleUtil {
 
 		// 排出安装顺序
 		orderBundleInstallList(bundleInfoList);
+		// 排出停止顺序(倒序)
+		List<BundleInfo> shouldStopBundleInfoList = getShouldRefreshBundleInfoList(
+				bundleInfoList, BundleUtil.getAllBundleInfoList(bundleContext));
+		// 按照逆序停止Bundle
+		for (int i = 0; i < shouldStopBundleInfoList.size(); i++) {
+			BundleInfo bundleInfo = shouldStopBundleInfoList
+					.get(shouldStopBundleInfoList.size() - i - 1);
+			String bundleName = bundleInfo.getBundleName();
+			Bundle bundle = getBundleByName(bundleContext, bundleName);
+			if (bundle != null && bundle.getState() == Bundle.ACTIVE) {
+				System.out.println(String.format("插件智能安装函数：根据依赖关系准备停止[%s]插件！",
+						bundleName));
+				bundle.stop();
+			}
+		}
 
 		Bundle[] installedBundles = new Bundle[bundleInfoList.size()];
 
@@ -210,12 +228,23 @@ public class BundleUtil {
 					bundleInfo);
 		}
 
-		// 排出启动或刷新顺序
-		List<BundleInfo> shouldStartBundleInfoList = getShouldRereshBundleInfoList(
+		// 刷新Bundle
+		Bundle systemBundle = bundleContext.getBundle(0);
+		FrameworkWiring frameworkWiring = systemBundle
+				.adapt(FrameworkWiring.class);
+
+		for (Bundle bundle : frameworkWiring.getRemovalPendingBundles()) {
+			System.out.println("RemovalPendingBundle:"
+					+ bundle.getSymbolicName());
+		}
+		frameworkWiring.refreshBundles(null);
+
+		// 重新排出启动或刷新顺序
+		List<BundleInfo> shouldStartBundleInfoList = getShouldRefreshBundleInfoList(
 				bundleInfoList, BundleUtil.getAllBundleInfoList(bundleContext));
 		orderBundleInstallList(shouldStartBundleInfoList);
 
-		List<Bundle> shouldStartBundleList = new ArrayList<Bundle>();
+		// 按照顺序启动Bundle
 		for (int i = 0; i < shouldStartBundleInfoList.size(); i++) {
 			BundleInfo bundleInfo = shouldStartBundleInfoList.get(i);
 			String bundleName = bundleInfo.getBundleName();
@@ -224,32 +253,17 @@ public class BundleUtil {
 				System.out.println(String.format(
 						"插件智能安装函数警告：在OSGi容器中未发现名称为[%s]的插件！", bundleName));
 				continue;
-			}
-			shouldStartBundleList.add(bundle);
-		}
-
-		// 按照逆序停止Bundle
-		for (int i = 0; i < shouldStartBundleList.size(); i++) {
-			Bundle bundle = shouldStartBundleList.get(shouldStartBundleList
-					.size() - i - 1);
-			String bundleName = bundle.getSymbolicName();
-			if (bundle.getState() == Bundle.ACTIVE) {
-				System.out.println(String.format("插件智能安装函数：根据依赖关系准备停止[%s]插件！",
+			} else {
+				if (bundle.getState() == Bundle.ACTIVE) {
+					System.out.println(String.format(
+							"插件智能安装函数警告：[%s]插件在启动之前，已经是启动状态！", bundleName));
+				}
+				System.out.println(String.format("插件智能安装函数：准备启动[%s]插件...",
 						bundleName));
-				bundle.stop();
+				bundle.start();
+				System.out.println(String.format("插件智能安装函数：启动[%s]插件完成！",
+						bundleName));
 			}
-		}
-		// 按照顺序启动或重启Bundle
-		for (int i = 0; i < shouldStartBundleList.size(); i++) {
-			Bundle bundle = shouldStartBundleList.get(i);
-			String bundleName = bundle.getSymbolicName();
-			if (bundle.getState() == Bundle.ACTIVE) {
-				System.out.println(String.format(
-						"插件智能安装函数警告：[%s]插件在启动之前，已经是启动状态！", bundleName));
-			}
-			System.out.println(String
-					.format("插件智能安装函数：准备启动[%s]插件！", bundleName));
-			bundle.start();
 		}
 		return installedBundles;
 	}
@@ -470,10 +484,8 @@ public class BundleUtil {
 		}
 	}
 
-	// 已安装全部插件信息列表
-	// List<BundleInfo> allBundleInfoList = getAllBundleInfoList();
 	// 得到应该刷新的Bundle
-	private static List<BundleInfo> getShouldRereshBundleInfoList(
+	private static List<BundleInfo> getShouldRefreshBundleInfoList(
 			List<BundleInfo> installedBundleInfoList,
 			List<BundleInfo> allBundleInfoList) {
 		// 已安装全部插件信息Map

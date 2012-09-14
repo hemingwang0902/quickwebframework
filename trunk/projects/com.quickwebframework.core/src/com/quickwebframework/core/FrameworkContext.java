@@ -120,6 +120,12 @@ public abstract class FrameworkContext {
 	 */
 	public static void registerWebApp(BundleActivator bundleActivator,
 			BundleContext bundleContext) {
+
+		if (FrameworkContext.mvcFrameworkService == null) {
+			throw new RuntimeException(
+					"注册WebApp时，未发现有注册的MvcFrameworkService服务！");
+		}
+
 		// 注册服务
 		final Bundle currentBundle = bundleContext.getBundle();
 		final ClassLoader currentClassLoader = bundleActivator.getClass()
