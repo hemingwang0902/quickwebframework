@@ -2,6 +2,7 @@ package com.quickwebframework.web.thread;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 
 import org.osgi.framework.BundleContext;
 
@@ -52,6 +53,10 @@ public class BundleAutoManageThread extends Thread {
 
 				try {
 					BundleUtil.installOrUpdateBundle(bundleContext, files);
+				} catch (IOException ex) {
+					System.out.println("插件自动管理线程：安装或更新插件时出现IOException异常,原因："
+							+ ex.getMessage());
+					continue;
 				} catch (Throwable ex) {
 					System.out.println("插件自动管理线程：安装或更新插件时出错。");
 					ex.printStackTrace();
