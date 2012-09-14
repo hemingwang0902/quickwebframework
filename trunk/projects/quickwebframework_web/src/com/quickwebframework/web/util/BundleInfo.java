@@ -12,6 +12,12 @@ import java.util.zip.ZipInputStream;
 
 import org.osgi.framework.Version;
 
+/**
+ * Bundle信息类(信息来源于META-INF/MANIFEST.MF文件)
+ * 
+ * @author aaa
+ * 
+ */
 public class BundleInfo {
 
 	public final static String METAINF_FILE_PATH = "META-INF/MANIFEST.MF";
@@ -171,7 +177,12 @@ public class BundleInfo {
 			IoUtil.copyStream(bundleInputStream, outputStream);
 			// 得到这个插件的字节数组
 			bundleContentBytes = outputStream.toByteArray();
-
+			if (bundleContentBytes.length < 2) {
+				throw new RuntimeException("输入流中的字节数小于2，不是一个ZIP压缩流！");
+			}
+			if (bundleContentBytes[0] != 'P' || bundleContentBytes[1] != 'K') {
+				throw new RuntimeException("输入流中的前两个字节不是'PK'，不是一个合法的ZIP压缩流！");
+			}
 			InputStream inputStream = getBundleInputStream();
 			// 从ZIP流中解压并读出META-INF/MANIFEST.MF文件的内容
 			ZipInputStream zipInputStream = new ZipInputStream(inputStream);
@@ -184,6 +195,10 @@ public class BundleInfo {
 					manifestFileLength = zipEntry.getSize();
 					break;
 				}
+			}
+			if (manifestFileLength <= 0) {
+				throw new RuntimeException(
+						"ZIP压缩流中未能找到META-INF/MANIFEST.MF清单文件！");
 			}
 			// 将manifest文件的内容从压缩流中解压出来
 			outputStream = new ByteArrayOutputStream();

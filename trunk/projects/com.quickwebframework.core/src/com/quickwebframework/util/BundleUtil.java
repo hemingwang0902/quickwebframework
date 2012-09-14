@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.zip.ZipFile;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -146,20 +147,31 @@ public class BundleUtil {
 	 * @param bundleFiles
 	 *            插件的文件数组
 	 * @return
+	 * @throws IOException
 	 */
 	public static Bundle[] installOrUpdateBundle(BundleContext bundleContext,
-			File[] bundleFiles) {
+			File[] bundleFiles) throws IOException {
 		InputStream[] bundleInputStreams = null;
 		try {
 			bundleInputStreams = new InputStream[bundleFiles.length];
 			for (int i = 0; i < bundleFiles.length; i++) {
 				File bundleFile = bundleFiles[i];
+				try {
+					// 尝试加载为ZIP文件
+					ZipFile zipFile = new ZipFile(bundleFile);
+					zipFile.close();
+				} catch (IOException ex) {
+					throw new IOException(String.format("将文件[%s]作为ZIP文件打开时出错！",
+							bundleFile.getName()), ex);
+				}
 				bundleInputStreams[i] = new FileInputStream(bundleFile);
 			}
 			Bundle[] bundles = installOrUpdateBundle(bundleContext,
 					bundleInputStreams);
 
 			return bundles;
+		} catch (IOException ex) {
+			throw ex;
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		} finally {
@@ -198,8 +210,8 @@ public class BundleUtil {
 				BundleInfo bundleInfo = new BundleInfo(bundleInputStream);
 				bundleInfoList.add(bundleInfo);
 			} catch (Exception ex) {
-				System.out.println("警告：安装Bundle时出错。");
-				ex.printStackTrace();
+				System.out
+						.println("警告：加载Bundle清单文件信息时失败。原因：" + ex.getMessage());
 			}
 		}
 
