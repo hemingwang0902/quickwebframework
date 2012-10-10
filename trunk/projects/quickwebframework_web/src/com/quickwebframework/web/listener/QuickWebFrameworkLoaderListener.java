@@ -67,14 +67,14 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 		return framework.getBundleContext();
 	}
 
-	private static Object dispatcherServletObject;
+	private static HttpServlet dispatcherServletObject;
 
 	/**
 	 * 得到DispatcherServlet对象
 	 * 
 	 * @return
 	 */
-	public static Object getDispatcherServletObject() {
+	public static HttpServlet getDispatcherServletObject() {
 		return dispatcherServletObject;
 	}
 
@@ -84,7 +84,7 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 				.getServiceReference(CONST_DISPATCHER_SERVLET_CLASS_NAME);
 		if (serviceReference == null)
 			return;
-		dispatcherServletObject = getBundleContext().getService(
+		dispatcherServletObject = (HttpServlet) getBundleContext().getService(
 				serviceReference);
 	}
 
@@ -184,7 +184,6 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 				}
 			}
 		}
-
 		framework = factory.newFramework(osgiFrameworkConfigMap);
 
 		try {
@@ -210,7 +209,7 @@ public class QuickWebFrameworkLoaderListener implements ServletContextListener {
 			if (tmpServlet != null) {
 				qwfServletList.add(tmpServlet);
 			}
-			
+
 			// 将ServletContext注册为服务
 			getBundleContext().registerService(ServletContext.class.getName(),
 					servletContext, null);

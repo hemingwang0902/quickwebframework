@@ -6,7 +6,9 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.quickwebframework.core.Activator
 Bundle-Vendor: aaaSoft
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: javax.xml.transform,
+Import-Package: javax.servlet,
+ javax.servlet.http,
+ javax.xml.transform,
  javax.xml.transform.dom,
  javax.xml.transform.sax,
  javax.xml.transform.stax,
@@ -18,11 +20,5 @@ Export-Package: com.quickwebframework.core,
  com.quickwebframework.entity,
  com.quickwebframework.entity.impl,
  com.quickwebframework.filter,
- com.quickwebframework.proxy,
  com.quickwebframework.service,
- com.quickwebframework.util,
- javax.servlet,
- javax.servlet.http
-Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: javax.servlet_2.5.0.jar,
- .
+ com.quickwebframework.util 

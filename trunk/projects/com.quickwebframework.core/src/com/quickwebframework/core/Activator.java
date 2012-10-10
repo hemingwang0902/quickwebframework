@@ -10,7 +10,6 @@ import com.quickwebframework.core.DispatcherServlet;
 import com.quickwebframework.core.FrameworkContext;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
-import com.quickwebframework.proxy.PluginServletContext;
 import com.quickwebframework.util.BundleUtil;
 
 public class Activator implements BundleActivator {
@@ -42,7 +41,7 @@ public class Activator implements BundleActivator {
 					"在OSGi服务中未找到javax.servlet.ServletContext服务！");
 		}
 		Object obj = context.getService(servletContextServiceReference);
-		return new PluginServletContext(obj);
+		return (ServletContext)obj;
 	}
 
 	/*

@@ -197,8 +197,8 @@ public class PluginResourceDispatcherServlet extends QwfServlet {
 
 			// 找到对应的处理方法
 			Method httpMethod = dispatcherServletClazz.getMethod(
-					javaMethodName, Object.class, Object.class, String.class,
-					String.class);
+					javaMethodName, HttpServletRequest.class,
+					HttpServletResponse.class, String.class, String.class);
 
 			if (httpMethod != null) {
 				String bundleName = null;

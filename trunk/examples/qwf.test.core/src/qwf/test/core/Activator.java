@@ -19,6 +19,16 @@ public class Activator implements BundleActivator {
 
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
+		
+		ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+		Class<?> tmpClass = systemClassLoader.loadClass("javax.activation.DataSource");
+		System.out.println("systemClassLoader -> tmpClass:" + tmpClass);
+		
+		ClassLoader currentClassLoader = Activator.class.getClassLoader();
+		tmpClass = currentClassLoader.loadClass("javax.activation.DataSource");
+		System.out.println("currentClassLoader -> tmpClass:" + tmpClass);
+		
+		sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
 
 		FrameworkContext.registerWebApp(this, bundleContext);
 		//FrameworkContext.setRootUrlHandleServlet(new RootUrlHandleServlet());

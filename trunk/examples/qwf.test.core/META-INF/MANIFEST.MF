@@ -6,7 +6,10 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: qwf.test.core.Activator
 Bundle-Vendor: aaaSoft
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.osgi.framework;version="1.3.0"
+Import-Package: javax.activation,
+ javax.servlet,
+ javax.servlet.http,
+ org.osgi.framework;version="1.3.0"
 Require-Bundle: com.quickwebframework.core;bundle-version="1.0.0",
  com.quickwebframework.log.log4j;bundle-version="1.2.15",
  com.quickwebframework.mvc.spring;bundle-version="1.0.0"

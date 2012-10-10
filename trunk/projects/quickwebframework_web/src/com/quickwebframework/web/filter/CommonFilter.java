@@ -31,26 +31,7 @@ public class CommonFilter implements Filter {
 			arg2.doFilter(arg0, arg1);
 			return;
 		}
-
-		// dispatcherServlet的类
-		Class<?> dispatcherServletClazz = dispatcherServletObject.getClass();
-
-		boolean isContinueFilter = true;
-		try {
-			// 找到对应的处理方法
-			Method httpMethod = dispatcherServletClazz.getMethod("doFilter",
-					Object.class, Object.class, Object.class);
-			if (httpMethod != null) {
-				isContinueFilter = (Boolean) httpMethod.invoke(
-						dispatcherServletObject, arg0, arg1, arg2);
-			}
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-
-		// 如果要继续执行其他过滤器
-		if (isContinueFilter) {
-			arg2.doFilter(arg0, arg1);
-		}
+		Filter filter = (Filter) dispatcherServletObject;
+		filter.doFilter(arg0, arg1, arg2);
 	}
 }
