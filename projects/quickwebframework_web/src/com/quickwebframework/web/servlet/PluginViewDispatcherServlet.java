@@ -1,11 +1,9 @@
 package com.quickwebframework.web.servlet;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -143,7 +141,7 @@ public class PluginViewDispatcherServlet extends QwfServlet {
 	private void processHttpMethod(HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			Object dispatcherServletObject = QuickWebFrameworkLoaderListener
+			HttpServlet dispatcherServletObject = QuickWebFrameworkLoaderListener
 					.getDispatcherServletObject();
 			if (dispatcherServletObject == null) {
 				response.setContentType("text/html;charset=utf-8");
@@ -153,37 +151,12 @@ public class PluginViewDispatcherServlet extends QwfServlet {
 				response.getWriter().write(sb.toString());
 				return;
 			}
-			// dispatcherServlet的类
-			Class<?> dispatcherServletClazz = dispatcherServletObject
-					.getClass();
 
 			String contextPath = request.getContextPath();
 			String requestURI = request.getRequestURI();
 
-			Method httpMethod = null;
-
-			// 先得到对应的Java方法
-			try {
-				// 如果当前是根URL："/"
-				if ("/".equals(requestURI)) {
-					httpMethod = dispatcherServletClazz.getMethod(
-							"serviceRootUrl", Object.class, Object.class);
-				} else {
-					// 找到对应的处理方法
-					httpMethod = dispatcherServletClazz.getMethod("service",
-							Object.class, Object.class, String.class,
-							String.class);
-				}
-			} catch (Exception ex) {
-				response.sendError(404, ex.toString());
-				return;
-			}
-
-			// 准备参数然后调用上面得到的Java方法
-			if ("/".equals(requestURI)) {
-				// 调用HTTP方法
-				httpMethod.invoke(dispatcherServletObject, request, response);
-			} else {
+			// 如果不是根路径
+			if (!"/".equals(requestURI)) {
 				String bundleName = null;
 				String methodName = null;
 
@@ -219,11 +192,8 @@ public class PluginViewDispatcherServlet extends QwfServlet {
 				// 将插件名称与方法名称设置到请求属性中
 				request.setAttribute(ARG_BUNDLE_NAME, bundleName);
 				request.setAttribute(ARG_METHOD_NAME, methodName);
-
-				// 调用HTTP方法
-				httpMethod.invoke(dispatcherServletObject, request, response,
-						bundleName, methodName);
 			}
+			dispatcherServletObject.service(request, response);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

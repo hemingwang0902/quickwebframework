@@ -8,11 +8,14 @@ import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.tools.JavaCompiler;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -26,14 +29,21 @@ import com.quickwebframework.entity.HandlerExceptionResolver;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
-import com.quickwebframework.proxy.PluginHttpServletRequest;
-import com.quickwebframework.proxy.PluginHttpServletResponse;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.WebAppService;
 import com.quickwebframework.service.ViewRenderService;
 
-public class DispatcherServlet {
+public class DispatcherServlet extends HttpServlet implements
+		javax.servlet.Filter {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6484809258029142503L;
+
 	private static Log log = LogFactory.getLog(DispatcherServlet.class);
+	public static final String ARG_BUNDLE_NAME = "com.quickwebframework.util.ARG_BUNDLE_NAME";
+	public static final String ARG_METHOD_NAME = "com.quickwebframework.util.ARG_METHOD_NAME";
+
 	// Bundle上下文
 	private BundleContext bundleContext;
 
@@ -165,21 +175,18 @@ public class DispatcherServlet {
 					response);
 	}
 
-	private void processHttp(Object request, Object response,
-			String bundleName, String methodName) {
+	private void processHttp(HttpServletRequest request,
+			HttpServletResponse response, String bundleName, String methodName) {
 		try {
-			HttpServletRequest req = new PluginHttpServletRequest(request);
-			HttpServletResponse rep = new PluginHttpServletResponse(response);
-
 			// 如果插件名称为null或空字符串
 			if (bundleName == null || bundleName.isEmpty()) {
-				handleUrlNotFound(req, rep);
+				handleUrlNotFound(request, response);
 				return;
 			}
 
 			try {
 				MvcModelAndView mav = FrameworkContext.mvcFrameworkService
-						.handle(req, rep, bundleName, methodName);
+						.handle(request, response, bundleName, methodName);
 				if (mav == null) {
 					return;
 				}
@@ -187,7 +194,7 @@ public class DispatcherServlet {
 
 				// 如果视图不为空
 				if (viewName != null) {
-					renderView(mav, req, rep);
+					renderView(mav, request, response);
 				}
 			} catch (Exception ex) {
 				HandlerExceptionResolver resolver = FrameworkContext
@@ -196,7 +203,7 @@ public class DispatcherServlet {
 				if (resolver == null)
 					throw ex;
 				// 解决处理器异常
-				resolver.resolveException(req, rep, ex);
+				resolver.resolveException(request, response, ex);
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -204,17 +211,30 @@ public class DispatcherServlet {
 	}
 
 	// 处理HTTP请求
-	public void service(Object request, Object response, String bundleName,
-			String methodName) {
-		processHttp(request, response, bundleName, methodName);
+	@Override
+	public void service(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+
+		String requestURIWithoutContextPath = request.getRequestURI()
+				.substring(request.getContextPath().length());
+		if (requestURIWithoutContextPath.isEmpty())
+			requestURIWithoutContextPath = "/";
+		if ("/".equals(requestURIWithoutContextPath)) {
+			serviceRootUrl(request, response);
+		} else {
+			String bundleName = request.getAttribute(ARG_BUNDLE_NAME)
+					.toString();
+			String methodName = request.getAttribute(ARG_METHOD_NAME)
+					.toString();
+			processHttp(request, response, bundleName, methodName);
+		}
 	}
 
 	// 处理根URL："/"请求
-	public void serviceRootUrl(Object request, Object response)
-			throws IOException, ServletException {
-		HttpServletResponse rep = new PluginHttpServletResponse(response);
+	public void serviceRootUrl(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
 		if (FrameworkContext.getRootUrlHandleServlet() == null) {
-			rep.setContentType("text/html;charset=utf-8");
+			response.setContentType("text/html;charset=utf-8");
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
 			if (FrameworkContext.mvcFrameworkService != null) {
@@ -231,16 +251,16 @@ public class DispatcherServlet {
 				sb.append("</table>");
 			}
 			sb.append("</body></html>");
-			rep.getWriter().write(sb.toString());
+			response.getWriter().write(sb.toString());
 			return;
 		}
-		HttpServletRequest req = new PluginHttpServletRequest(response);
-		FrameworkContext.getRootUrlHandleServlet().service(req, rep);
+		FrameworkContext.getRootUrlHandleServlet().service(request, response);
 	}
 
 	// 得到资源
-	public InputStream doGetResource(Object request, Object response,
-			String bundleName, String resourcePath) throws IOException {
+	public InputStream doGetResource(HttpServletRequest request,
+			HttpServletResponse response, String bundleName, String resourcePath)
+			throws IOException {
 		if (FrameworkContext.mvcFrameworkService == null)
 			return null;
 
@@ -254,38 +274,57 @@ public class DispatcherServlet {
 		return resourceUrl.openStream();
 	}
 
-	// 处理过滤器,返回值是是否继续处理其他的过滤器
-	public boolean doFilter(Object request, Object response, Object chain)
-			throws IOException, ServletException {
-		HttpServletRequest req = new PluginHttpServletRequest(request);
-		HttpServletResponse rep = new PluginHttpServletResponse(response);
-		BooleanFilterChain booleanFilterChain = new BooleanFilterChain();
+	public class ArrayFilterChain implements FilterChain {
+		private Filter[] filters;
+		private int filterIndex = -1;
+		private int filterCount = 0;
 
-		for (Filter filter : FrameworkContext.getFilterList()) {
-			filter.doFilter(req, rep, booleanFilterChain);
-			if (!booleanFilterChain.isContinueFilter)
-				return false;
-		}
-		return true;
-	}
+		public Filter lastFilter;
 
-	public class BooleanFilterChain implements FilterChain {
-		// 是否继续过滤
-		private boolean isContinueFilter = false;
-
-		public boolean isContinueFilter() {
-			return isContinueFilter;
+		public boolean isContinueFilterChain() {
+			return filterIndex >= filterCount;
 		}
 
-		public void setContinueFilter(boolean isContinueFilter) {
-			this.isContinueFilter = isContinueFilter;
+		public ArrayFilterChain(Filter[] filters) {
+			if (filters == null)
+				return;
+			this.filters = filters;
+			filterCount = filters.length;
 		}
 
 		@Override
 		public void doFilter(ServletRequest arg0, ServletResponse arg1)
 				throws IOException, ServletException {
-			isContinueFilter = true;
-		}
+			if (filters == null)
+				return;
 
+			filterIndex++;
+
+			// 如果过滤器已使用完
+			if (filterIndex >= filterCount)
+				return;
+
+			lastFilter = filters[filterIndex];
+			lastFilter.doFilter(arg0, arg1, this);
+		}
+	}
+
+	// 执行过滤
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain filterChain) throws IOException, ServletException {
+		ArrayFilterChain arrayFilterChain = new ArrayFilterChain(
+				FrameworkContext.getFilterList().toArray(new Filter[0]));
+		arrayFilterChain.doFilter(request, response);
+		if (arrayFilterChain.isContinueFilterChain())
+			filterChain.doFilter(request, response);
+		else
+			log.info("过滤器链未全部执行完成，在执行完过滤器[" + arrayFilterChain.lastFilter
+					+ "]后断开。");
+	}
+
+	// 过滤器初始化
+	@Override
+	public void init(FilterConfig arg0) throws ServletException {
 	}
 }

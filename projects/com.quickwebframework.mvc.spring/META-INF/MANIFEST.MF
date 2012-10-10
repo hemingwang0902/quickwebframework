@@ -6,7 +6,9 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.quickwebframework.mvc.spring.Activator
 Bundle-Vendor: aaaSoft
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: javax.sql,
+Import-Package: javax.servlet,
+ javax.servlet.http,
+ javax.sql,
  javax.xml.parsers,
  javax.xml.transform,
  javax.xml.transform.dom,

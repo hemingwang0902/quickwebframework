@@ -1,9 +1,14 @@
 package qwf.test.core.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -18,7 +23,8 @@ import com.quickwebframework.service.MvcFrameworkService;
 public class IndexController {
 
 	@RequestMapping(value = "index", method = RequestMethod.GET)
-	public String index_get(HttpServletRequest request) {
+	public String index_get(HttpServletRequest request,
+			HttpServletResponse response) {
 		BundleContext bundleContext = Activator.getContext();
 		ServiceReference<?> sr = bundleContext
 				.getServiceReference(MvcFrameworkService.class.getName());
@@ -27,6 +33,15 @@ public class IndexController {
 		}
 		MvcFrameworkService mvcFrameworkService = (MvcFrameworkService) bundleContext
 				.getService(sr);
+
+		try {			
+			Cookie[] c = request.getCookies();
+			if(c == null){
+				response.addCookie(new Cookie("randomUUID", UUID.randomUUID().toString()));	
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		// 得到插件名称与方法名称列表的MAP
 		Map<String, List<String>> bundleNameUrlListMap = mvcFrameworkService
