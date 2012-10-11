@@ -15,7 +15,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.tools.JavaCompiler;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -43,6 +42,8 @@ public class DispatcherServlet extends HttpServlet implements
 	private static Log log = LogFactory.getLog(DispatcherServlet.class);
 	public static final String ARG_BUNDLE_NAME = "com.quickwebframework.util.ARG_BUNDLE_NAME";
 	public static final String ARG_METHOD_NAME = "com.quickwebframework.util.ARG_METHOD_NAME";
+	public static final String ARG_RESOURCE_PATH = "com.quickwebframework.util.ARG_RESOURCE_PATH";
+	public static final String ARG_RESOURCE_INPUTSTREAM = "com.quickwebframework.web.servlet.PluginResourceDispatcherServlet.ARG_RESOURCE_INPUTSTREAM";
 
 	// Bundle上下文
 	private BundleContext bundleContext;
@@ -219,19 +220,31 @@ public class DispatcherServlet extends HttpServlet implements
 				.substring(request.getContextPath().length());
 		if (requestURIWithoutContextPath.isEmpty())
 			requestURIWithoutContextPath = "/";
+
+		// 如果是根路径
 		if ("/".equals(requestURIWithoutContextPath)) {
 			serviceRootUrl(request, response);
-		} else {
-			String bundleName = request.getAttribute(ARG_BUNDLE_NAME)
-					.toString();
-			String methodName = request.getAttribute(ARG_METHOD_NAME)
-					.toString();
+			return;
+		}
+
+		String bundleName = request.getAttribute(ARG_BUNDLE_NAME).toString();
+		Object methodNameObject = request.getAttribute(ARG_METHOD_NAME);
+		Object resourcePathObject = request.getAttribute(ARG_RESOURCE_PATH);
+		// 如果是视图
+		if (methodNameObject != null) {
+			String methodName = methodNameObject.toString();
 			processHttp(request, response, bundleName, methodName);
+		}
+		// 如果是资源
+		else if (resourcePathObject != null) {
+			String resourcePath = resourcePathObject.toString();
+			request.setAttribute(ARG_RESOURCE_INPUTSTREAM,
+					getBundleResource(bundleName, resourcePath));
 		}
 	}
 
 	// 处理根URL："/"请求
-	public void serviceRootUrl(HttpServletRequest request,
+	private void serviceRootUrl(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 		if (FrameworkContext.getRootUrlHandleServlet() == null) {
 			response.setContentType("text/html;charset=utf-8");
@@ -257,9 +270,8 @@ public class DispatcherServlet extends HttpServlet implements
 		FrameworkContext.getRootUrlHandleServlet().service(request, response);
 	}
 
-	// 得到资源
-	public InputStream doGetResource(HttpServletRequest request,
-			HttpServletResponse response, String bundleName, String resourcePath)
+	// 得到Bundle资源
+	private InputStream getBundleResource(String bundleName, String resourcePath)
 			throws IOException {
 		if (FrameworkContext.mvcFrameworkService == null)
 			return null;

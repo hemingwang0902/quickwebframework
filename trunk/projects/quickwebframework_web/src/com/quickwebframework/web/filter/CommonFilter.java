@@ -1,7 +1,6 @@
 package com.quickwebframework.web.filter;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
