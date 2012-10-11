@@ -2,7 +2,6 @@ package com.quickwebframework.web.servlet;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +27,10 @@ public class PluginResourceDispatcherServlet extends QwfServlet {
 	public static final String RESOURCE_PATH_PARAMETER_NAME_PROPERTY_KEY = "quickwebframework.pluginResourceServlet.resourcePathParameterName";
 	public static final String RESOURCE_PATH_PREFIX_PROPERTY_KEY = "quickwebframework.pluginResourceServlet.resourcePathPrefix";
 	public static final String ALLOW_MIME_PROPERTY_KEY = "quickwebframework.pluginResourceServlet.allowMIME";
+
+	public static final String ARG_BUNDLE_NAME = "com.quickwebframework.util.ARG_BUNDLE_NAME";
+	public static final String ARG_RESOURCE_PATH = "com.quickwebframework.util.ARG_RESOURCE_PATH";
+	public static final String ARG_RESOURCE_INPUTSTREAM = "com.quickwebframework.web.servlet.PluginResourceDispatcherServlet.ARG_RESOURCE_INPUTSTREAM";
 
 	// 默认允许的MIME
 	private final static String DEFAULT_ALLOW_MIME = ".js=application/x-javascript;.txt=text/plain;.htm=text/html;.html=text/html;.jpg=image/jpeg;.png=image/png";
@@ -181,123 +184,100 @@ public class PluginResourceDispatcherServlet extends QwfServlet {
 		return false;
 	}
 
-	// 处理HTTP方法
-	private void processHttpMethod(String javaMethodName,
-			HttpServletRequest request, HttpServletResponse response) {
+	@Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			Object dispatcherServletObject = QuickWebFrameworkLoaderListener
+			HttpServlet dispatcherServletObject = QuickWebFrameworkLoaderListener
 					.getDispatcherServletObject();
 			if (dispatcherServletObject == null) {
 				response.sendError(404, "DispatcherServlet object not found!");
 				return;
 			}
-			// dispatcherServlet的类
-			Class<?> dispatcherServletClazz = dispatcherServletObject
-					.getClass();
 
-			// 找到对应的处理方法
-			Method httpMethod = dispatcherServletClazz.getMethod(
-					javaMethodName, HttpServletRequest.class,
-					HttpServletResponse.class, String.class, String.class);
+			String bundleName = null;
+			String resourcePath = null;
 
-			if (httpMethod != null) {
-				String bundleName = null;
-				String resourcePath = null;
+			String contextPath = request.getContextPath();
+			String requestURI = request.getRequestURI();
 
-				String contextPath = request.getContextPath();
-				String requestURI = request.getRequestURI();
-
-				// 如果映射的URL是类似于 */resource/
-				if (urlMappingStyle == 1) {
-					String otherString = requestURI.substring(contextPath
-							.length());
-					String[] tmpArray = StringUtils.split(otherString, "/");
-					if (tmpArray.length >= 2) {
-						bundleName = tmpArray[0];
-						resourcePath = otherString.substring(bundleName
-								.length() + mapping.length());
-					}
+			// 如果映射的URL是类似于 */resource/
+			if (urlMappingStyle == 1) {
+				String otherString = requestURI.substring(contextPath.length());
+				String[] tmpArray = StringUtils.split(otherString, "/");
+				if (tmpArray.length >= 2) {
+					bundleName = tmpArray[0];
+					resourcePath = otherString.substring(bundleName.length()
+							+ mapping.length());
 				}
-				// 如果映射的URL是类似于 /resource/*
-				else if (urlMappingStyle == 2) {
-					String otherString = requestURI.substring(contextPath
-							.length() + mapping.length() - 1);
-					String[] tmpArray = StringUtils.split(otherString, "/");
-					if (tmpArray.length >= 2) {
-						bundleName = tmpArray[0];
-						resourcePath = otherString.substring(bundleName
-								.length() + 1);
-					}
+			}
+			// 如果映射的URL是类似于 /resource/*
+			else if (urlMappingStyle == 2) {
+				String otherString = requestURI.substring(contextPath.length()
+						+ mapping.length() - 1);
+				String[] tmpArray = StringUtils.split(otherString, "/");
+				if (tmpArray.length >= 2) {
+					bundleName = tmpArray[0];
+					resourcePath = otherString
+							.substring(bundleName.length() + 1);
 				}
-				// 如果映射的URL是类似于 /resource，只需要直接取出参数
-				else if (urlMappingStyle == 3) {
-					bundleName = request.getParameter(bundleNameParameterName);
-					resourcePath = request
-							.getParameter(resourcePathParameterName);
-				}
+			}
+			// 如果映射的URL是类似于 /resource，只需要直接取出参数
+			else if (urlMappingStyle == 3) {
+				bundleName = request.getParameter(bundleNameParameterName);
+				resourcePath = request.getParameter(resourcePathParameterName);
+			}
 
-				// 如果有统一前缀，则添加统一前缀
-				if (resourcePathPrefix != null && !resourcePathPrefix.isEmpty()) {
-					resourcePath = resourcePathPrefix + resourcePath;
-				}
+			// 如果有统一前缀，则添加统一前缀
+			if (resourcePathPrefix != null && !resourcePathPrefix.isEmpty()) {
+				resourcePath = resourcePathPrefix + resourcePath;
+			}
 
-				// 此处资源路径的后缀判断只否允许访问此资源
+			// 此处资源路径的后缀判断只否允许访问此资源
 
-				// 如果请求的资源路径没有后缀，则不允许访问
-				if (!resourcePath.contains(".")) {
-					// 返回400 Bad Request
-					response.sendError(400, "请求的资源[" + resourcePath
-							+ "]未包括后缀，不允许访问！");
-					return;
-				}
-				String[] tmpArray = resourcePath.split("\\.");
-				String extension = "." + tmpArray[tmpArray.length - 1];
-				// 如果此扩展名不在被允许访问的列表内
-				if (!allowMimeMap.containsKey(extension)) {
-					// 返回403 Forbidden
-					response.sendError(403, "扩展名[" + extension
-							+ "]不在被允许访问的扩展名列表中！");
-					return;
-				}
-
-				// 调用HTTP方法
-				InputStream inputStream = (InputStream) httpMethod.invoke(
-						dispatcherServletObject, request, response, bundleName,
-						resourcePath);
-
-				// 如果资源未找到
-				if (inputStream == null) {
-					response.sendError(404, "在插件[" + bundleName + "]中未找到资源["
-							+ resourcePath + "]！");
-					return;
-				}
-
-				// 输出
-				String contentType = allowMimeMap.get(extension);
-				response.setContentType(contentType);
-				OutputStream outputStream = response.getOutputStream();
-				IoUtil.copyStream(inputStream, outputStream);
-				inputStream.close();
-			} else {
-				response.sendError(
-						404,
-						String.format(
-								"Java method [%s] not found in dispatcherServletObject!",
-								javaMethodName));
+			// 如果请求的资源路径没有后缀，则不允许访问
+			if (!resourcePath.contains(".")) {
+				// 返回400 Bad Request
+				response.sendError(400, "请求的资源[" + resourcePath
+						+ "]未包括后缀，不允许访问！");
 				return;
 			}
+			String[] tmpArray = resourcePath.split("\\.");
+			String extension = "." + tmpArray[tmpArray.length - 1];
+			// 如果此扩展名不在被允许访问的列表内
+			if (!allowMimeMap.containsKey(extension)) {
+				// 返回403 Forbidden
+				response.sendError(403, "扩展名[" + extension + "]不在被允许访问的扩展名列表中！");
+				return;
+			}
+
+			// 将插件名称与资源路径设置到请求属性中
+			request.setAttribute(ARG_BUNDLE_NAME, bundleName);
+			request.setAttribute(ARG_RESOURCE_PATH, resourcePath);
+
+			// 调用Servlet的service
+			dispatcherServletObject.service(request, response);
+
+			Object inputStreamObject = request
+					.getAttribute(ARG_RESOURCE_INPUTSTREAM);
+
+			// 如果资源未找到
+			if (inputStreamObject == null
+					|| !InputStream.class.isInstance(inputStreamObject)) {
+				response.sendError(404, "在插件[" + bundleName + "]中未找到资源["
+						+ resourcePath + "]！");
+				return;
+			}
+			InputStream inputStream = (InputStream) inputStreamObject;
+
+			// 输出
+			String contentType = allowMimeMap.get(extension);
+			response.setContentType(contentType);
+			OutputStream outputStream = response.getOutputStream();
+			IoUtil.copyStream(inputStream, outputStream);
+			inputStream.close();
+
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-	}
-
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		processHttpMethod("doGetResource", request, response);
-	}
-
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) {
-		processHttpMethod("doGetResource", request, response);
 	}
 }

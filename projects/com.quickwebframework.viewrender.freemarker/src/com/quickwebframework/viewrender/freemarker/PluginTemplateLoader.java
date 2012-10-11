@@ -6,16 +6,12 @@ import java.io.Reader;
 import java.net.URL;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 
 import com.quickwebframework.core.FrameworkContext;
 
 import freemarker.cache.TemplateLoader;
 
 public class PluginTemplateLoader implements TemplateLoader {
-
-	// Bundle上下文
-	private BundleContext bundleContext;
 
 	// 插件名称与路径分隔符
 	private String pluginNameAndPathSplitString = ":";
@@ -41,10 +37,6 @@ public class PluginTemplateLoader implements TemplateLoader {
 
 	public void setViewNameSuffix(String viewNameSuffix) {
 		this.viewNameSuffix = viewNameSuffix;
-	}
-
-	public PluginTemplateLoader(BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
 	}
 
 	@Override

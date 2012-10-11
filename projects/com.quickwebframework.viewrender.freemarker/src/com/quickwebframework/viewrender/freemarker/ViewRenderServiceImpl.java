@@ -25,8 +25,7 @@ public class ViewRenderServiceImpl implements ViewRenderService {
 		}
 
 		// 配置ViewRender
-		PluginTemplateLoader pluginTemplateLoader = new PluginTemplateLoader(
-				bundleContext);
+		PluginTemplateLoader pluginTemplateLoader = new PluginTemplateLoader();
 
 		// 分隔符
 		if (viewRenderProp

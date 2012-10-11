@@ -1,7 +1,6 @@
 package com.quickwebframework.mvc.spring;
 
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,10 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleException;
-import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -29,8 +25,6 @@ import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
 import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
-import com.quickwebframework.mvc.spring.util.BundleAnnotationConfigApplicationContext;
-import com.quickwebframework.mvc.spring.util.BundleGenericXmlApplicationContext;
 import com.quickwebframework.mvc.spring.util.BundleScanner;
 import com.quickwebframework.mvc.spring.util.PluginPathMatcher;
 import com.quickwebframework.mvc.spring.util.PluginUrlPathHelper;
@@ -51,8 +45,9 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 			PluginControllerInfo pluginControllerInfo) {
 
 		ClassLoader bundleClassLoader = pluginControllerInfo.getWebAppService()
-				.getClassLoader();		
-		ApplicationContext applicationContext = scanner.scan(bundle, bundleClassLoader);
+				.getClassLoader();
+		ApplicationContext applicationContext = scanner.scan(bundle,
+				bundleClassLoader);
 		// 从ApplicationContext得到过滤器列表
 		Map<String, Filter> filterMap = applicationContext
 				.getBeansOfType(Filter.class);
