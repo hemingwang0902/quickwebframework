@@ -37,11 +37,12 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	private static Log log = LogFactory.getLog(SpringMvcFrameworkService.class);
 	private PathMatcher pathMatcher = new AntPathMatcher();
 	private BundleScanner scanner = new BundleScanner();
+	public static Map<Bundle, ApplicationContext> bundleApplicationContextMap = new HashMap<Bundle, ApplicationContext>();
 
 	// 插件名与ControllerService对应Map
 	private Map<String, PluginControllerInfo> bundleNamePluginControllerInfoMap = new HashMap<String, PluginControllerInfo>();
 
-	private void initPluginControllerInfo(Bundle bundle,
+	private ApplicationContext initPluginControllerInfo(Bundle bundle,
 			PluginControllerInfo pluginControllerInfo) {
 
 		ClassLoader bundleClassLoader = pluginControllerInfo.getWebAppService()
@@ -126,6 +127,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 				}
 			}
 		}
+		return applicationContext;
 	}
 
 	@Override
@@ -135,7 +137,9 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 
 		PluginControllerInfo pluginControllerInfo = new PluginControllerInfo(
 				webAppService);
-		initPluginControllerInfo(bundle, pluginControllerInfo);
+		ApplicationContext applicationContext = initPluginControllerInfo(
+				bundle, pluginControllerInfo);
+		bundleApplicationContextMap.put(bundle, applicationContext);
 		bundleNamePluginControllerInfoMap.put(bundleName, pluginControllerInfo);
 		log.info("插件[" + bundleName + "]已注册为Spring MVC的Web App.");
 		return true;
@@ -143,8 +147,11 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 
 	@Override
 	public boolean removeWebApp(WebAppService webAppService) {
-		String bundleName = webAppService.getBundle().getSymbolicName();
+		Bundle bundle = webAppService.getBundle();
+		String bundleName = bundle.getSymbolicName();
 		bundleNamePluginControllerInfoMap.remove(bundleName);
+		if (bundleApplicationContextMap.containsKey(bundle))
+			bundleApplicationContextMap.remove(bundle);
 		log.info("插件[" + bundleName + "]注册在Spring MVC的Web App已经移除！");
 		return true;
 	}
