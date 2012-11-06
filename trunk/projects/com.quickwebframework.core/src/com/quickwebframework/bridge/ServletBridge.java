@@ -11,22 +11,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
-
 import com.quickwebframework.entity.HandlerExceptionResolver;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
-import com.quickwebframework.framework.FrameworkContext;
-import com.quickwebframework.service.MvcFrameworkService;
+import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.service.WebAppService;
-import com.quickwebframework.service.ViewRenderService;
 
 public class ServletBridge extends HttpServlet {
 	/**
@@ -40,40 +30,6 @@ public class ServletBridge extends HttpServlet {
 	public static final String ARG_RESOURCE_PATH = "com.quickwebframework.util.ARG_RESOURCE_PATH";
 	public static final String ARG_RESOURCE_INPUTSTREAM = "com.quickwebframework.web.servlet.PluginResourceDispatcherServlet.ARG_RESOURCE_INPUTSTREAM";
 
-	// Bundle上下文
-	private BundleContext bundleContext;
-
-	// 刷新渲染服务
-	private void refreshViewRenderService() {
-		try {
-			ServiceReference<?> viewRenderServiceReference = bundleContext
-					.getServiceReference(ViewRenderService.class.getName());
-			if (viewRenderServiceReference == null) {
-				FrameworkContext.viewRenderService = null;
-			} else {
-				FrameworkContext.viewRenderService = (ViewRenderService) bundleContext
-						.getService(viewRenderServiceReference);
-			}
-		} catch (Exception ex) {
-		}
-	}
-
-	// 刷新MVC框架服务
-	private void refreshMvcFrameworkService() {
-		try {
-			ServiceReference<?> serviceReference = bundleContext
-					.getServiceReference(MvcFrameworkService.class.getName());
-			if (serviceReference == null) {
-				FrameworkContext.mvcFrameworkService = null;
-				return;
-			}
-			FrameworkContext.mvcFrameworkService = (MvcFrameworkService) bundleContext
-					.getService(serviceReference);
-		} catch (Exception ex) {
-			return;
-		}
-	}
-
 	/**
 	 * 渲染视图
 	 * 
@@ -82,11 +38,11 @@ public class ServletBridge extends HttpServlet {
 	public void renderView(MvcModelAndView mav, HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			if (FrameworkContext.viewRenderService != null) {
+			if (WebContext.viewRenderService != null) {
 				// 渲染视图
-				FrameworkContext.viewRenderService.renderView(mav
-						.getWebAppService().getBundle().getSymbolicName(),
-						mav.getViewName(), request, response);
+				WebContext.viewRenderService.renderView(mav.getWebAppService()
+						.getBundle().getSymbolicName(), mav.getViewName(),
+						request, response);
 			} else {
 				response.sendError(500,
 						"[com.quickwebframework.core.DispatcherServlet] cannot found ViewRender!");
@@ -96,79 +52,13 @@ public class ServletBridge extends HttpServlet {
 		}
 	}
 
-	public ServletBridge(final BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
-
-		final Bundle currentBundle = bundleContext.getBundle();
-
-		// 刷新视图渲染器
-		refreshViewRenderService();
-		// 刷新MVC框架服务
-		refreshMvcFrameworkService();
-
-		bundleContext.addBundleListener(new BundleListener() {
-			@Override
-			public void bundleChanged(BundleEvent arg0) {
-				Bundle bundle = arg0.getBundle();
-				String bundleName = bundle.getSymbolicName();
-				int bundleEventType = arg0.getType();
-				// 如果是已经停止
-				if (bundleEventType == BundleEvent.STOPPED) {
-					if (FrameworkContext.mvcFrameworkService == null)
-						return;
-					WebAppService webAppService = FrameworkContext.mvcFrameworkService
-							.getWebAppService(bundleName);
-					if (webAppService != null) {
-						FrameworkContext.mvcFrameworkService
-								.removeWebApp(webAppService);
-					}
-				}
-			}
-		});
-
-		bundleContext.addServiceListener(new ServiceListener() {
-			@Override
-			public void serviceChanged(ServiceEvent arg0) {
-				String serviceReferenceName = arg0.getServiceReference()
-						.toString();
-				// 如果视图渲染器服务改变，刷新视图渲染器
-				if (serviceReferenceName.contains(ViewRenderService.class
-						.getName())) {
-					refreshViewRenderService();
-				} else if (serviceReferenceName
-						.contains(MvcFrameworkService.class.getName())) {
-					refreshMvcFrameworkService();
-				}
-
-				int serviceEventType = arg0.getType();
-				if (serviceEventType == ServiceEvent.REGISTERED) {
-					log.info(String.format("[%s]插件的[%s]服务已注册", arg0
-							.getServiceReference().getBundle()
-							.getSymbolicName(), arg0.getServiceReference()));
-				} else if (serviceEventType == ServiceEvent.UNREGISTERING) {
-					log.info(String.format("[%s]插件的[%s]服务正在取消注册", arg0
-							.getServiceReference().getBundle()
-							.getSymbolicName(), arg0.getServiceReference()));
-
-					ServiceReference<?> serviceReference = arg0
-							.getServiceReference();
-
-					// 如果卸载的插件就是自己
-					if (currentBundle.equals(serviceReference.getBundle()))
-						return;
-				}
-			}
-		});
-	}
-
 	private void handleUrlNotFound(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		if (FrameworkContext.getUrlNotFoundHandleServlet() == null)
+		if (WebContext.getUrlNotFoundHandleServlet() == null)
 			response.sendError(404, "URL " + request.getRequestURI()
 					+ " not found!");
 		else
-			FrameworkContext.getUrlNotFoundHandleServlet().service(request,
-					response);
+			WebContext.getUrlNotFoundHandleServlet().service(request, response);
 	}
 
 	private void processHttp(HttpServletRequest request,
@@ -181,8 +71,8 @@ public class ServletBridge extends HttpServlet {
 			}
 
 			try {
-				MvcModelAndView mav = FrameworkContext.mvcFrameworkService
-						.handle(request, response, bundleName, methodName);
+				MvcModelAndView mav = WebContext.mvcFrameworkService.handle(
+						request, response, bundleName, methodName);
 				if (mav == null) {
 					return;
 				}
@@ -193,7 +83,7 @@ public class ServletBridge extends HttpServlet {
 					renderView(mav, request, response);
 				}
 			} catch (Exception ex) {
-				HandlerExceptionResolver resolver = FrameworkContext
+				HandlerExceptionResolver resolver = WebContext
 						.getHandlerExceptionResolver();
 
 				if (resolver == null)
@@ -241,12 +131,12 @@ public class ServletBridge extends HttpServlet {
 	// 处理根URL："/"请求
 	private void serviceRootUrl(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		if (FrameworkContext.getRootUrlHandleServlet() == null) {
+		if (WebContext.getRootUrlHandleServlet() == null) {
 			response.setContentType("text/html;charset=utf-8");
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
-			if (FrameworkContext.mvcFrameworkService != null) {
-				Map<String, List<String>> map = FrameworkContext.mvcFrameworkService
+			if (WebContext.mvcFrameworkService != null) {
+				Map<String, List<String>> map = WebContext.mvcFrameworkService
 						.getBundleNameUrlListMap();
 				sb.append("<table>");
 				for (String bundleName : map.keySet()) {
@@ -262,16 +152,16 @@ public class ServletBridge extends HttpServlet {
 			response.getWriter().write(sb.toString());
 			return;
 		}
-		FrameworkContext.getRootUrlHandleServlet().service(request, response);
+		WebContext.getRootUrlHandleServlet().service(request, response);
 	}
 
 	// 得到Bundle资源
 	private InputStream getBundleResource(String bundleName, String resourcePath)
 			throws IOException {
-		if (FrameworkContext.mvcFrameworkService == null)
+		if (WebContext.mvcFrameworkService == null)
 			return null;
 
-		WebAppService webAppService = FrameworkContext.mvcFrameworkService
+		WebAppService webAppService = WebContext.mvcFrameworkService
 				.getWebAppService(bundleName);
 		if (webAppService == null)
 			return null;

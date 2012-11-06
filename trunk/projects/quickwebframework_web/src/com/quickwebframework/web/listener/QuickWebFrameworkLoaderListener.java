@@ -1,6 +1,5 @@
 package com.quickwebframework.web.listener;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
