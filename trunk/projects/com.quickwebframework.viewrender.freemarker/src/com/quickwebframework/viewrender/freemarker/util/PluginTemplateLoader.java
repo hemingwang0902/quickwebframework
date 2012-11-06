@@ -1,4 +1,4 @@
-package com.quickwebframework.viewrender.freemarker;
+package com.quickwebframework.viewrender.freemarker.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,7 +7,7 @@ import java.net.URL;
 
 import org.osgi.framework.Bundle;
 
-import com.quickwebframework.core.FrameworkContext;
+import com.quickwebframework.framework.FrameworkContext;
 
 import freemarker.cache.TemplateLoader;
 

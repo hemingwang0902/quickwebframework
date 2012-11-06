@@ -6,10 +6,10 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
-import com.quickwebframework.core.DispatcherServlet;
-import com.quickwebframework.core.FrameworkContext;
+import com.quickwebframework.bridge.FrameworkBridge;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
+import com.quickwebframework.framework.FrameworkContext;
 import com.quickwebframework.util.BundleUtil;
 
 public class Activator implements BundleActivator {
@@ -41,7 +41,7 @@ public class Activator implements BundleActivator {
 					"在OSGi服务中未找到javax.servlet.ServletContext服务！");
 		}
 		Object obj = context.getService(servletContextServiceReference);
-		return (ServletContext)obj;
+		return (ServletContext) obj;
 	}
 
 	/*
@@ -67,10 +67,10 @@ public class Activator implements BundleActivator {
 		// 初始化FrameworkContext
 		FrameworkContext.init(context.getBundle());
 
-		// 注册DispatcherServlet对象为Service
-		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
-		context.registerService(DispatcherServlet.class.getName(),
-				dispatcherServlet, null);
+		// 注册FrameworkBridge对象为服务
+		FrameworkBridge frameworkBridge = new FrameworkBridge(context);
+		context.registerService(FrameworkBridge.class.getName(),
+				frameworkBridge, null);
 
 		log.info("Started [com.quickwebframework.bundle].");
 	}

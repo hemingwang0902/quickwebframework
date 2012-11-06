@@ -141,8 +141,8 @@ public class PluginViewDispatcherServlet extends QwfServlet {
 	private void processHttpMethod(HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			HttpServlet dispatcherServletObject = QuickWebFrameworkLoaderListener
-					.getDispatcherServletObject();
+			HttpServlet dispatcherServletObject = (HttpServlet) QuickWebFrameworkLoaderListener
+					.getFrameworkBridgeObject();
 			if (dispatcherServletObject == null) {
 				response.setContentType("text/html;charset=utf-8");
 				StringBuilder sb = new StringBuilder();

@@ -1,4 +1,4 @@
-package com.quickwebframework.viewrender.freemarker;
+package com.quickwebframework.viewrender.freemarker.service.impl;
 
 import java.util.Properties;
 
@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.BundleContext;
 
 import com.quickwebframework.service.ViewRenderService;
+import com.quickwebframework.viewrender.freemarker.util.FreemarkerViewRender;
+import com.quickwebframework.viewrender.freemarker.util.PluginTemplateLoader;
 
 import freemarker.template.Configuration;
 

@@ -24,13 +24,13 @@ public class CommonFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest arg0, ServletResponse arg1,
 			FilterChain arg2) throws IOException, ServletException {
-		Object dispatcherServletObject = QuickWebFrameworkLoaderListener
-				.getDispatcherServletObject();
-		if (dispatcherServletObject == null) {
+		Object frameworkBridgeObject = QuickWebFrameworkLoaderListener
+				.getFrameworkBridgeObject();
+		if (frameworkBridgeObject == null) {
 			arg2.doFilter(arg0, arg1);
 			return;
 		}
-		Filter filter = (Filter) dispatcherServletObject;
+		Filter filter = (Filter) frameworkBridgeObject;
 		filter.doFilter(arg0, arg1, arg2);
 	}
 }

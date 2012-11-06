@@ -32,9 +32,7 @@ Bundle-ClassPath: org.aopalliance_1.0.0.v200905130917.jar,
  org.springframework.jdbc_3.0.5.RELEASE.jar,
  .
 Require-Bundle: com.quickwebframework.core;bundle-version="1.0.0"
-Export-Package: com.quickwebframework.mvc.spring,
- com.quickwebframework.mvc.spring.entity.impl,
- com.quickwebframework.mvc.spring.util,
+Export-Package: com.quickwebframework.mvc.spring.util,
  org.aopalliance.aop,
  org.aopalliance.intercept,
  org.apache.commons.logging,

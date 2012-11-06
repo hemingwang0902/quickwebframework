@@ -1,4 +1,4 @@
-package com.quickwebframework.mvc.spring;
+package com.quickwebframework.mvc.spring.service.impl;
 
 import javax.sql.DataSource;
 

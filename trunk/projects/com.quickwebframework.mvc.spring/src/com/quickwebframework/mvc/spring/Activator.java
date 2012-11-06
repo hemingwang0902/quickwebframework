@@ -3,6 +3,8 @@ package com.quickwebframework.mvc.spring;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import com.quickwebframework.mvc.spring.service.impl.SpringMvcFrameworkService;
+import com.quickwebframework.mvc.spring.service.impl.TransactionDatabaseService;
 import com.quickwebframework.service.DatabaseService;
 import com.quickwebframework.service.MvcFrameworkService;
 

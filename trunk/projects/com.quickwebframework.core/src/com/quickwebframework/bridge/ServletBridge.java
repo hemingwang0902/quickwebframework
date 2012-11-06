@@ -1,4 +1,4 @@
-package com.quickwebframework.core;
+package com.quickwebframework.bridge;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,12 +6,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,18 +23,18 @@ import com.quickwebframework.entity.HandlerExceptionResolver;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
+import com.quickwebframework.framework.FrameworkContext;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.WebAppService;
 import com.quickwebframework.service.ViewRenderService;
 
-public class DispatcherServlet extends HttpServlet implements
-		javax.servlet.Filter {
+public class ServletBridge extends HttpServlet {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -6484809258029142503L;
 
-	private static Log log = LogFactory.getLog(DispatcherServlet.class);
+	public static Log log = LogFactory.getLog(ServletBridge.class);
 	public static final String ARG_BUNDLE_NAME = "com.quickwebframework.util.ARG_BUNDLE_NAME";
 	public static final String ARG_METHOD_NAME = "com.quickwebframework.util.ARG_METHOD_NAME";
 	public static final String ARG_RESOURCE_PATH = "com.quickwebframework.util.ARG_RESOURCE_PATH";
@@ -101,7 +96,7 @@ public class DispatcherServlet extends HttpServlet implements
 		}
 	}
 
-	public DispatcherServlet(final BundleContext bundleContext) {
+	public ServletBridge(final BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 
 		final Bundle currentBundle = bundleContext.getBundle();
@@ -284,59 +279,5 @@ public class DispatcherServlet extends HttpServlet implements
 		if (resourceUrl == null)
 			return null;
 		return resourceUrl.openStream();
-	}
-
-	public class ArrayFilterChain implements FilterChain {
-		private Filter[] filters;
-		private int filterIndex = -1;
-		private int filterCount = 0;
-
-		public Filter lastFilter;
-
-		public boolean isContinueFilterChain() {
-			return filterIndex >= filterCount;
-		}
-
-		public ArrayFilterChain(Filter[] filters) {
-			if (filters == null)
-				return;
-			this.filters = filters;
-			filterCount = filters.length;
-		}
-
-		@Override
-		public void doFilter(ServletRequest arg0, ServletResponse arg1)
-				throws IOException, ServletException {
-			if (filters == null)
-				return;
-
-			filterIndex++;
-
-			// 如果过滤器已使用完
-			if (filterIndex >= filterCount)
-				return;
-
-			lastFilter = filters[filterIndex];
-			lastFilter.doFilter(arg0, arg1, this);
-		}
-	}
-
-	// 执行过滤
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain filterChain) throws IOException, ServletException {
-		ArrayFilterChain arrayFilterChain = new ArrayFilterChain(
-				FrameworkContext.getFilterList().toArray(new Filter[0]));
-		arrayFilterChain.doFilter(request, response);
-		if (arrayFilterChain.isContinueFilterChain())
-			filterChain.doFilter(request, response);
-		else
-			log.info("过滤器链未全部执行完成，在执行完过滤器[" + arrayFilterChain.lastFilter
-					+ "]后断开。");
-	}
-
-	// 过滤器初始化
-	@Override
-	public void init(FilterConfig arg0) throws ServletException {
 	}
 }

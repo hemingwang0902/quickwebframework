@@ -1,4 +1,4 @@
-package com.quickwebframework.db.jdbc.mysql;
+package com.quickwebframework.db.jdbc.mysql.service.impl;
 
 import java.util.Properties;
 

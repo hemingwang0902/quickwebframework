@@ -16,9 +16,8 @@ Import-Package: javax.servlet,
  org.osgi.framework,
  org.osgi.framework.launch,
  org.osgi.framework.wiring
-Export-Package: com.quickwebframework.core,
- com.quickwebframework.entity,
+Export-Package: com.quickwebframework.entity,
  com.quickwebframework.entity.impl,
- com.quickwebframework.filter,
+ com.quickwebframework.framework,
  com.quickwebframework.service,
- com.quickwebframework.util 
+ com.quickwebframework.util
