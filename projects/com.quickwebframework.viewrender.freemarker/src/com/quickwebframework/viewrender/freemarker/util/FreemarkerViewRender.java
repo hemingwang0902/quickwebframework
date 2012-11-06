@@ -1,4 +1,4 @@
-package com.quickwebframework.viewrender.freemarker;
+package com.quickwebframework.viewrender.freemarker.util;
 
 import java.util.Enumeration;
 import java.util.HashMap;

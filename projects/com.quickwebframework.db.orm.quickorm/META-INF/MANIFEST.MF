@@ -22,6 +22,4 @@ Export-Package: com.quickorm.config,
  com.quickorm.logging,
  com.quickorm.stereotype,
  com.quickorm.support,
- com.quickwebframework.db.orm.quickorm,
- com.quickwebframework.db.orm.quickorm.service,
- com.quickwebframework.db.orm.quickorm.service.impl
+ com.quickwebframework.db.orm.quickorm.service

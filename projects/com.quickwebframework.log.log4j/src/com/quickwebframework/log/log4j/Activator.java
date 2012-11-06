@@ -7,6 +7,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.quickwebframework.log.log4j.service.impl.LogServiceImpl;
 import com.quickwebframework.service.LogService;
 
 public class Activator implements BundleActivator {
@@ -59,6 +60,9 @@ public class Activator implements BundleActivator {
 					"%-d{yyyy-MM-dd HH:mm:ss,SSS} [%c]-[%p] %m%n");
 
 			PropertyConfigurator.configure(prop);
+		} catch (IllegalStateException ex) {
+			System.out
+					.println("[Info]com.quickwebframework.log.log4j的Activator在Stop时出现异常。");
 		} catch (Exception ex) {
 			System.out
 					.println("[Info]com.quickwebframework.log.log4j的Activator在Stop时出现异常。");

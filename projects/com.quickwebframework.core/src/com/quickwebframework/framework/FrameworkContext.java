@@ -1,4 +1,4 @@
-package com.quickwebframework.core;
+package com.quickwebframework.framework;
 
 import java.util.ArrayList;
 import java.util.HashMap;

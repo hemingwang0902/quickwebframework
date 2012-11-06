@@ -1,4 +1,4 @@
-package com.quickwebframework.mvc.spring;
+package com.quickwebframework.mvc.spring.service.impl;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
-import com.quickwebframework.core.FrameworkContext;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
@@ -49,21 +47,8 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 				.getClassLoader();
 		ApplicationContext applicationContext = scanner.scan(bundle,
 				bundleClassLoader);
-		// 从ApplicationContext得到过滤器列表
-		Map<String, Filter> filterMap = applicationContext
-				.getBeansOfType(Filter.class);
-		for (Filter filter : filterMap.values()) {
-			FrameworkContext.addFilter(bundle, filter);
-		}
 
-		// 从ApplicationContext得到线程列表
-		Map<String, Thread> threadMap = applicationContext
-				.getBeansOfType(Thread.class);
-		for (Thread thread : threadMap.values()) {
-			FrameworkContext.addThread(bundle, thread);
-		}
-
-		// 从ApplicationContext得到处理器列表
+		// 从ApplicationContext得到MVC控制器列表
 		final Map<String, Object> handlerMap = applicationContext
 				.getBeansWithAnnotation(Controller.class);
 

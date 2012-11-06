@@ -187,8 +187,8 @@ public class PluginResourceDispatcherServlet extends QwfServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			HttpServlet dispatcherServletObject = QuickWebFrameworkLoaderListener
-					.getDispatcherServletObject();
+			HttpServlet dispatcherServletObject = (HttpServlet) QuickWebFrameworkLoaderListener
+					.getFrameworkBridgeObject();
 			if (dispatcherServletObject == null) {
 				response.sendError(404, "DispatcherServlet object not found!");
 				return;

@@ -1,4 +1,4 @@
-package com.quickwebframework.log.log4j;
+package com.quickwebframework.log.log4j.entity.impl;
 
 import org.apache.log4j.Logger;
 

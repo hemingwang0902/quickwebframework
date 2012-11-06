@@ -13,6 +13,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.service.ViewRenderService;
+import com.quickwebframework.viewrender.freemarker.service.impl.ViewRenderServiceImpl;
 
 public class Activator implements BundleActivator {
 

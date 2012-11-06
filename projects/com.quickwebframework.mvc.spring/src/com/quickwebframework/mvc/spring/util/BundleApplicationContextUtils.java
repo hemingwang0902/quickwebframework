@@ -3,7 +3,7 @@ package com.quickwebframework.mvc.spring.util;
 import org.osgi.framework.Bundle;
 import org.springframework.context.ApplicationContext;
 
-import com.quickwebframework.mvc.spring.SpringMvcFrameworkService;
+import com.quickwebframework.mvc.spring.service.impl.SpringMvcFrameworkService;
 
 public class BundleApplicationContextUtils {
 

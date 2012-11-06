@@ -1,9 +1,10 @@
-package com.quickwebframework.log.log4j;
+package com.quickwebframework.log.log4j.service.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.quickwebframework.entity.Log;
+import com.quickwebframework.log.log4j.entity.impl.LogImpl;
 import com.quickwebframework.service.LogService;
 
 public class LogServiceImpl implements LogService {

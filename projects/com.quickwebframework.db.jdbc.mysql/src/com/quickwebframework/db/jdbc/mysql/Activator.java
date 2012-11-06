@@ -12,6 +12,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.quickwebframework.db.jdbc.mysql.service.impl.DatabaseServiceImpl;
 import com.quickwebframework.service.DatabaseService;
 
 public class Activator implements BundleActivator {
