@@ -68,7 +68,7 @@ public class Activator implements BundleActivator {
 		FrameworkContext.init(context.getBundle());
 
 		// 注册FrameworkBridge对象为服务
-		FrameworkBridge frameworkBridge = new FrameworkBridge(context);
+		FrameworkBridge frameworkBridge = new FrameworkBridge();
 		context.registerService(FrameworkBridge.class.getName(),
 				frameworkBridge, null);
 
@@ -83,7 +83,6 @@ public class Activator implements BundleActivator {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		log.info("Stoping [com.quickwebframework.core]...");
-		FrameworkContext.whenBundleStoped(context.getBundle());
 		Activator.context = null;
 		log.info("Stoped [com.quickwebframework.core].");
 	}

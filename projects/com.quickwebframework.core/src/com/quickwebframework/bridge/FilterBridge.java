@@ -9,9 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.osgi.framework.BundleContext;
-
-import com.quickwebframework.framework.FrameworkContext;
+import com.quickwebframework.framework.FilterContext;
 
 public abstract class FilterBridge extends ServletBridge implements
 		javax.servlet.Filter {
@@ -20,10 +18,6 @@ public abstract class FilterBridge extends ServletBridge implements
 	 * 
 	 */
 	private static final long serialVersionUID = 7816449987888773855L;
-
-	public FilterBridge(BundleContext bundleContext) {
-		super(bundleContext);
-	}
 
 	public class ArrayFilterChain implements FilterChain {
 		private Filter[] filters;
@@ -64,8 +58,8 @@ public abstract class FilterBridge extends ServletBridge implements
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
-		ArrayFilterChain arrayFilterChain = new ArrayFilterChain(
-				FrameworkContext.getFilterList().toArray(new Filter[0]));
+		ArrayFilterChain arrayFilterChain = new ArrayFilterChain(FilterContext
+				.getFilterList().toArray(new Filter[0]));
 		arrayFilterChain.doFilter(request, response);
 		if (arrayFilterChain.isContinueFilterChain())
 			filterChain.doFilter(request, response);

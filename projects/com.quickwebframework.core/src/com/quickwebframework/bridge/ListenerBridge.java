@@ -1,5 +1,7 @@
 package com.quickwebframework.bridge;
 
+import java.util.List;
+
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
@@ -15,8 +17,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.osgi.framework.BundleContext;
-
+import com.quickwebframework.framework.ListenerContext;
 
 public abstract class ListenerBridge extends FilterBridge implements
 		ServletContextListener, ServletContextAttributeListener,
@@ -29,19 +30,27 @@ public abstract class ListenerBridge extends FilterBridge implements
 	 */
 	private static final long serialVersionUID = 3779917967114677693L;
 
-	public ListenerBridge(BundleContext bundleContext) {
-		super(bundleContext);
-	}
-
 	// 开始 ServletContextListener
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		// TODO
+		List<ServletContextListener> list = ListenerContext
+				.getListenerList(ServletContextListener.class);
+		if (list == null)
+			return;
+		for (ServletContextListener listener : list) {
+			listener.contextInitialized(arg0);
+		}
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		// TODO
+		List<ServletContextListener> list = ListenerContext
+				.getListenerList(ServletContextListener.class);
+		if (list == null)
+			return;
+		for (ServletContextListener listener : list) {
+			listener.contextDestroyed(arg0);
+		}
 	}
 
 	// 停止 ServletContextListener
@@ -49,20 +58,35 @@ public abstract class ListenerBridge extends FilterBridge implements
 	// 开始 ServletContextAttributeListener
 	@Override
 	public void attributeAdded(ServletContextAttributeEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<ServletContextAttributeListener> list = ListenerContext
+				.getListenerList(ServletContextAttributeListener.class);
+		if (list == null)
+			return;
+		for (ServletContextAttributeListener listener : list) {
+			listener.attributeAdded(arg0);
+		}
 	}
 
 	@Override
 	public void attributeRemoved(ServletContextAttributeEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<ServletContextAttributeListener> list = ListenerContext
+				.getListenerList(ServletContextAttributeListener.class);
+		if (list == null)
+			return;
+		for (ServletContextAttributeListener listener : list) {
+			listener.attributeRemoved(arg0);
+		}
 	}
 
 	@Override
 	public void attributeReplaced(ServletContextAttributeEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<ServletContextAttributeListener> list = ListenerContext
+				.getListenerList(ServletContextAttributeListener.class);
+		if (list == null)
+			return;
+		for (ServletContextAttributeListener listener : list) {
+			listener.attributeReplaced(arg0);
+		}
 	}
 
 	// 结束 ServletContextAttributeListener
@@ -70,14 +94,24 @@ public abstract class ListenerBridge extends FilterBridge implements
 	// 开始 ServletRequestListener
 	@Override
 	public void requestDestroyed(ServletRequestEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<ServletRequestListener> list = ListenerContext
+				.getListenerList(ServletRequestListener.class);
+		if (list == null)
+			return;
+		for (ServletRequestListener listener : list) {
+			listener.requestDestroyed(arg0);
+		}
 	}
 
 	@Override
 	public void requestInitialized(ServletRequestEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<ServletRequestListener> list = ListenerContext
+				.getListenerList(ServletRequestListener.class);
+		if (list == null)
+			return;
+		for (ServletRequestListener listener : list) {
+			listener.requestInitialized(arg0);
+		}
 	}
 
 	// 结束 ServletRequestListener
@@ -85,20 +119,35 @@ public abstract class ListenerBridge extends FilterBridge implements
 	// 开始 ServletRequestAttributeListener
 	@Override
 	public void attributeAdded(ServletRequestAttributeEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<ServletRequestAttributeListener> list = ListenerContext
+				.getListenerList(ServletRequestAttributeListener.class);
+		if (list == null)
+			return;
+		for (ServletRequestAttributeListener listener : list) {
+			listener.attributeAdded(arg0);
+		}
 	}
 
 	@Override
 	public void attributeRemoved(ServletRequestAttributeEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<ServletRequestAttributeListener> list = ListenerContext
+				.getListenerList(ServletRequestAttributeListener.class);
+		if (list == null)
+			return;
+		for (ServletRequestAttributeListener listener : list) {
+			listener.attributeRemoved(arg0);
+		}
 	}
 
 	@Override
 	public void attributeReplaced(ServletRequestAttributeEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<ServletRequestAttributeListener> list = ListenerContext
+				.getListenerList(ServletRequestAttributeListener.class);
+		if (list == null)
+			return;
+		for (ServletRequestAttributeListener listener : list) {
+			listener.attributeReplaced(arg0);
+		}
 	}
 
 	// 结束 ServletRequestAttributeListener
@@ -106,14 +155,24 @@ public abstract class ListenerBridge extends FilterBridge implements
 	// 开始 HttpSessionActivationListener
 	@Override
 	public void sessionDidActivate(HttpSessionEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<HttpSessionActivationListener> list = ListenerContext
+				.getListenerList(HttpSessionActivationListener.class);
+		if (list == null)
+			return;
+		for (HttpSessionActivationListener listener : list) {
+			listener.sessionDidActivate(arg0);
+		}
 	}
 
 	@Override
 	public void sessionWillPassivate(HttpSessionEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<HttpSessionActivationListener> list = ListenerContext
+				.getListenerList(HttpSessionActivationListener.class);
+		if (list == null)
+			return;
+		for (HttpSessionActivationListener listener : list) {
+			listener.sessionWillPassivate(arg0);
+		}
 	}
 
 	// 结束 HttpSessionActivationListener
@@ -121,20 +180,35 @@ public abstract class ListenerBridge extends FilterBridge implements
 	// 开始 HttpSessionAttributeListener
 	@Override
 	public void attributeAdded(HttpSessionBindingEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<HttpSessionAttributeListener> list = ListenerContext
+				.getListenerList(HttpSessionAttributeListener.class);
+		if (list == null)
+			return;
+		for (HttpSessionAttributeListener listener : list) {
+			listener.attributeAdded(arg0);
+		}
 	}
 
 	@Override
 	public void attributeRemoved(HttpSessionBindingEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<HttpSessionAttributeListener> list = ListenerContext
+				.getListenerList(HttpSessionAttributeListener.class);
+		if (list == null)
+			return;
+		for (HttpSessionAttributeListener listener : list) {
+			listener.attributeRemoved(arg0);
+		}
 	}
 
 	@Override
 	public void attributeReplaced(HttpSessionBindingEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<HttpSessionAttributeListener> list = ListenerContext
+				.getListenerList(HttpSessionAttributeListener.class);
+		if (list == null)
+			return;
+		for (HttpSessionAttributeListener listener : list) {
+			listener.attributeReplaced(arg0);
+		}
 	}
 
 	// 结束 HttpSessionAttributeListener
@@ -142,14 +216,24 @@ public abstract class ListenerBridge extends FilterBridge implements
 	// 开始 HttpSessionBindingListener
 	@Override
 	public void valueBound(HttpSessionBindingEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<HttpSessionBindingListener> list = ListenerContext
+				.getListenerList(HttpSessionBindingListener.class);
+		if (list == null)
+			return;
+		for (HttpSessionBindingListener listener : list) {
+			listener.valueBound(arg0);
+		}
 	}
 
 	@Override
 	public void valueUnbound(HttpSessionBindingEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<HttpSessionBindingListener> list = ListenerContext
+				.getListenerList(HttpSessionBindingListener.class);
+		if (list == null)
+			return;
+		for (HttpSessionBindingListener listener : list) {
+			listener.valueUnbound(arg0);
+		}
 	}
 
 	// 结束 HttpSessionBindingListener
@@ -157,14 +241,24 @@ public abstract class ListenerBridge extends FilterBridge implements
 	// 开始 HttpSessionListener
 	@Override
 	public void sessionCreated(HttpSessionEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<HttpSessionListener> list = ListenerContext
+				.getListenerList(HttpSessionListener.class);
+		if (list == null)
+			return;
+		for (HttpSessionListener listener : list) {
+			listener.sessionCreated(arg0);
+		}
 	}
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent arg0) {
-		// TODO Auto-generated method stub
-
+		List<HttpSessionListener> list = ListenerContext
+				.getListenerList(HttpSessionListener.class);
+		if (list == null)
+			return;
+		for (HttpSessionListener listener : list) {
+			listener.sessionDestroyed(arg0);
+		}
 	}
 	// 结束 HttpSessionListener
 }
