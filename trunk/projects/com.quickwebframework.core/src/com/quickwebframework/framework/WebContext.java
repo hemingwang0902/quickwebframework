@@ -15,7 +15,6 @@ import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.ViewRenderService;
-import com.quickwebframework.service.WebAppService;
 
 public class WebContext {
 	private static Log log = LogFactory.getLog(WebContext.class);
@@ -65,21 +64,14 @@ public class WebContext {
 	 * 
 	 * @param bundleContext
 	 */
-	public static void registerWebApp(final Bundle bundle) {
-
+	public static void addBundle(Bundle bundle) {
 		if (WebContext.mvcFrameworkService == null) {
 			log.error("注册WebApp时，未发现有注册的MvcFrameworkService服务！");
 			throw new RuntimeException(
 					"注册WebApp时，未发现有注册的MvcFrameworkService服务！");
 		}
-
 		// 注册服务
-		WebContext.mvcFrameworkService.addWebApp(new WebAppService() {
-			@Override
-			public Bundle getBundle() {
-				return bundle;
-			}
-		});
+		WebContext.mvcFrameworkService.addBundle(bundle);
 	}
 
 	// 刷新渲染服务
@@ -125,18 +117,12 @@ public class WebContext {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
 				Bundle bundle = arg0.getBundle();
-				String bundleName = bundle.getSymbolicName();
 				int bundleEventType = arg0.getType();
 				// 如果是已经停止
 				if (bundleEventType == BundleEvent.STOPPED) {
 					if (WebContext.mvcFrameworkService == null)
 						return;
-					WebAppService webAppService = WebContext.mvcFrameworkService
-							.getWebAppService(bundleName);
-					if (webAppService != null) {
-						WebContext.mvcFrameworkService
-								.removeWebApp(webAppService);
-					}
+					WebContext.mvcFrameworkService.removeBundle(bundle);
 				}
 			}
 		});

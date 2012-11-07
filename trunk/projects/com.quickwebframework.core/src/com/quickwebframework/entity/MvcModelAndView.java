@@ -2,7 +2,7 @@ package com.quickwebframework.entity;
 
 import java.util.Map;
 
-import com.quickwebframework.service.WebAppService;
+import org.osgi.framework.Bundle;
 
 //MVC的模型与视图
 public class MvcModelAndView {
@@ -24,15 +24,15 @@ public class MvcModelAndView {
 		return model;
 	}
 
-	// WebAppService
-	private WebAppService webAppService;
+	// Bundle
+	private Bundle bundle;
 
-	public WebAppService getWebAppService() {
-		return webAppService;
+	public Bundle getBundle() {
+		return bundle;
 	}
 
-	public void setWebAppService(WebAppService webAppService) {
-		this.webAppService = webAppService;
+	public void setBundle(Bundle bundle) {
+		this.bundle = bundle;
 	}
 
 	public void setModel(Map<?, ?> model) {
@@ -51,15 +51,13 @@ public class MvcModelAndView {
 		init(viewName, model, null);
 	}
 
-	public MvcModelAndView(String viewName, Map<?, ?> model,
-			WebAppService webAppService) {
-		init(viewName, model, webAppService);
+	public MvcModelAndView(String viewName, Map<?, ?> model, Bundle bundle) {
+		init(viewName, model, bundle);
 	}
 
-	private void init(String viewName, Map<?, ?> model,
-			WebAppService webAppService) {
+	private void init(String viewName, Map<?, ?> model, Bundle bundle) {
 		this.viewName = viewName;
 		this.model = model;
-		this.webAppService = webAppService;
+		this.bundle = bundle;
 	}
 }

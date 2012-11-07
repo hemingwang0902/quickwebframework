@@ -7,8 +7,6 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.mvc.spring.service.impl.SpringMvcFrameworkService;
 import com.quickwebframework.mvc.spring.service.impl.TransactionDatabaseService;
@@ -19,7 +17,6 @@ import com.quickwebframework.service.MvcFrameworkService;
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;
-	private static Log log = LogFactory.getLog(SpringMvcFrameworkService.class);
 
 	public static BundleContext getContext() {
 		return context;
@@ -68,7 +65,7 @@ public class Activator implements BundleActivator {
 							.getBundleApplicationContext(startingBundle) == null) {
 						iocFrameworkService.addBundle(startingBundle);
 					}
-					WebContext.registerWebApp(startingBundle);
+					WebContext.addBundle(startingBundle);
 				}
 			}
 		});

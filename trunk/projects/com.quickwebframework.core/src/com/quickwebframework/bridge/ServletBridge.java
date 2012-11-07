@@ -11,12 +11,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.framework.Bundle;
+
 import com.quickwebframework.entity.HandlerExceptionResolver;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
+import com.quickwebframework.framework.FrameworkContext;
 import com.quickwebframework.framework.WebContext;
-import com.quickwebframework.service.WebAppService;
 
 public class ServletBridge extends HttpServlet {
 	/**
@@ -40,9 +42,9 @@ public class ServletBridge extends HttpServlet {
 		try {
 			if (WebContext.viewRenderService != null) {
 				// 渲染视图
-				WebContext.viewRenderService.renderView(mav.getWebAppService()
-						.getBundle().getSymbolicName(), mav.getViewName(),
-						request, response);
+				WebContext.viewRenderService.renderView(mav.getBundle()
+						.getSymbolicName(), mav.getViewName(), request,
+						response);
 			} else {
 				response.sendError(500,
 						"[com.quickwebframework.core.DispatcherServlet] cannot found ViewRender!");
@@ -161,11 +163,9 @@ public class ServletBridge extends HttpServlet {
 		if (WebContext.mvcFrameworkService == null)
 			return null;
 
-		WebAppService webAppService = WebContext.mvcFrameworkService
-				.getWebAppService(bundleName);
-		if (webAppService == null)
-			return null;
-		URL resourceUrl = webAppService.getBundle().getResource(resourcePath);
+		Bundle bundle = FrameworkContext.getBundleByName(bundleName);
+
+		URL resourceUrl = bundle.getResource(resourcePath);
 		if (resourceUrl == null)
 			return null;
 		return resourceUrl.openStream();
