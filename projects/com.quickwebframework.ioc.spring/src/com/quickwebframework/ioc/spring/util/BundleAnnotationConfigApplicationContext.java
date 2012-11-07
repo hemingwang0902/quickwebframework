@@ -1,4 +1,4 @@
-package com.quickwebframework.mvc.spring.util;
+package com.quickwebframework.ioc.spring.util;
 
 import org.osgi.framework.Bundle;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

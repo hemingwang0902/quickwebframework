@@ -22,8 +22,8 @@ import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAda
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
+import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
-import com.quickwebframework.mvc.spring.util.BundleScanner;
 import com.quickwebframework.mvc.spring.util.PluginPathMatcher;
 import com.quickwebframework.mvc.spring.util.PluginUrlPathHelper;
 import com.quickwebframework.service.MvcFrameworkService;
@@ -34,7 +34,6 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 
 	private static Log log = LogFactory.getLog(SpringMvcFrameworkService.class);
 	private PathMatcher pathMatcher = new AntPathMatcher();
-	private BundleScanner scanner = new BundleScanner();
 	public static Map<Bundle, ApplicationContext> bundleApplicationContextMap = new HashMap<Bundle, ApplicationContext>();
 
 	// 插件名与ControllerService对应Map
@@ -43,10 +42,12 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	private ApplicationContext initPluginControllerInfo(Bundle bundle,
 			PluginControllerInfo pluginControllerInfo) {
 
-		ClassLoader bundleClassLoader = pluginControllerInfo.getWebAppService()
-				.getClassLoader();
-		ApplicationContext applicationContext = scanner.scan(bundle,
-				bundleClassLoader);
+		ApplicationContext applicationContext = BundleApplicationContextUtils
+				.getBundleApplicationContext(bundle);
+
+		if (applicationContext == null) {
+			throw new RuntimeException("找不到此Bundle对应的ApplicationContext对象！");
+		}
 
 		// 从ApplicationContext得到MVC控制器列表
 		final Map<String, Object> handlerMap = applicationContext

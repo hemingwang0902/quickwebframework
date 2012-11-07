@@ -77,6 +77,35 @@ public class BundleUtil {
 	}
 
 	/**
+	 * 得到Bundle的类加载器
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public static ClassLoader getBundleClassLoader(Bundle bundle) {
+		List<String> bundlePathList = BundleUtil.getPathListInBundle(bundle,
+				"/");
+		String bundleOneClassName = null;
+		for (String bundlePath : bundlePathList) {
+			if (bundlePath.endsWith(".class")) {
+				bundleOneClassName = bundlePath.replace("/", ".").substring(0,
+						bundlePath.lastIndexOf("."));
+				break;
+			}
+		}
+		if (bundleOneClassName == null) {
+			throw new RuntimeException("Bundle中没有一个Java类！");
+		}
+		Class<?> bundleOneClass = null;
+		try {
+			bundleOneClass = bundle.loadClass(bundleOneClassName);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		return bundleOneClass.getClassLoader();
+	}
+
+	/**
 	 * 解压Bundle的文件
 	 * 
 	 * @param bundle

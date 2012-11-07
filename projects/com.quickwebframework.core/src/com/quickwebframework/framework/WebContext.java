@@ -1,7 +1,5 @@
 package com.quickwebframework.framework;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.Bundle;
@@ -18,7 +16,6 @@ import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.service.WebAppService;
-import com.quickwebframework.util.BundleUtil;
 
 public class WebContext {
 	private static Log log = LogFactory.getLog(WebContext.class);
@@ -76,39 +73,11 @@ public class WebContext {
 					"注册WebApp时，未发现有注册的MvcFrameworkService服务！");
 		}
 
-		// 得到其ClassLoader
-		List<String> bundlePathList = BundleUtil.getPathListInBundle(bundle,
-				"/");
-		String bundleOneClassName = null;
-		for (String bundlePath : bundlePathList) {
-			if (bundlePath.endsWith(".class")) {
-				bundleOneClassName = bundlePath.replace("/", ".").substring(0,
-						bundlePath.lastIndexOf("."));
-				break;
-			}
-		}
-		if (bundleOneClassName == null)
-			return;
-		Class<?> bundleOneClass = null;
-		try {
-			bundleOneClass = bundle.loadClass(bundleOneClassName);
-
-		} catch (ClassNotFoundException e) {
-			log.error(e);
-			return;
-		}
-		final ClassLoader currentClassLoader = bundleOneClass.getClassLoader();
-
 		// 注册服务
 		WebContext.mvcFrameworkService.addWebApp(new WebAppService() {
 			@Override
 			public Bundle getBundle() {
 				return bundle;
-			}
-
-			@Override
-			public ClassLoader getClassLoader() {
-				return currentClassLoader;
 			}
 		});
 	}
