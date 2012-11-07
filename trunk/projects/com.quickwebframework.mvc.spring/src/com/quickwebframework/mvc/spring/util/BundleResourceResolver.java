@@ -74,27 +74,28 @@ public class BundleResourceResolver {
 
 		List<String> importPackageList = new ArrayList<String>(
 				bundleInfo.getImportPackageList());
-		List<String> exportPackageList = new ArrayList<String>(
-				bundleInfo.getExportPackageList());
 
 		if (importPackageList != null) {
 			Bundle[] allBundles = bundle.getBundleContext().getBundles();
 
 			Map<Bundle, List<String>> bundleClassPathListMap = new HashMap<Bundle, List<String>>();
 
-			for (Bundle bundle : allBundles) {
-				for (String bundleExportPackageInfo : exportPackageList) {
+			for (Bundle tmpBundle : allBundles) {
+				BundleInfo tmpBundleInfo = BundleUtil.getBundleInfo(tmpBundle);
+				List<String> tmpBundleExportPackageList = tmpBundleInfo.getExportPackageList();
+				
+				for (String tmpBundleExportPackageInfo : tmpBundleExportPackageList) {
 					// 已找到对应Bundle的路径列表
 					List<String> foundClassPathList = new ArrayList<String>();
 					for (String importPackage : importPackageList) {
-						if (bundleExportPackageInfo.startsWith(importPackage)) {
+						if (tmpBundleExportPackageInfo.startsWith(importPackage)) {
 							List<String> bundleClassPathList = null;
-							if (bundleClassPathListMap.containsKey(bundle)) {
+							if (bundleClassPathListMap.containsKey(tmpBundle)) {
 								bundleClassPathList = bundleClassPathListMap
-										.get(bundle);
+										.get(tmpBundle);
 							} else {
 								bundleClassPathList = new ArrayList<String>();
-								bundleClassPathListMap.put(bundle,
+								bundleClassPathListMap.put(tmpBundle,
 										bundleClassPathList);
 							}
 							String classPath = importPackage.split(",")[0];
