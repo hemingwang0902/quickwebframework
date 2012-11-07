@@ -1,14 +1,10 @@
 package com.quickwebframework.mvc.spring;
 
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.List;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 
 import com.quickwebframework.entity.Log;
@@ -17,8 +13,8 @@ import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.mvc.spring.service.impl.SpringMvcFrameworkService;
 import com.quickwebframework.mvc.spring.service.impl.TransactionDatabaseService;
 import com.quickwebframework.service.DatabaseService;
+import com.quickwebframework.service.IocFrameworkService;
 import com.quickwebframework.service.MvcFrameworkService;
-import com.quickwebframework.util.BundleUtil;
 
 public class Activator implements BundleActivator {
 
@@ -36,7 +32,7 @@ public class Activator implements BundleActivator {
 	 * org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext
 	 * )
 	 */
-	public void start(BundleContext bundleContext) throws Exception {
+	public void start(final BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
 
 		// 注册为服务
@@ -57,6 +53,21 @@ public class Activator implements BundleActivator {
 				int bundleEventType = arg0.getType();
 				if (BundleEvent.STARTING == bundleEventType) {
 					Bundle startingBundle = arg0.getBundle();
+
+					ServiceReference<IocFrameworkService> sr = bundleContext
+							.getServiceReference(IocFrameworkService.class);
+					if (sr == null)
+						return;
+					IocFrameworkService iocFrameworkService = bundleContext
+							.getService(sr);
+					if (iocFrameworkService == null) {
+						return;
+					}
+
+					if (iocFrameworkService
+							.getBundleApplicationContext(startingBundle) == null) {
+						iocFrameworkService.addBundle(startingBundle);
+					}
 					WebContext.registerWebApp(startingBundle);
 				}
 			}

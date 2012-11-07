@@ -11,4 +11,5 @@ Import-Package: javax.servlet,
  org.osgi.framework;version="1.3.0",
  qwf.test.core
 Require-Bundle: com.quickwebframework.core;bundle-version="1.0.0",
+ com.quickwebframework.ioc.spring;bundle-version="1.0.0",
  com.quickwebframework.mvc.spring;bundle-version="1.0.0"

@@ -1,9 +1,9 @@
-package com.quickwebframework.mvc.spring.util;
+package com.quickwebframework.ioc.spring.util;
 
 import org.osgi.framework.Bundle;
 import org.springframework.context.ApplicationContext;
 
-import com.quickwebframework.mvc.spring.service.impl.SpringMvcFrameworkService;
+import com.quickwebframework.ioc.spring.service.impl.SpringIocFrameworkService;
 
 public class BundleApplicationContextUtils {
 
@@ -14,7 +14,7 @@ public class BundleApplicationContextUtils {
 	 * @return
 	 */
 	public static ApplicationContext getBundleApplicationContext(Bundle bundle) {
-		return SpringMvcFrameworkService.bundleApplicationContextMap
+		return SpringIocFrameworkService.bundleApplicationContextMap
 				.get(bundle);
 	}
 }

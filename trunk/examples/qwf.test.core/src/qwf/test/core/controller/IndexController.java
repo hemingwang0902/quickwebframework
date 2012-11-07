@@ -1,7 +1,5 @@
 package qwf.test.core.controller;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -16,7 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.quickwebframework.core.Activator;
+import qwf.test.core.Activator;
+
 import com.quickwebframework.service.MvcFrameworkService;
 
 @Controller
@@ -34,10 +33,11 @@ public class IndexController {
 		MvcFrameworkService mvcFrameworkService = (MvcFrameworkService) bundleContext
 				.getService(sr);
 
-		try {			
+		try {
 			Cookie[] c = request.getCookies();
-			if(c == null){
-				response.addCookie(new Cookie("randomUUID", UUID.randomUUID().toString()));	
+			if (c == null) {
+				response.addCookie(new Cookie("randomUUID", UUID.randomUUID()
+						.toString()));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
