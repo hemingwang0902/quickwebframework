@@ -27,7 +27,6 @@ import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
 import com.quickwebframework.mvc.spring.util.PluginPathMatcher;
 import com.quickwebframework.mvc.spring.util.PluginUrlPathHelper;
 import com.quickwebframework.service.MvcFrameworkService;
-import com.quickwebframework.service.WebAppService;
 import com.quickwebframework.util.BundleUtil;
 
 public class SpringMvcFrameworkService implements MvcFrameworkService {
@@ -117,12 +116,11 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	}
 
 	@Override
-	public boolean addWebApp(WebAppService webAppService) {
-		Bundle bundle = webAppService.getBundle();
+	public boolean addBundle(Bundle bundle) {
 		String bundleName = bundle.getSymbolicName();
 
 		PluginControllerInfo pluginControllerInfo = new PluginControllerInfo(
-				webAppService);
+				bundle);
 		ApplicationContext applicationContext = initPluginControllerInfo(
 				bundle, pluginControllerInfo);
 		bundleApplicationContextMap.put(bundle, applicationContext);
@@ -132,23 +130,13 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	}
 
 	@Override
-	public boolean removeWebApp(WebAppService webAppService) {
-		Bundle bundle = webAppService.getBundle();
+	public boolean removeBundle(Bundle bundle) {
 		String bundleName = bundle.getSymbolicName();
 		bundleNamePluginControllerInfoMap.remove(bundleName);
 		if (bundleApplicationContextMap.containsKey(bundle))
 			bundleApplicationContextMap.remove(bundle);
 		log.info("插件[" + bundleName + "]注册在Spring MVC的Web App已经移除！");
 		return true;
-	}
-
-	@Override
-	public WebAppService getWebAppService(String bundleName) {
-		PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
-				.get(bundleName);
-		if (pluginControllerInfo == null)
-			return null;
-		return pluginControllerInfo.getWebAppService();
 	}
 
 	@Override
@@ -234,7 +222,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 				return null;
 			}
 			MvcModelAndView mmav = new MvcModelAndView(mav.getViewName(),
-					mav.getModel(), pluginControllerInfo.getWebAppService());
+					mav.getModel(), pluginControllerInfo.getBundle());
 			return mmav;
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
