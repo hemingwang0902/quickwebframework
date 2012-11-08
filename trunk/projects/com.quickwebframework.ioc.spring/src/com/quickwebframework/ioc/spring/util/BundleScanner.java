@@ -1,6 +1,7 @@
 package com.quickwebframework.ioc.spring.util;
 
 import java.net.URL;
+import java.util.List;
 
 import org.osgi.framework.Bundle;
 import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
@@ -17,11 +18,27 @@ public class BundleScanner {
 
 		ApplicationContext applicationContext = null;
 
-		// 如果有，则让Spring加载这个xml文件
+		// 如果有xml文件，则初始化BundleGenericXmlApplicationContext类
+		if (applicationContextUrl != null) {
+			applicationContext = new BundleGenericXmlApplicationContext(bundle);
+		}
+		// 否则初始化BundleAnnotationConfigApplicationContext类
+		else {
+			applicationContext = new BundleAnnotationConfigApplicationContext(
+					bundle);
+		}
+
+		List<ApplicationContextListener> listenerList = BundleApplicationContextUtils
+				.getApplicationContextListenerList();
+
+		// 触发Starting事件
+		for (ApplicationContextListener listener : listenerList)
+			listener.contextStarting(applicationContext, bundle);
+
+		// 如果有xml文件，则让Spring加载这个xml文件
 		if (applicationContextUrl != null) {
 			try {
-				BundleGenericXmlApplicationContext bundleGenericXmlApplicationContext = new BundleGenericXmlApplicationContext(
-						bundle);
+				BundleGenericXmlApplicationContext bundleGenericXmlApplicationContext = (BundleGenericXmlApplicationContext) applicationContext;
 				bundleGenericXmlApplicationContext
 						.setNamespaceHandlerResolver(new DefaultNamespaceHandlerResolver(
 								this.getClass().getClassLoader()));
@@ -31,7 +48,6 @@ public class BundleScanner {
 						applicationContextUrl));
 				bundleGenericXmlApplicationContext.refresh();
 				bundleGenericXmlApplicationContext.start();
-				applicationContext = bundleGenericXmlApplicationContext;
 			} catch (Exception ex) {
 				throw new RuntimeException("Spring加载插件["
 						+ bundle.getSymbolicName()
@@ -41,8 +57,7 @@ public class BundleScanner {
 		// 否则扫描插件的所有文件
 		else {
 			// 初始化AnnotationConfigApplicationContext
-			BundleAnnotationConfigApplicationContext bundleAnnotationConfigApplicationContext = new BundleAnnotationConfigApplicationContext(
-					bundle);
+			BundleAnnotationConfigApplicationContext bundleAnnotationConfigApplicationContext = (BundleAnnotationConfigApplicationContext) applicationContext;
 			try {
 				// 开始Spring扫描
 				bundleAnnotationConfigApplicationContext
@@ -50,12 +65,16 @@ public class BundleScanner {
 				bundleAnnotationConfigApplicationContext.scan("*");
 				bundleAnnotationConfigApplicationContext.refresh();
 				bundleAnnotationConfigApplicationContext.start();
-				applicationContext = bundleAnnotationConfigApplicationContext;
 			} catch (Exception ex) {
 				throw new RuntimeException("用Spring扫描插件["
 						+ bundle.getSymbolicName() + "]时出错异常！", ex);
 			}
 		}
+
+		// 触发Started事件
+		for (ApplicationContextListener listener : listenerList)
+			listener.contextStarted(applicationContext, bundle);
+
 		return applicationContext;
 	}
 
