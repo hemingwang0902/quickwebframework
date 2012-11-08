@@ -27,7 +27,7 @@ public class BundleAutoManageThread extends Thread {
 	public void run() {
 		try {
 			logger.config("quickwebframework_web:插件自动管理线程已启动！");
-			logger.config("插件目录：" + bundleFolderPath);
+			logger.info("QuickWebFramework插件目录：" + bundleFolderPath);
 			while (true) {
 				Thread.sleep(1000);
 				BundleContext bundleContext = QuickWebFrameworkLoaderListener

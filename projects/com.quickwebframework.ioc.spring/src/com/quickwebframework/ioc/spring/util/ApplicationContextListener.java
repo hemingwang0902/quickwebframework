@@ -1,0 +1,27 @@
+package com.quickwebframework.ioc.spring.util;
+
+import java.util.EventListener;
+
+import org.osgi.framework.Bundle;
+import org.springframework.context.ApplicationContext;
+
+public interface ApplicationContextListener extends EventListener {
+
+	/**
+	 * ApplicationContext 开始之前
+	 * 
+	 * @param applicationContext
+	 * @param bundle
+	 */
+	public void contextStarting(ApplicationContext applicationContext,
+			Bundle bundle);
+
+	/**
+	 * ApplicationContext 开始之后
+	 * 
+	 * @param applicationContext
+	 * @param bundle
+	 */
+	public void contextStarted(ApplicationContext applicationContext,
+			Bundle bundle);
+}
