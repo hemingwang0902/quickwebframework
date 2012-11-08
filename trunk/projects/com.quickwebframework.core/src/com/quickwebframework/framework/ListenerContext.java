@@ -38,8 +38,9 @@ public class ListenerContext {
 		});
 	}
 
-	private static Map<String, List<EventListener>> typeNameListenerMap = new HashMap<String, List<EventListener>>();
-	private static Map<Bundle, List<EventListener>> bundleListenerMap = new HashMap<Bundle, List<EventListener>>();
+	private static List<EventListener> listenerList = new ArrayList<EventListener>();
+	private static Map<String, List<EventListener>> typeNameListenerListMap = new HashMap<String, List<EventListener>>();
+	private static Map<Bundle, List<EventListener>> bundleListenerListMap = new HashMap<Bundle, List<EventListener>>();
 
 	/**
 	 * 得到所有监听器列表
@@ -51,16 +52,17 @@ public class ListenerContext {
 	public static <T extends EventListener> List<T> getListenerList(
 			Class<T> clazz) {
 		String listenerTypeName = getServletInterface(clazz).getName();
-		if (!typeNameListenerMap.containsKey(listenerTypeName))
+		if (!typeNameListenerListMap.containsKey(listenerTypeName))
 			return null;
-		return (List<T>) typeNameListenerMap.get(listenerTypeName);
+		return (List<T>) typeNameListenerListMap.get(listenerTypeName);
 	}
 
 	/**
 	 * 移除所有监听器
 	 */
 	public static void removeAllFilter() {
-		for (Bundle bundle : bundleListenerMap.keySet().toArray(new Bundle[0])) {
+		for (Bundle bundle : bundleListenerListMap.keySet().toArray(
+				new Bundle[0])) {
 			removeBundleAllListener(bundle);
 		}
 	}
@@ -71,15 +73,15 @@ public class ListenerContext {
 	 * @param bundle
 	 */
 	public static void removeBundleAllListener(Bundle bundle) {
-		if (!bundleListenerMap.containsKey(bundle))
+		if (!bundleListenerListMap.containsKey(bundle))
 			return;
-		EventListener[] bundleListenerArray = bundleListenerMap.get(bundle)
+		EventListener[] bundleListenerArray = bundleListenerListMap.get(bundle)
 				.toArray(new EventListener[0]);
 
 		for (EventListener listener : bundleListenerArray) {
 			removeListener(bundle, listener);
 		}
-		bundleListenerMap.remove(bundle);
+		bundleListenerListMap.remove(bundle);
 	}
 
 	/**
@@ -90,9 +92,9 @@ public class ListenerContext {
 	public static void removeListener(Bundle bundle, EventListener listener) {
 
 		// 从Bundle对应的监听器列表中移除
-		if (!bundleListenerMap.containsKey(bundle))
+		if (!bundleListenerListMap.containsKey(bundle))
 			return;
-		List<? extends EventListener> bundleListenerList = bundleListenerMap
+		List<? extends EventListener> bundleListenerList = bundleListenerListMap
 				.get(bundle);
 		bundleListenerList.remove(listener);
 
@@ -103,9 +105,11 @@ public class ListenerContext {
 			List<? extends EventListener> listenerList = getListenerList(listenerClass);
 			if (listenerList != null)
 				listenerList.remove(listener);
-			log.info(String.format("已成功移除插件[%s]的[%s]类型监听器[%s]！",
+			log.debug(String.format("已成功移除插件[%s]的[%s]类型监听器[%s]！",
 					bundle.getSymbolicName(), listenerClass.getName(), listener));
 		}
+		// 从全部监听器对象列表中移除
+		listenerList.remove(listener);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -144,13 +148,50 @@ public class ListenerContext {
 	 *            监听器
 	 */
 	public static void addListener(Bundle bundle, EventListener listener) {
+
+		String listenerClassName = listener.getClass().getName();
+		// 是否存在同类名实例
+		boolean hasSameClassNameObject = false;
+		for (EventListener preListener : listenerList) {
+			if (preListener.getClass().getName().equals(listenerClassName)) {
+				hasSameClassNameObject = true;
+				break;
+			}
+		}
+		// 如果存在同类名实例，则抛出异常
+		if (hasSameClassNameObject) {
+
+			StringBuilder sb = new StringBuilder();
+			sb.append(String.format(
+					"警告：将Bundle[%s]的过滤器[类名:%s]加入到FilterContext中时，发现存在多个同类名实例！",
+					bundle.getSymbolicName(), listenerClassName));
+			sb.append("\n--同类名实例列表如下：");
+			synchronized (bundleListenerListMap) {
+				for (Bundle tmpBundle : bundleListenerListMap.keySet()) {
+					List<EventListener> tmpBundleListenerList = bundleListenerListMap
+							.get(tmpBundle);
+					for (EventListener tmpListener : tmpBundleListenerList) {
+						if (tmpListener.getClass().getName()
+								.equals(listenerClassName)) {
+							sb.append(String.format(
+									"\n  --Bundle[%s],监听器[%s ,类名:%s]",
+									tmpBundle.getSymbolicName(),
+									tmpListener.toString(), listenerClassName));
+						}
+					}
+				}
+			}
+			String errorMessage = sb.toString();
+			log.warn(errorMessage);
+		}
+
 		// 加入到Bundle对应的监听器列表中
 		List<EventListener> bundleListenerList = null;
-		if (bundleListenerMap.containsKey(bundle)) {
-			bundleListenerList = bundleListenerMap.get(bundle);
+		if (bundleListenerListMap.containsKey(bundle)) {
+			bundleListenerList = bundleListenerListMap.get(bundle);
 		} else {
 			bundleListenerList = new ArrayList<EventListener>();
-			bundleListenerMap.put(bundle, bundleListenerList);
+			bundleListenerListMap.put(bundle, bundleListenerList);
 		}
 		bundleListenerList.add(listener);
 
@@ -160,15 +201,18 @@ public class ListenerContext {
 			// 加入到所有监听器列表中
 			String listenerTypeName = listenerClass.getName();
 			List<EventListener> typeListenerList = null;
-			if (typeNameListenerMap.containsKey(listenerTypeName)) {
-				typeListenerList = typeNameListenerMap.get(listenerTypeName);
+			if (typeNameListenerListMap.containsKey(listenerTypeName)) {
+				typeListenerList = typeNameListenerListMap
+						.get(listenerTypeName);
 			} else {
 				typeListenerList = new ArrayList<EventListener>();
-				typeNameListenerMap.put(listenerTypeName, typeListenerList);
+				typeNameListenerListMap.put(listenerTypeName, typeListenerList);
 			}
 			typeListenerList.add(listener);
-			log.info(String.format("已添加插件[%s]的[%s]类型监听器[%s]！",
+			log.debug(String.format("已添加插件[%s]的[%s]类型监听器[%s]！",
 					bundle.getSymbolicName(), listenerClass.getName(), listener));
 		}
+		// 加入到全部监听器对象列表中
+		listenerList.add(listener);
 	}
 }

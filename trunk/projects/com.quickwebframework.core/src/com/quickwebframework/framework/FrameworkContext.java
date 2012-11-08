@@ -63,11 +63,11 @@ public class FrameworkContext {
 			public void serviceChanged(ServiceEvent arg0) {
 				int serviceEventType = arg0.getType();
 				if (serviceEventType == ServiceEvent.REGISTERED) {
-					log.info(String.format("[%s]插件的[%s]服务已注册", arg0
+					log.debug(String.format("[%s]插件的[%s]服务已注册", arg0
 							.getServiceReference().getBundle()
 							.getSymbolicName(), arg0.getServiceReference()));
 				} else if (serviceEventType == ServiceEvent.UNREGISTERING) {
-					log.info(String.format("[%s]插件的[%s]服务正在取消注册", arg0
+					log.debug(String.format("[%s]插件的[%s]服务正在取消注册", arg0
 							.getServiceReference().getBundle()
 							.getSymbolicName(), arg0.getServiceReference()));
 				}

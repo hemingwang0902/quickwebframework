@@ -13,10 +13,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
-import javax.servlet.Filter;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -35,6 +34,8 @@ import com.quickwebframework.web.servlet.QwfServlet;
 import com.quickwebframework.web.thread.BundleAutoManageThread;
 
 public abstract class QuickWebFrameworkFactory {
+	static Logger logger = Logger.getLogger(QuickWebFrameworkFactory.class
+			.getName());
 
 	public final static String CONST_FRAMEWORK_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.FrameworkBridge";
 	public final static String PLUGIN_CONFIG_FILES_PROPERTY_KEY = "quickwebframework.pluginConfigFiles.";
@@ -143,6 +144,10 @@ public abstract class QuickWebFrameworkFactory {
 			throw new RuntimeException(
 					"指定的osgiFrameworkFactoryClass不是org.osgi.framework.launch.FrameworkFactory的派生类！");
 		}
+
+		long osgiFrameworkStartTime = System.currentTimeMillis();
+		logger.info("正在启动OSGi框架: " + osgiFrameworkFactoryClass);
+
 		FrameworkFactory factory;
 		try {
 			factory = (FrameworkFactory) osgiFrameworkFactoryClazz
@@ -244,7 +249,12 @@ public abstract class QuickWebFrameworkFactory {
 			});
 
 			framework.start();
-			System.out.println("启动OSGi Framework成功！");
+
+			// 启动OSGi框架所用时间
+			long startFrameworkUsedTime = System.currentTimeMillis()
+					- osgiFrameworkStartTime;
+			logger.info(String.format("启动OSGi框架完成，用时 %,d ms",
+					startFrameworkUsedTime));
 
 			// 扫描插件目录，看是否有插件需要自动安装
 			Thread trdBundleAutoManage = new BundleAutoManageThread(
@@ -262,7 +272,7 @@ public abstract class QuickWebFrameworkFactory {
 		try {
 			if (framework != null)
 				framework.stop();
-			System.out.println("停止OSGi Framework成功！");
+			logger.info("停止OSGi Framework成功！");
 		} catch (BundleException e) {
 			throw new RuntimeException("停止OSGi Framework失败！", e);
 		}

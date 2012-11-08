@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
 import org.osgi.framework.Bundle;
@@ -28,7 +29,7 @@ import org.osgi.framework.wiring.FrameworkWiring;
  * 
  */
 public class BundleUtil {
-
+	static Logger logger = Logger.getLogger(BundleUtil.class.getName());
 	// 插件方法URL模板
 	public static String bundleMethodUrlTemplate;
 
@@ -208,8 +209,7 @@ public class BundleUtil {
 				BundleInfo bundleInfo = new BundleInfo(bundleInputStream);
 				bundleInfoList.add(bundleInfo);
 			} catch (Exception ex) {
-				System.out
-						.println("警告：加载Bundle清单文件信息时失败。原因：" + ex.getMessage());
+				logger.warning("警告：加载Bundle清单文件信息时失败。原因：" + ex.getMessage());
 			}
 		}
 
@@ -225,7 +225,7 @@ public class BundleUtil {
 			String bundleName = bundleInfo.getBundleName();
 			Bundle bundle = getBundleByName(bundleContext, bundleName);
 			if (bundle != null && bundle.getState() == Bundle.ACTIVE) {
-				System.out.println(String.format("插件智能安装函数：根据依赖关系准备停止[%s]插件！",
+				logger.config(String.format("插件智能安装函数：根据依赖关系准备停止[%s]插件！",
 						bundleName));
 				bundle.stop();
 			}
@@ -246,8 +246,7 @@ public class BundleUtil {
 				.adapt(FrameworkWiring.class);
 
 		for (Bundle bundle : frameworkWiring.getRemovalPendingBundles()) {
-			System.out.println("RemovalPendingBundle:"
-					+ bundle.getSymbolicName());
+			logger.config("RemovalPendingBundle:" + bundle.getSymbolicName());
 		}
 		frameworkWiring.refreshBundles(null);
 
@@ -262,19 +261,18 @@ public class BundleUtil {
 			String bundleName = bundleInfo.getBundleName();
 			Bundle bundle = getBundleByName(bundleContext, bundleName);
 			if (bundle == null) {
-				System.out.println(String.format(
+				logger.warning(String.format(
 						"插件智能安装函数警告：在OSGi容器中未发现名称为[%s]的插件！", bundleName));
 				continue;
 			} else {
 				if (bundle.getState() == Bundle.ACTIVE) {
-					System.out.println(String.format(
+					logger.warning(String.format(
 							"插件智能安装函数警告：[%s]插件在启动之前，已经是启动状态！", bundleName));
 				}
-				System.out.println(String.format("插件智能安装函数：准备启动[%s]插件...",
+				logger.config(String.format("插件智能安装函数：准备启动[%s]插件...",
 						bundleName));
 				bundle.start();
-				System.out.println(String.format("插件智能安装函数：启动[%s]插件完成！",
-						bundleName));
+				logger.config(String.format("插件智能安装函数：启动[%s]插件完成！", bundleName));
 			}
 		}
 		return installedBundles;
@@ -296,19 +294,19 @@ public class BundleUtil {
 
 		Bundle newBundle = null; // 如果之前没有此插件，则安装
 		if (preBundle == null) {
-			System.out.println("自动安装新插件：" + bundleName + "  " + bundleVersion);
+			logger.config("自动安装新插件：" + bundleName + "  " + bundleVersion);
 			newBundle = bundleContext.installBundle(bundleInfo.getBundleName(),
 					bundleInfo.getBundleInputStream());
 		}// 否则更新
 		else {
 			if (bundleVersion.compareTo(preBundle.getVersion()) >= 0) {
 				preBundle.stop();
-				System.out.println("自动将插件：" + bundleName + " 由 "
+				logger.config("自动将插件：" + bundleName + " 由 "
 						+ preBundle.getVersion() + "更新到" + bundleVersion);
 				preBundle.update(bundleInfo.getBundleInputStream());
 				newBundle = preBundle;
 			} else {
-				System.out.println("插件：" + bundleName + "的版本" + bundleVersion
+				logger.warning("插件：" + bundleName + "的版本" + bundleVersion
 						+ "小于已安装的版本" + preBundle.getVersion() + "，没有应用更新！");
 			}
 		}
@@ -368,11 +366,10 @@ public class BundleUtil {
 			newBundleInfo.loadProperties(prop);
 			return newBundleInfo;
 		} catch (Exception ex) {
-			System.out
-					.println(String
-							.format("[com.quickwebframework.util.BundleUtil.getBundleInfo]警告：读取插件[%s]的资源文件[%s]时出错，原因：[%s]",
-									bundle.getSymbolicName(),
-									BundleInfo.METAINF_FILE_PATH, ex));
+			logger.warning(String
+					.format("[com.quickwebframework.util.BundleUtil.getBundleInfo]警告：读取插件[%s]的资源文件[%s]时出错，原因：[%s]",
+							bundle.getSymbolicName(),
+							BundleInfo.METAINF_FILE_PATH, ex));
 			return null;
 		}
 	}
@@ -447,13 +444,11 @@ public class BundleUtil {
 					bundleNameList = getBundleNameList(list);
 					isItemMoved = true;
 					i++;
-					System.out
-							.println(String
-									.format("安装/更新顺序自动计算算法：因为插件[%s]需要插件[%s]，所以将插件[%s]移动到[%s]前面。",
-											bundleInfo.getBundleName(),
-											requireBundleName,
-											requireBundleName,
-											bundleInfo.getBundleName()));
+					logger.config(String
+							.format("安装/更新顺序自动计算算法：因为插件[%s]需要插件[%s]，所以将插件[%s]移动到[%s]前面。",
+									bundleInfo.getBundleName(),
+									requireBundleName, requireBundleName,
+									bundleInfo.getBundleName()));
 				}
 			}
 
@@ -477,14 +472,13 @@ public class BundleUtil {
 					bundleNameList = getBundleNameList(list);
 					isItemMoved = true;
 					i++;
-					System.out
-							.println(String
-									.format("安装/更新顺序自动计算算法：因为插件[%s]导入了插件[%s]的包[%s]，所以将插件[%s]移动到[%s]前面。",
-											bundleInfo.getBundleName(),
-											importPackageBelongBundleName,
-											importPackage,
-											importPackageBelongBundleName,
-											bundleInfo.getBundleName()));
+					logger.warning(String
+							.format("安装/更新顺序自动计算算法：因为插件[%s]导入了插件[%s]的包[%s]，所以将插件[%s]移动到[%s]前面。",
+									bundleInfo.getBundleName(),
+									importPackageBelongBundleName,
+									importPackage,
+									importPackageBelongBundleName,
+									bundleInfo.getBundleName()));
 				}
 
 			}

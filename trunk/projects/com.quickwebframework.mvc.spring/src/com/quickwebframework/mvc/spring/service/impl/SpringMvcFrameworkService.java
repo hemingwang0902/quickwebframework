@@ -126,7 +126,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 						else
 							sb.setLength(sb.length() - 1);
 
-						log.info(String.format(
+						log.debug(String.format(
 								"映射内部URL路径[%s]的[%s]HTTP请求到处理器'%s'", mappingUrl,
 								sb.toString(), handler.getClass().getName()));
 
@@ -157,7 +157,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 				bundle, pluginControllerInfo);
 		bundleApplicationContextMap.put(bundle, applicationContext);
 		bundleNamePluginControllerInfoMap.put(bundleName, pluginControllerInfo);
-		log.info("插件[" + bundleName + "]已注册为Spring MVC的Web App.");
+		log.debug("插件[" + bundleName + "]已注册为Spring MVC的Web App.");
 		return true;
 	}
 
@@ -167,7 +167,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		bundleNamePluginControllerInfoMap.remove(bundleName);
 		if (bundleApplicationContextMap.containsKey(bundle))
 			bundleApplicationContextMap.remove(bundle);
-		log.info("插件[" + bundleName + "]注册在Spring MVC的Web App已经移除！");
+		log.debug("插件[" + bundleName + "]注册在Spring MVC的Web App已经移除！");
 		return true;
 	}
 

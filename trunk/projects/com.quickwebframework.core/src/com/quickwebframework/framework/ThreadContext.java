@@ -100,10 +100,10 @@ public abstract class ThreadContext {
 				Integer.toHexString(thread.hashCode()));
 		try {
 			thread.interrupt();
-			log.info(String.format("已成功向插件[%s]的线程[%s]发送中断命令！", bundleName,
+			log.debug(String.format("已成功向插件[%s]的线程[%s]发送中断命令！", bundleName,
 					threadName));
 		} catch (Exception ex) {
-			log.error(String.format("向插件[%s]的线程[%s]发送中断命令失败！", bundleName,
+			log.warn(String.format("向插件[%s]的线程[%s]发送中断命令失败！", bundleName,
 					threadName));
 			ex.printStackTrace();
 		}
@@ -116,6 +116,43 @@ public abstract class ThreadContext {
 	 * @param thread
 	 */
 	public static void addThread(Bundle bundle, Thread thread) {
+
+		String threadClassName = thread.getClass().getName();
+		// 是否存在同类名实例
+		boolean hasSameClassNameObject = false;
+		for (Thread preThread : threadList) {
+			if (preThread.getClass().getName().equals(threadClassName)) {
+				hasSameClassNameObject = true;
+				break;
+			}
+		}
+		// 如果存在同类名实例，则抛出异常
+		if (hasSameClassNameObject) {
+
+			StringBuilder sb = new StringBuilder();
+			sb.append(String.format(
+					"警告：将Bundle[%s]的线程[类名:%s]加入到ThreadContext中时，发现存在多个同类名实例！",
+					bundle.getSymbolicName(), threadClassName));
+			sb.append("\n--同类名实例列表如下：");
+			synchronized (bundleThreadListMap) {
+				for (Bundle tmpBundle : bundleThreadListMap.keySet()) {
+					List<Thread> tmpBundleThreadList = bundleThreadListMap
+							.get(tmpBundle);
+					for (Thread tmpThread : tmpBundleThreadList) {
+						if (tmpThread.getClass().getName()
+								.equals(threadClassName)) {
+							sb.append(String.format(
+									"\n  --Bundle[%s],线程[ID:%s ,类名:%s]",
+									tmpBundle.getSymbolicName(),
+									tmpThread.getId(), threadClassName));
+						}
+					}
+				}
+			}
+			String errorMessage = sb.toString();
+			log.warn(errorMessage);
+		}
+
 		// 加入到Bundle对应的线程列表中
 		List<Thread> bundleThreadList = null;
 		if (bundleThreadListMap.containsKey(bundle)) {
@@ -132,10 +169,10 @@ public abstract class ThreadContext {
 		// 启动线程
 		try {
 			thread.start();
-			log.info(String.format("已成功启动插件[%s]的线程[%s]！",
+			log.debug(String.format("已成功启动插件[%s]的线程[%s]！",
 					bundle.getSymbolicName(), thread));
 		} catch (Exception ex) {
-			log.error(String.format("启动插件[%s]的线程[%s]失败！",
+			log.warn(String.format("启动插件[%s]的线程[%s]失败！",
 					bundle.getSymbolicName(), thread));
 		}
 	}
