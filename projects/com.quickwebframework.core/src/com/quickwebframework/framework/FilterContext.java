@@ -94,7 +94,7 @@ public class FilterContext {
 
 		// 从所有的过滤器列表中移除
 		filterList.remove(filter);
-		log.info(String.format("已成功移除插件[%s]的过滤器[%s]！",
+		log.debug(String.format("已成功移除插件[%s]的过滤器[%s]！",
 				bundle.getSymbolicName(), filter));
 	}
 
@@ -105,6 +105,43 @@ public class FilterContext {
 	 * @param filter
 	 */
 	public static void addFilter(Bundle bundle, Filter filter) {
+
+		String filterClassName = filter.getClass().getName();
+		// 是否存在同类名实例
+		boolean hasSameClassNameObject = false;
+		for (Filter preFilter : filterList) {
+			if (preFilter.getClass().getName().equals(filterClassName)) {
+				hasSameClassNameObject = true;
+				break;
+			}
+		}
+		// 如果存在同类名实例，则抛出异常
+		if (hasSameClassNameObject) {
+
+			StringBuilder sb = new StringBuilder();
+			sb.append(String.format(
+					"警告：将Bundle[%s]的过滤器[类名:%s]加入到FilterContext中时，发现存在多个同类名实例！",
+					bundle.getSymbolicName(), filterClassName));
+			sb.append("\n--同类名实例列表如下：");
+			synchronized (bundleFilterListMap) {
+				for (Bundle tmpBundle : bundleFilterListMap.keySet()) {
+					List<Filter> tmpBundleFilterList = bundleFilterListMap
+							.get(tmpBundle);
+					for (Filter tmpFilter : tmpBundleFilterList) {
+						if (tmpFilter.getClass().getName()
+								.equals(filterClassName)) {
+							sb.append(String.format(
+									"\n  --Bundle[%s],过滤器[%s ,类名:%s]",
+									tmpBundle.getSymbolicName(),
+									tmpFilter.toString(), filterClassName));
+						}
+					}
+				}
+			}
+			String errorMessage = sb.toString();
+			log.warn(errorMessage);
+		}
+
 		// 加入到Bundle对应的过滤器列表中
 		List<Filter> bundleFilterList = null;
 		if (bundleFilterListMap.containsKey(bundle)) {
@@ -117,7 +154,7 @@ public class FilterContext {
 
 		// 加入到全部过滤器列表中
 		filterList.add(filter);
-		log.info(String.format("已添加插件[%s]的过滤器[%s]！", bundle.getSymbolicName(),
+		log.debug(String.format("已添加插件[%s]的过滤器[%s]！", bundle.getSymbolicName(),
 				filter));
 	}
 }

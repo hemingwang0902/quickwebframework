@@ -3,6 +3,7 @@ package com.quickwebframework.web.thread;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
 
@@ -10,6 +11,9 @@ import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 import com.quickwebframework.web.util.BundleUtil;
 
 public class BundleAutoManageThread extends Thread {
+
+	static Logger logger = Logger.getLogger(BundleAutoManageThread.class
+			.getName());
 
 	public final static String METAINF_FILE_PATH = "META-INF/MANIFEST.MF";
 
@@ -22,8 +26,8 @@ public class BundleAutoManageThread extends Thread {
 	@Override
 	public void run() {
 		try {
-			System.out.println("quickwebframework_web:插件自动管理线程已启动！");
-			System.out.println("插件目录：" + bundleFolderPath);
+			logger.config("quickwebframework_web:插件自动管理线程已启动！");
+			logger.config("插件目录：" + bundleFolderPath);
 			while (true) {
 				Thread.sleep(1000);
 				BundleContext bundleContext = QuickWebFrameworkLoaderListener
@@ -54,11 +58,11 @@ public class BundleAutoManageThread extends Thread {
 				try {
 					BundleUtil.installOrUpdateBundle(bundleContext, files);
 				} catch (IOException ex) {
-					System.out.println("插件自动管理线程：安装或更新插件时出现IOException异常,原因："
+					logger.severe("插件自动管理线程：安装或更新插件时出现IOException异常,原因："
 							+ ex.getMessage());
 					continue;
 				} catch (Throwable ex) {
-					System.out.println("插件自动管理线程：安装或更新插件时出错。");
+					logger.severe("插件自动管理线程：安装或更新插件时出错。");
 					ex.printStackTrace();
 				}
 				// 删除这些jar文件
@@ -67,7 +71,7 @@ public class BundleAutoManageThread extends Thread {
 				}
 			}
 		} catch (InterruptedException e) {
-			System.out.println("quickwebframework_web:插件自动管理线程接到线程中止命令，线程已终止！");
+			logger.config("quickwebframework_web:插件自动管理线程接到线程中止命令，线程已终止！");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
