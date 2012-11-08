@@ -3,9 +3,12 @@ package com.quickwebframework.mvc.spring.service.impl;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +25,10 @@ import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAda
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
+import com.quickwebframework.framework.FilterContext;
+import com.quickwebframework.framework.IocContext;
+import com.quickwebframework.framework.ListenerContext;
+import com.quickwebframework.framework.ThreadContext;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
 import com.quickwebframework.mvc.spring.util.PluginPathMatcher;
@@ -41,11 +48,36 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	private ApplicationContext initPluginControllerInfo(Bundle bundle,
 			PluginControllerInfo pluginControllerInfo) {
 
+		// 如果IoC框架中还没有此Bundle,则添加到IoC框架中
+		if (IocContext.getBundleApplicationContext(bundle) == null)
+			IocContext.addBundle(bundle);
+
 		ApplicationContext applicationContext = BundleApplicationContextUtils
 				.getBundleApplicationContext(bundle);
 
 		if (applicationContext == null) {
 			throw new RuntimeException("找不到此Bundle对应的ApplicationContext对象！");
+		}
+
+		// 从ApplicationContext得到监听器列表
+		Map<String, EventListener> listenerMap = applicationContext
+				.getBeansOfType(EventListener.class);
+		for (EventListener listener : listenerMap.values()) {
+			ListenerContext.addListener(bundle, listener);
+		}
+
+		// 从ApplicationContext得到过滤器列表
+		Map<String, Filter> filterMap = applicationContext
+				.getBeansOfType(Filter.class);
+		for (Filter filter : filterMap.values()) {
+			FilterContext.addFilter(bundle, filter);
+		}
+
+		// 从ApplicationContext得到线程列表
+		Map<String, Thread> threadMap = applicationContext
+				.getBeansOfType(Thread.class);
+		for (Thread thread : threadMap.values()) {
+			ThreadContext.addThread(bundle, thread);
 		}
 
 		// 从ApplicationContext得到MVC控制器列表
