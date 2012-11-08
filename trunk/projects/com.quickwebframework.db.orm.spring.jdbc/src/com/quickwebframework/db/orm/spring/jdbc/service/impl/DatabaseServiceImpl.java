@@ -50,7 +50,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 		}
 		if (serviceReferences == null)
 			return;
-		log.info("准备刷新com.quickwebframework.db.orm.spring.jdbc.service.impl.DatabaseServiceImpl中的数据源");
+		log.debug("准备刷新com.quickwebframework.db.orm.spring.jdbc.service.impl.DatabaseServiceImpl中的数据源");
 		for (ServiceReference<?> serviceReference : serviceReferences) {
 			com.quickwebframework.service.DatabaseService databaseService = (com.quickwebframework.service.DatabaseService) bundleContext
 					.getService(serviceReference);
