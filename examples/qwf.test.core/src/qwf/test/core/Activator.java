@@ -18,19 +18,12 @@ public class Activator implements BundleActivator {
 
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
-
-		// WebContext.registerWebApp(this, bundleContext);
-		// ListenerContext.addListener(bundleContext.getBundle(),new
-		// TestListener());
-
-		// FrameworkContext.setRootUrlHandleServlet(new RootUrlHandleServlet());
-
 		log.info("qwf.test.core插件已启动!");
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
 		Activator.context = null;
-		// FrameworkContext.setRootUrlHandleServlet(null);
+
 		log.info("qwf.test.core插件已停止!");
 	}
 

@@ -20,9 +20,18 @@ public class WebContext {
 	private static Log log = LogFactory.getLog(WebContext.class);
 
 	// MVC框架服务
-	public static MvcFrameworkService mvcFrameworkService;
+	private static MvcFrameworkService mvcFrameworkService;
+
+	public static MvcFrameworkService getMvcFrameworkService() {
+		return mvcFrameworkService;
+	}
+
 	// 视图渲染服务
-	public static ViewRenderService viewRenderService;
+	private static ViewRenderService viewRenderService;
+
+	public static ViewRenderService getViewRenderService() {
+		return viewRenderService;
+	}
 
 	// 根URL处理Servlet
 	private static HttpServlet rootUrlHandleServlet;

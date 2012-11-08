@@ -40,11 +40,11 @@ public class ServletBridge extends HttpServlet {
 	public void renderView(MvcModelAndView mav, HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			if (WebContext.viewRenderService != null) {
+			if (WebContext.getViewRenderService() != null) {
 				// 渲染视图
-				WebContext.viewRenderService.renderView(mav.getBundle()
-						.getSymbolicName(), mav.getViewName(), request,
-						response);
+				WebContext.getViewRenderService().renderView(
+						mav.getBundle().getSymbolicName(), mav.getViewName(),
+						request, response);
 			} else {
 				response.sendError(500,
 						"[com.quickwebframework.core.DispatcherServlet] cannot found ViewRender!");
@@ -73,8 +73,8 @@ public class ServletBridge extends HttpServlet {
 			}
 
 			try {
-				MvcModelAndView mav = WebContext.mvcFrameworkService.handle(
-						request, response, bundleName, methodName);
+				MvcModelAndView mav = WebContext.getMvcFrameworkService()
+						.handle(request, response, bundleName, methodName);
 				if (mav == null) {
 					return;
 				}
@@ -137,9 +137,9 @@ public class ServletBridge extends HttpServlet {
 			response.setContentType("text/html;charset=utf-8");
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
-			if (WebContext.mvcFrameworkService != null) {
-				Map<String, List<String>> map = WebContext.mvcFrameworkService
-						.getBundleNameUrlListMap();
+			if (WebContext.getMvcFrameworkService() != null) {
+				Map<String, List<String>> map = WebContext
+						.getMvcFrameworkService().getBundleNameUrlListMap();
 				sb.append("<table>");
 				for (String bundleName : map.keySet()) {
 					sb.append("<tr><td><b>" + bundleName + "</b></td></tr>");
@@ -160,11 +160,7 @@ public class ServletBridge extends HttpServlet {
 	// 得到Bundle资源
 	private InputStream getBundleResource(String bundleName, String resourcePath)
 			throws IOException {
-		if (WebContext.mvcFrameworkService == null)
-			return null;
-
 		Bundle bundle = FrameworkContext.getBundleByName(bundleName);
-
 		URL resourceUrl = bundle.getResource(resourcePath);
 		if (resourceUrl == null)
 			return null;

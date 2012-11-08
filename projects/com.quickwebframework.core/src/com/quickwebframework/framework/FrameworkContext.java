@@ -74,6 +74,7 @@ public class FrameworkContext {
 			}
 		});
 
+		IocContext.init();
 		ListenerContext.init();
 		FilterContext.init();
 		WebContext.init();
