@@ -294,14 +294,14 @@ public class BundleUtil {
 
 		Bundle newBundle = null; // 如果之前没有此插件，则安装
 		if (preBundle == null) {
-			logger.config("自动安装新插件：" + bundleName + "  " + bundleVersion);
+			logger.info("自动安装新插件：" + bundleName + "  " + bundleVersion);
 			newBundle = bundleContext.installBundle(bundleInfo.getBundleName(),
 					bundleInfo.getBundleInputStream());
 		}// 否则更新
 		else {
 			if (bundleVersion.compareTo(preBundle.getVersion()) >= 0) {
 				preBundle.stop();
-				logger.config("自动将插件：" + bundleName + " 由 "
+				logger.info("自动将插件：" + bundleName + " 由 "
 						+ preBundle.getVersion() + "更新到" + bundleVersion);
 				preBundle.update(bundleInfo.getBundleInputStream());
 				newBundle = preBundle;

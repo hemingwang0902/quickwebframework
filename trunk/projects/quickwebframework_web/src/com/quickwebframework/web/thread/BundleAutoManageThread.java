@@ -58,7 +58,7 @@ public class BundleAutoManageThread extends Thread {
 				try {
 					BundleUtil.installOrUpdateBundle(bundleContext, files);
 				} catch (IOException ex) {
-					logger.severe("插件自动管理线程：安装或更新插件时出现IOException异常,原因："
+					logger.warning("插件自动管理线程：安装或更新插件时出现IOException异常,原因："
 							+ ex.getMessage());
 					continue;
 				} catch (Throwable ex) {
