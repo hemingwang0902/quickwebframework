@@ -52,6 +52,8 @@ public class BundleUtil {
 			String startPath) {
 		List<String> rtnList = new ArrayList<String>();
 		Enumeration urlEnum = bundle.getEntryPaths(startPath);
+		if (urlEnum == null)
+			return rtnList;
 		while (urlEnum.hasMoreElements()) {
 			String url = (String) urlEnum.nextElement();
 			rtnList.add(url);
@@ -327,15 +329,15 @@ public class BundleUtil {
 
 		Bundle newBundle = null; // 如果之前没有此插件，则安装
 		if (preBundle == null) {
-			log.debug("自动安装新插件：" + bundleName + "  " + bundleVersion);
+			log.info("自动安装新插件：" + bundleName + "  " + bundleVersion);
 			newBundle = bundleContext.installBundle(bundleInfo.getBundleName(),
 					bundleInfo.getBundleInputStream());
 		}// 否则更新
 		else {
 			if (bundleVersion.compareTo(preBundle.getVersion()) >= 0) {
 				preBundle.stop();
-				log.debug("自动将插件：" + bundleName + " 由 "
-						+ preBundle.getVersion() + "更新到" + bundleVersion);
+				log.info("自动将插件：" + bundleName + " 由 " + preBundle.getVersion()
+						+ "更新到" + bundleVersion);
 				preBundle.update(bundleInfo.getBundleInputStream());
 				newBundle = preBundle;
 			} else {
