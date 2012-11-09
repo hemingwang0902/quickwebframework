@@ -286,7 +286,7 @@ public class BundleUtil {
 		Bundle preBundle = null;
 		Bundle[] bundles = bundleContext.getBundles();
 		for (Bundle bundle : bundles) {
-			if (bundle.getSymbolicName().equals(bundleName)) {
+			if (bundleName.equals(bundle.getSymbolicName())) {
 				preBundle = bundle;
 				break;
 			}
@@ -341,7 +341,7 @@ public class BundleUtil {
 		}
 		Bundle[] bundles = bundleContext.getBundles();
 		for (Bundle bundle : bundles) {
-			if (bundle.getSymbolicName().equals(bundleName))
+			if (bundleName.equals(bundle.getSymbolicName()))
 				return bundle;
 		}
 		return null;
