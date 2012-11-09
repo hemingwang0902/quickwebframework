@@ -29,7 +29,7 @@ public class Activator implements BundleActivator {
 		final SpringIocFrameworkService springIocFrameworkService = new SpringIocFrameworkService();
 
 		// 注册为IocFrameworkService服务
-		bundleContext.registerService(IocFrameworkService.class,
+		bundleContext.registerService(IocFrameworkService.class.getName(),
 				springIocFrameworkService, null);
 
 		bundleContext.addBundleListener(new SynchronousBundleListener() {
