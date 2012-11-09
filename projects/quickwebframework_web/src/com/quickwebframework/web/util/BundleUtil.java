@@ -240,16 +240,20 @@ public class BundleUtil {
 					bundleInfo);
 		}
 
-		// 刷新Bundle
-		Bundle systemBundle = bundleContext.getBundle(0);
-		FrameworkWiring frameworkWiring = systemBundle
-				.adapt(FrameworkWiring.class);
+		try {
+			// 刷新Bundle
+			Bundle systemBundle = bundleContext.getBundle(0);
+			FrameworkWiring frameworkWiring = systemBundle
+					.adapt(FrameworkWiring.class);
 
-		for (Bundle bundle : frameworkWiring.getRemovalPendingBundles()) {
-			logger.config("RemovalPendingBundle:" + bundle.getSymbolicName());
+			for (Bundle bundle : frameworkWiring.getRemovalPendingBundles()) {
+				logger.config("RemovalPendingBundle:"
+						+ bundle.getSymbolicName());
+			}
+			frameworkWiring.refreshBundles(null);
+		} catch (Error error) {
+			logger.warning("RemovalPendingBundle error." + error.getMessage());
 		}
-		frameworkWiring.refreshBundles(null);
-
 		// 重新排出启动或刷新顺序
 		List<BundleInfo> shouldStartBundleInfoList = getShouldRefreshBundleInfoList(
 				bundleInfoList, BundleUtil.getAllBundleInfoList(bundleContext));

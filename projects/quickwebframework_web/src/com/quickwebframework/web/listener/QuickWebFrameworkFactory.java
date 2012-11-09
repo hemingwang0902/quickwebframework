@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -130,31 +131,7 @@ public abstract class QuickWebFrameworkFactory {
 		// ====================
 		// 初始化OSGi框架
 		// ====================
-		String osgiFrameworkFactoryClass = quickWebFrameworkProperties
-				.getProperty("quickwebframework.osgiFrameworkFactoryClass");
-		Class<?> osgiFrameworkFactoryClazz;
-		try {
-			osgiFrameworkFactoryClazz = Class
-					.forName(osgiFrameworkFactoryClass);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("查找osgiFrameworkFactoryClass类失败！", e);
-		}
-		// 如果osgiFrameworkFactoryClazz不是FrameworkFactory的派生类
-		if (!FrameworkFactory.class.isAssignableFrom(osgiFrameworkFactoryClazz)) {
-			throw new RuntimeException(
-					"指定的osgiFrameworkFactoryClass不是org.osgi.framework.launch.FrameworkFactory的派生类！");
-		}
 
-		long osgiFrameworkStartTime = System.currentTimeMillis();
-		logger.info("正在启动OSGi框架: " + osgiFrameworkFactoryClass);
-
-		FrameworkFactory factory;
-		try {
-			factory = (FrameworkFactory) osgiFrameworkFactoryClazz
-					.newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException("初始化osgiFrameworkFactoryClass失败！", e);
-		}
 		// 配置Map
 		Map<String, String> osgiFrameworkConfigMap = new HashMap<String, String>();
 
@@ -181,7 +158,75 @@ public abstract class QuickWebFrameworkFactory {
 				}
 			}
 		}
-		framework = factory.newFramework(osgiFrameworkConfigMap);
+
+		// 加载OSGi框架类或OSGi框架工厂类
+		String osgiFrameworkClass = quickWebFrameworkProperties
+				.getProperty("quickwebframework.osgiFrameworkClass");
+		if (osgiFrameworkClass != null) {
+			Class<?> osgiFrameworkClazz;
+			try {
+				osgiFrameworkClazz = Class.forName(osgiFrameworkClass);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException("查找osgiFrameworkClass类失败！-->"
+						+ osgiFrameworkClass, e);
+			}
+			// 如果osgiFrameworkClazz不是Framework的派生类
+			if (!Framework.class.isAssignableFrom(osgiFrameworkClazz)) {
+				throw new RuntimeException(
+						"指定的osgiFrameworkClass不是org.osgi.framework.launch.Framework的派生类！-->"
+								+ osgiFrameworkClass);
+			}
+			// Framework构造函数
+			Constructor<?> frameworkConstructor;
+			try {
+				frameworkConstructor = osgiFrameworkClazz
+						.getConstructor(Map.class);
+			} catch (SecurityException e) {
+				throw new RuntimeException("获取osgiFrameworkClass的构造函数时出现安全异常。",
+						e);
+			} catch (NoSuchMethodException e) {
+				throw new RuntimeException(
+						"未找到osgiFrameworkClass的Class(Map map)构造函数。", e);
+			}
+			try {
+				framework = (Framework) frameworkConstructor
+						.newInstance(osgiFrameworkConfigMap);
+			} catch (Exception e) {
+				throw new RuntimeException("初始化osgiFrameworkClass的实例时出现异常。", e);
+			}
+			logger.info("正在启动OSGi框架，OSGi框架类: " + osgiFrameworkClass);
+		} else {
+			String osgiFrameworkFactoryClass = quickWebFrameworkProperties
+					.getProperty("quickwebframework.osgiFrameworkFactoryClass");
+			Class<?> osgiFrameworkFactoryClazz;
+			try {
+				osgiFrameworkFactoryClazz = Class
+						.forName(osgiFrameworkFactoryClass);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException("查找osgiFrameworkFactoryClass类失败！-->"
+						+ osgiFrameworkFactoryClass, e);
+			}
+			// 如果osgiFrameworkFactoryClazz不是FrameworkFactory的派生类
+			if (!FrameworkFactory.class
+					.isAssignableFrom(osgiFrameworkFactoryClazz)) {
+				throw new RuntimeException(
+						"指定的osgiFrameworkFactoryClass不是org.osgi.framework.launch.FrameworkFactory的派生类！-->"
+								+ osgiFrameworkFactoryClass);
+			}
+
+			FrameworkFactory factory;
+			try {
+				factory = (FrameworkFactory) osgiFrameworkFactoryClazz
+						.newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException("初始化osgiFrameworkFactoryClass失败！", e);
+			}
+			framework = factory.newFramework(osgiFrameworkConfigMap);
+
+			logger.info("正在启动OSGi框架，OSGi框架工厂类: " + osgiFrameworkFactoryClass);
+		}
+
+		long osgiFrameworkStartTime = System.currentTimeMillis();
 
 		try {
 			// Framework初始化
