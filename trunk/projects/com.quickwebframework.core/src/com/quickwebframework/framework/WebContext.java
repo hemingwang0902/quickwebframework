@@ -1,5 +1,6 @@
 package com.quickwebframework.framework;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.Bundle;
@@ -24,6 +25,17 @@ public class WebContext {
 
 	public static MvcFrameworkService getMvcFrameworkService() {
 		return mvcFrameworkService;
+	}
+
+	private static ServletContext servletContext;
+
+	/**
+	 * 得到ServletContext
+	 * 
+	 * @return
+	 */
+	public static ServletContext getServletContext() {
+		return servletContext;
 	}
 
 	// 视图渲染服务
@@ -114,6 +126,22 @@ public class WebContext {
 		}
 	}
 
+	// 刷新ServletContext
+	private static void refreshServletContextService(BundleContext bundleContext) {
+		try {
+			ServiceReference<?> serviceReference = bundleContext
+					.getServiceReference(ServletContext.class.getName());
+			if (serviceReference == null) {
+				WebContext.servletContext = null;
+				return;
+			}
+			WebContext.servletContext = (ServletContext) bundleContext
+					.getService(serviceReference);
+		} catch (Exception ex) {
+			return;
+		}
+	}
+
 	public static void init() {
 		final BundleContext bundleContext = FrameworkContext.coreBundle
 				.getBundleContext();
@@ -121,6 +149,8 @@ public class WebContext {
 		refreshViewRenderService(bundleContext);
 		// 刷新MVC框架服务
 		refreshMvcFrameworkService(bundleContext);
+		// 刷新ServletContext
+		refreshServletContextService(bundleContext);
 
 		bundleContext.addBundleListener(new BundleListener() {
 			@Override
@@ -148,6 +178,9 @@ public class WebContext {
 				} else if (serviceReferenceName
 						.contains(MvcFrameworkService.class.getName())) {
 					refreshMvcFrameworkService(bundleContext);
+				} else if (serviceReferenceName.contains(ServletContext.class
+						.getName())) {
+					refreshServletContextService(bundleContext);
 				}
 			}
 		});
