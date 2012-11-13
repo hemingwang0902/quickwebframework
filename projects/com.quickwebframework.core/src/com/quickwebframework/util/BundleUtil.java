@@ -35,9 +35,6 @@ public class BundleUtil {
 
 	static Log log = LogFactory.getLog(BundleUtil.class);
 
-	// 插件方法URL模板
-	public static String bundleMethodUrlTemplate;
-
 	/**
 	 * 得到Bundle中的路径列表
 	 * 
@@ -350,20 +347,6 @@ public class BundleUtil {
 			}
 		}
 		return newBundle;
-	}
-
-	/**
-	 * 得到插件方法的URL
-	 * 
-	 * @param bundleName
-	 * @param methodName
-	 * @return
-	 */
-	public static String getBundleMethodUrl(String bundleName, String methodName) {
-		if (bundleMethodUrlTemplate == null
-				|| bundleMethodUrlTemplate.isEmpty())
-			return "Missing bundleMethodUrlTemplate";
-		return String.format(bundleMethodUrlTemplate, bundleName, methodName);
 	}
 
 	/**

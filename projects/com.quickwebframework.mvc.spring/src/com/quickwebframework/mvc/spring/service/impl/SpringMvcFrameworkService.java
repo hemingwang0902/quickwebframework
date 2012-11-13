@@ -29,12 +29,12 @@ import com.quickwebframework.framework.FilterContext;
 import com.quickwebframework.framework.IocContext;
 import com.quickwebframework.framework.ListenerContext;
 import com.quickwebframework.framework.ThreadContext;
+import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
 import com.quickwebframework.mvc.spring.util.PluginPathMatcher;
 import com.quickwebframework.mvc.spring.util.PluginUrlPathHelper;
 import com.quickwebframework.service.MvcFrameworkService;
-import com.quickwebframework.util.BundleUtil;
 
 public class SpringMvcFrameworkService implements MvcFrameworkService {
 
@@ -102,7 +102,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 						String methodName = mappingUrl;
 
 						pluginControllerInfo.getUrlList().add(
-								BundleUtil.getBundleMethodUrl(bundleName,
+								WebContext.getBundleMethodUrl(bundleName,
 										methodName));
 
 						if (!mappingUrl.startsWith("/")) {
