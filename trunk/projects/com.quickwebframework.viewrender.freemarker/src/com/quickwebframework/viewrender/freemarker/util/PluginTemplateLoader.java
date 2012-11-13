@@ -43,8 +43,8 @@ public class PluginTemplateLoader implements TemplateLoader {
 	public Object findTemplateSource(String name) throws IOException {
 		String[] tmpArray = name.split(pluginNameAndPathSplitString);
 		if (tmpArray.length < 2) {
-			throw new IOException("不符合规则：“[插件名]" + pluginNameAndPathSplitString
-					+ "[路径]”");
+			throw new IOException("视图名称[" + name + "]不符合规则：“[插件名]"
+					+ pluginNameAndPathSplitString + "[路径]”");
 		}
 		String pluginName = tmpArray[0];
 		String path = tmpArray[1];
