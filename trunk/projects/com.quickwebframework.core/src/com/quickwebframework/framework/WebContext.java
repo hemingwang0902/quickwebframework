@@ -20,6 +20,9 @@ import com.quickwebframework.service.ViewRenderService;
 public class WebContext {
 	private static Log log = LogFactory.getLog(WebContext.class);
 
+	// 插件方法URL模板
+	public static String bundleMethodUrlTemplate;
+
 	// MVC框架服务
 	private static MvcFrameworkService mvcFrameworkService;
 
@@ -27,6 +30,7 @@ public class WebContext {
 		return mvcFrameworkService;
 	}
 
+	// ServletContext
 	private static ServletContext servletContext;
 
 	/**
@@ -78,6 +82,20 @@ public class WebContext {
 	public static void setHandlerExceptionResolver(
 			HandlerExceptionResolver handlerExceptionResolver) {
 		WebContext.handlerExceptionResolver = handlerExceptionResolver;
+	}
+
+	/**
+	 * 得到插件方法的URL
+	 * 
+	 * @param bundleName
+	 * @param methodName
+	 * @return
+	 */
+	public static String getBundleMethodUrl(String bundleName, String methodName) {
+		if (bundleMethodUrlTemplate == null
+				|| bundleMethodUrlTemplate.isEmpty())
+			return "Missing bundleMethodUrlTemplate";
+		return String.format(bundleMethodUrlTemplate, bundleName, methodName);
 	}
 
 	/**

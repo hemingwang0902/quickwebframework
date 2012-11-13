@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.quickwebframework.util.BundleUtil;
+import com.quickwebframework.framework.WebContext;
 
 public class RootUrlHandleServlet extends HttpServlet {
 	/**
@@ -17,7 +17,7 @@ public class RootUrlHandleServlet extends HttpServlet {
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			response.sendRedirect(BundleUtil.getBundleMethodUrl(Activator
+			response.sendRedirect(WebContext.getBundleMethodUrl(Activator
 					.getContext().getBundle().getSymbolicName(), "index"));
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -10,7 +10,7 @@ import com.quickwebframework.bridge.FrameworkBridge;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.framework.FrameworkContext;
-import com.quickwebframework.util.BundleUtil;
+import com.quickwebframework.framework.WebContext;
 
 public class Activator implements BundleActivator {
 	public static final String BUNDLE_METHOD_URL_TEMPLATE = "com.quickwebframework.util.BUNDLE_METHOD_URL_TEMPLATE";
@@ -61,7 +61,7 @@ public class Activator implements BundleActivator {
 		ServletContext servletContext = getServletContext();
 		Object tmpObj = servletContext.getAttribute(BUNDLE_METHOD_URL_TEMPLATE);
 		if (tmpObj != null) {
-			BundleUtil.bundleMethodUrlTemplate = tmpObj.toString();
+			WebContext.bundleMethodUrlTemplate = tmpObj.toString();
 		}
 
 		// 初始化FrameworkContext
