@@ -142,8 +142,11 @@ public class ServletBridge extends HttpServlet {
 						.getMvcFrameworkService().getBundleNameUrlListMap();
 				sb.append("<table>");
 				for (String bundleName : map.keySet()) {
+					List<String> urlList = map.get(bundleName);
+					if (urlList.isEmpty())
+						continue;
 					sb.append("<tr><td><b>" + bundleName + "</b></td></tr>");
-					for (String url : map.get(bundleName)) {
+					for (String url : urlList) {
 						sb.append("<tr><td><a style=\"margin-left:20px\" href=\""
 								+ url + "\">" + url + "</a></td></tr>");
 					}
