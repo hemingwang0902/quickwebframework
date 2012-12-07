@@ -20,4 +20,5 @@ Export-Package: com.quickwebframework.entity,
  com.quickwebframework.entity.impl,
  com.quickwebframework.framework,
  com.quickwebframework.service,
+ com.quickwebframework.stereotype,
  com.quickwebframework.util

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
+
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -11,7 +12,10 @@ import javax.servlet.ServletResponse;
 
 import org.springframework.stereotype.Component;
 
+import com.quickwebframework.stereotype.FilterSetting;
+
 @Component
+@FilterSetting(index = 2)
 public class HelloFilter implements Filter {
 
 	public void destroy() {

@@ -11,7 +11,10 @@ import javax.servlet.ServletResponse;
 
 import org.springframework.stereotype.Component;
 
+import com.quickwebframework.stereotype.FilterSetting;
+
 @Component
+@FilterSetting(index = 3)
 public class HelloFilter2 implements Filter {
 
 	public void destroy() {

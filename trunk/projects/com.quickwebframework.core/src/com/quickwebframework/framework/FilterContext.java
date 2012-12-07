@@ -13,6 +13,7 @@ import org.osgi.framework.BundleListener;
 
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
+import com.quickwebframework.stereotype.FilterSetting;
 
 public class FilterContext {
 
@@ -154,6 +155,61 @@ public class FilterContext {
 
 		// 加入到全部过滤器列表中
 		filterList.add(filter);
+
+		// 过滤器的类
+		Class<?> filterClass = filter.getClass();
+		// 过滤器的FilterSetting实例
+		FilterSetting filterSetting = filterClass
+				.getAnnotation(FilterSetting.class);
+		// 如果此过滤器的类上有FilterSetting注解，则全部过滤器根据FilterSetting注解的index的值进行排序
+		if (filterSetting != null) {
+			// 有属性的过滤器列表
+			List<Filter> hasSettingFilterList = new ArrayList<Filter>();
+			// 没有属性的过滤器列表
+			List<Filter> noSettingFilterList = new ArrayList<Filter>();
+			// 设置与过滤器的Map
+			Map<FilterSetting, Filter> settingFilterMap = new HashMap<FilterSetting, Filter>();
+
+			// 分离
+			for (Filter tmpFilter : filterList) {
+				Class<?> tmpFilterClass = tmpFilter.getClass();
+				FilterSetting tmpFilterSetting = tmpFilterClass
+						.getAnnotation(FilterSetting.class);
+				// 如果没有设置
+				if (tmpFilterSetting == null) {
+					noSettingFilterList.add(tmpFilter);
+				}// 否则有设置
+				else {
+					hasSettingFilterList.add(tmpFilter);
+					settingFilterMap.put(tmpFilterSetting, tmpFilter);
+				}
+			}
+			// 根据index排序
+			FilterSetting[] filterSettings = settingFilterMap.keySet().toArray(
+					new FilterSetting[0]);
+			for (int j = 0; j < filterSettings.length; j++) {
+				for (int i = 0; i < filterSettings.length; i++) {
+					if (i == 0)
+						continue;
+					// 如果前面的index大于后面的index，则交换
+					if (filterSettings[i - 1].index() > filterSettings[i]
+							.index()) {
+						FilterSetting tmpExchangeObject = filterSettings[i - 1];
+						filterSettings[i - 1] = filterSettings[i];
+						filterSettings[i] = tmpExchangeObject;
+					}
+				}
+			}
+
+			// 得到新的列表
+			List<Filter> newFilterList = new ArrayList<Filter>();
+			for (int i = 0; i < filterSettings.length; i++) {
+				newFilterList.add(settingFilterMap.get(filterSettings[i]));
+			}
+			newFilterList.addAll(noSettingFilterList);
+			filterList = newFilterList;
+		}
+
 		log.debug(String.format("已添加插件[%s]的过滤器[%s]！", bundle.getSymbolicName(),
 				filter));
 	}
