@@ -14,4 +14,11 @@ public @interface FilterSetting {
 	 * @return
 	 */
 	public int index();
+
+	/**
+	 * 返回到控制器(当过滤器不调用doFilter方法，而是return时是否返回到控制器)
+	 * 
+	 * @return
+	 */
+	public boolean returnToController() default false;
 }

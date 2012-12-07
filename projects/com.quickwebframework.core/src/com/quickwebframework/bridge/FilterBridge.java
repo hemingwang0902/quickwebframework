@@ -10,6 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import com.quickwebframework.framework.FilterContext;
+import com.quickwebframework.stereotype.FilterSetting;
 
 public abstract class FilterBridge extends ServletBridge implements
 		javax.servlet.Filter {
@@ -63,9 +64,19 @@ public abstract class FilterBridge extends ServletBridge implements
 		arrayFilterChain.doFilter(request, response);
 		if (arrayFilterChain.isContinueFilterChain())
 			filterChain.doFilter(request, response);
-		else
-			log.info("过滤器链未全部执行完成，在执行完过滤器[" + arrayFilterChain.lastFilter
-					+ "]后断开。");
+		else {
+			Filter lastFilter = arrayFilterChain.lastFilter;
+			Class<?> lastFilterClass = lastFilter.getClass();
+			FilterSetting lastFilterSetting = lastFilterClass
+					.getAnnotation(FilterSetting.class);
+			if (lastFilterSetting != null
+					&& lastFilterSetting.returnToController()) {
+				filterChain.doFilter(request, response);
+			} else {
+				log.info("过滤器链未全部执行完成，在执行完过滤器[" + arrayFilterChain.lastFilter
+						+ "]后断开。");
+			}
+		}
 	}
 
 	// 过滤器初始化
