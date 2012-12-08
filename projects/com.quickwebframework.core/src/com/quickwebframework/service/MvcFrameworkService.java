@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
 
+import com.quickwebframework.entity.HttpMethodInfo;
 import com.quickwebframework.entity.MvcModelAndView;
 
 public interface MvcFrameworkService {
@@ -31,20 +32,6 @@ public interface MvcFrameworkService {
 	public boolean removeBundle(Bundle bundle);
 
 	/**
-	 * 得到所有的URL列表
-	 * 
-	 * @return
-	 */
-	public List<String> getAllUrlList();
-
-	/**
-	 * 得到插件名称与URL列表的Map
-	 * 
-	 * @return
-	 */
-	public Map<String, List<String>> getBundleNameUrlListMap();
-
-	/**
 	 * 处理HTTP请求
 	 * 
 	 * @param request
@@ -59,4 +46,11 @@ public interface MvcFrameworkService {
 	 */
 	public MvcModelAndView handle(HttpServletRequest request,
 			HttpServletResponse response, String bundleName, String methodName);
+
+	/**
+	 * 得到插件名称与Http方法信息列表的Map
+	 * 
+	 * @return
+	 */
+	public Map<String, List<HttpMethodInfo>> getBundleHttpMethodInfoListMap();
 }

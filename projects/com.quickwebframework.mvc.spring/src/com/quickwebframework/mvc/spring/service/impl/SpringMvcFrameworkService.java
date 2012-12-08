@@ -1,7 +1,6 @@
 package com.quickwebframework.mvc.spring.service.impl;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
+import com.quickwebframework.entity.HttpMethodInfo;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
@@ -47,6 +47,8 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 
 	private ApplicationContext initPluginControllerInfo(Bundle bundle,
 			PluginControllerInfo pluginControllerInfo) {
+		// Bundle的名称
+		String bundleName = bundle.getSymbolicName();
 
 		// 如果IoC框架中还没有此Bundle,则添加到IoC框架中
 		if (IocContext.getBundleApplicationContext(bundle) == null)
@@ -97,38 +99,55 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 					if (requestMapping == null)
 						continue;
 
-					for (String mappingUrl : requestMapping.value()) {
-						String bundleName = bundle.getSymbolicName();
-						String methodName = mappingUrl;
-
-						pluginControllerInfo.getUrlList().add(
-								WebContext.getBundleMethodUrl(bundleName,
-										methodName));
-
-						if (!mappingUrl.startsWith("/")) {
-							mappingUrl = "/" + mappingUrl;
+					for (String methodName : requestMapping.value()) {
+						// 内部URL，仅用于 Spring MVC内部匹配到控制器方法
+						// 要获取外部URL，请调用WebContext.getBundleMethodUrl方法
+						String innerMappingUrl = methodName;
+						if (!innerMappingUrl.startsWith("/")) {
+							innerMappingUrl = "/" + innerMappingUrl;
 						}
-						mappingUrl = "/" + bundleName + mappingUrl;
-						pluginControllerInfo.getMappingUrlHandlerMap().put(
-								mappingUrl, handler);
+						innerMappingUrl = "/" + bundleName + innerMappingUrl;
 
-						StringBuilder sb = new StringBuilder();
 						RequestMethod[] requestMethods = requestMapping
 								.method();
-						if (requestMethods != null) {
-							for (RequestMethod requestMethod : requestMethods) {
-								sb.append(requestMethod.name());
-								sb.append(",");
-							}
+						// 如果方法为空，则映射所有的HTTP方法
+						if (requestMethods == null
+								|| requestMethods.length == 0) {
+							requestMethods = RequestMethod.values();
 						}
+
+						StringBuilder sb = new StringBuilder();
+
+						for (RequestMethod requestMethod : requestMethods) {
+							sb.append(requestMethod.name());
+							sb.append(",");
+
+							// 添加到映射MAP中
+							String tmpMappingUrl = requestMethod.name()
+									.toUpperCase() + "_" + innerMappingUrl;
+							pluginControllerInfo.getMappingUrlHandlerMap().put(
+									tmpMappingUrl, handler);
+							// 添加到HTTP方法信息列表中
+							HttpMethodInfo httpMethodInfo = new HttpMethodInfo();
+							httpMethodInfo.setHttpMethod(requestMethod.name());
+							httpMethodInfo
+									.setMappingUrl(WebContext
+											.getBundleMethodUrl(bundleName,
+													methodName));
+							pluginControllerInfo.getHttpMethodInfoList().add(
+									httpMethodInfo);
+						}
+
 						if (sb.length() == 0)
+							// 正常情况下，这儿不可能被执行到。
 							sb.append("所有");
 						else
 							sb.setLength(sb.length() - 1);
 
 						log.debug(String.format(
-								"映射内部URL路径[%s]的[%s]HTTP请求到处理器'%s'", mappingUrl,
-								sb.toString(), handler.getClass().getName()));
+								"映射内部URL路径[%s]的[%s]HTTP请求到处理器'%s'",
+								innerMappingUrl, sb.toString(), handler
+										.getClass().getName()));
 
 						// 将处理器与对应的适配器放入映射中
 						if (!pluginControllerInfo.getHandlerAdapterMap()
@@ -172,23 +191,12 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 	}
 
 	@Override
-	public List<String> getAllUrlList() {
-		List<String> list = new ArrayList<String>();
-
-		Map<String, List<String>> map = getBundleNameUrlListMap();
-		for (String key : map.keySet()) {
-			list.addAll(map.get(key));
-		}
-		return list;
-	}
-
-	@Override
-	public Map<String, List<String>> getBundleNameUrlListMap() {
-		Map<String, List<String>> rtnMap = new HashMap<String, List<String>>();
+	public Map<String, List<HttpMethodInfo>> getBundleHttpMethodInfoListMap() {
+		Map<String, List<HttpMethodInfo>> rtnMap = new HashMap<String, List<HttpMethodInfo>>();
 		for (String key : bundleNamePluginControllerInfoMap.keySet()) {
 			PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
 					.get(key);
-			rtnMap.put(key, pluginControllerInfo.getUrlList());
+			rtnMap.put(key, pluginControllerInfo.getHttpMethodInfoList());
 		}
 		return rtnMap;
 	}
@@ -210,7 +218,12 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
 				.get(bundleName);
 
-		String mappingUrl = "/" + bundleName + "/" + methodName;
+		// 请求的HTTP方法
+		String requestMethod = request.getMethod().toUpperCase();
+
+		// URL的模板:[requestMethod]_/[bundleName]/[methodName]
+		String mappingUrl = requestMethod + "_" + "/" + bundleName + "/"
+				+ methodName;
 
 		// 如果方法名称为null或Map中不存在此方法名称
 		if (methodName == null) {

@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.quickwebframework.stereotype.FilterSetting;
 
-@Component
-@FilterSetting(index = 1)
+//@Component
+@FilterSetting(index = 3)
 public class HelloFilter3 implements Filter {
 
 	public void destroy() {

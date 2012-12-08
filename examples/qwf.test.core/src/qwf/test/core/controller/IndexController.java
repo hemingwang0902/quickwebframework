@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import qwf.test.core.Activator;
 
+import com.quickwebframework.entity.HttpMethodInfo;
 import com.quickwebframework.service.MvcFrameworkService;
 
 @Controller
@@ -44,9 +45,9 @@ public class IndexController {
 		}
 
 		// 得到插件名称与方法名称列表的MAP
-		Map<String, List<String>> bundleNameUrlListMap = mvcFrameworkService
-				.getBundleNameUrlListMap();
-		request.setAttribute("bundleNameUrlListMap", bundleNameUrlListMap);
+		Map<String, List<HttpMethodInfo>> bundleNameHttpMethodInfoListMap = mvcFrameworkService
+				.getBundleHttpMethodInfoListMap();
+		request.setAttribute("bundleNameHttpMethodInfoListMap", bundleNameHttpMethodInfoListMap);
 		return "index";
 	}
 }

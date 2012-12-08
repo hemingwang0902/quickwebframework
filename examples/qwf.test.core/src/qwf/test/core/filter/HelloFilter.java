@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 import com.quickwebframework.stereotype.FilterSetting;
 
-@Component
-@FilterSetting(index = 2, returnToController = true)
+//@Component
+@FilterSetting(index = 1, returnToController = true)
 public class HelloFilter implements Filter {
 
 	public void destroy() {
