@@ -18,12 +18,13 @@
         <input type="submit" class="button" value="更新插件" onclick="document.getElementById('hiddenPluginUploadMod').value='updatePlugin'" />
         <input type="submit" class="button" value="刷新插件列表" onclick="document.getElementById('hiddenPluginUploadMod').value='refreshPlugin'" />
         <input type="submit" class="button" value="重启框架" onclick="document.getElementById('hiddenPluginUploadMod').value='restartFramework'" />
+        <input type="button" class="button" value="<-返回到根页面" onclick="window.location.href='{0}'" />
       </form>
     </td>
     </tr>
     </tbody>
     </table>
   </div>
-{0}
+{1}
 </body>
 </html>
