@@ -16,7 +16,7 @@ public class DefaultController {
 	@Autowired
 	private Config config;
 
-	@RequestMapping(value = "index", method = RequestMethod.GET)
+	@RequestMapping(value = "index")
 	public String index_get(HttpServletRequest request,
 			HttpServletResponse response) {
 		return null;

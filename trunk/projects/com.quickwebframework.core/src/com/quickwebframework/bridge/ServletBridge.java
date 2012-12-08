@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.Bundle;
 
 import com.quickwebframework.entity.HandlerExceptionResolver;
+import com.quickwebframework.entity.HttpMethodInfo;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
@@ -138,17 +139,22 @@ public class ServletBridge extends HttpServlet {
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
 			if (WebContext.getMvcFrameworkService() != null) {
-				Map<String, List<String>> map = WebContext
-						.getMvcFrameworkService().getBundleNameUrlListMap();
+				Map<String, List<HttpMethodInfo>> map = WebContext
+						.getMvcFrameworkService()
+						.getBundleHttpMethodInfoListMap();
 				sb.append("<table>");
 				for (String bundleName : map.keySet()) {
-					List<String> urlList = map.get(bundleName);
-					if (urlList.isEmpty())
+					List<HttpMethodInfo> httpMethodInfoList = map
+							.get(bundleName);
+					if (httpMethodInfoList.isEmpty())
 						continue;
 					sb.append("<tr><td><b>" + bundleName + "</b></td></tr>");
-					for (String url : urlList) {
+					for (HttpMethodInfo httpMethodInfo : httpMethodInfoList) {
+						String url = httpMethodInfo.getMappingUrl();
+						String httpMethod = httpMethodInfo.getHttpMethod();
 						sb.append("<tr><td><a style=\"margin-left:20px\" href=\""
-								+ url + "\">" + url + "</a></td></tr>");
+								+ url + "\">" + url + "</a>(" +  httpMethod
+								 + ")</td></tr>");
 					}
 				}
 				sb.append("</table>");
