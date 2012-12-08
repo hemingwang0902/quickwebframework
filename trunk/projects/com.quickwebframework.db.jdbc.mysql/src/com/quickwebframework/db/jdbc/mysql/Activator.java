@@ -1,13 +1,5 @@
 package com.quickwebframework.db.jdbc.mysql;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Properties;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -42,21 +34,8 @@ public class Activator implements BundleActivator {
 					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.db.jdbc.properties'！");
 		}
 
-		File jdbcPropertyFile = new File(jdbcPropertyFilePath);
-		if (!jdbcPropertyFile.exists() || !jdbcPropertyFile.isFile()) {
-			String message = String.format("Config file [%s] not exist!",
-					jdbcPropertyFilePath);
-			throw new IOException(message);
-		}
-
-		InputStream inputStream = new FileInputStream(jdbcPropertyFile);
-		Reader reader = new InputStreamReader(inputStream, "utf-8");
-		Properties prop = new Properties();
-		prop.load(reader);
-		reader.close();
-		inputStream.close();
-
-		DatabaseService databaseService = new DatabaseServiceImpl(prop);
+		DatabaseService databaseService = new DatabaseServiceImpl(
+				jdbcPropertyFilePath);
 		context.registerService(DatabaseService.class.getName(),
 				databaseService, null);
 	}
