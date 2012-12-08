@@ -52,4 +52,46 @@ public class SpringIocFrameworkService implements IocFrameworkService {
 		return BundleApplicationContextUtils
 				.getBundleApplicationContext(bundle);
 	}
+
+	@Override
+	public boolean containsBean(Bundle bundle, String beanName) {
+		return BundleApplicationContextUtils
+				.getBundleApplicationContext(bundle).containsBean(beanName);
+	}
+
+	@Override
+	public <T> T getBean(Bundle bundle, Class<T> clazz) {
+		return BundleApplicationContextUtils
+				.getBundleApplicationContext(bundle).getBean(clazz);
+	}
+
+	@Override
+	public Object getBean(Bundle bundle, String beanName) {
+		return BundleApplicationContextUtils
+				.getBundleApplicationContext(bundle).getBean(beanName);
+	}
+
+	@Override
+	public int getBeanDefinitionCount(Bundle bundle) {
+		return BundleApplicationContextUtils
+				.getBundleApplicationContext(bundle).getBeanDefinitionCount();
+	}
+
+	@Override
+	public String[] getBeanDefinitionNames(Bundle bundle) {
+		return BundleApplicationContextUtils
+				.getBundleApplicationContext(bundle).getBeanDefinitionNames();
+	}
+
+	@Override
+	public String[] getBeanNamesForType(Bundle bundle, Class<?> clazz) {
+		return BundleApplicationContextUtils
+				.getBundleApplicationContext(bundle).getBeanNamesForType(clazz);
+	}
+
+	@Override
+	public <T> Map<String, T> getBeansOfType(Bundle bundle, Class<T> clazz) {
+		return BundleApplicationContextUtils
+				.getBundleApplicationContext(bundle).getBeansOfType(clazz);
+	}
 }

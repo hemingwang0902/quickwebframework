@@ -1,5 +1,7 @@
 package com.quickwebframework.framework;
 
+import java.util.Map;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -92,6 +94,7 @@ public class IocContext {
 	 * @param bundle
 	 * @return
 	 */
+	@Deprecated
 	public static Object getBundleApplicationContext(Bundle bundle) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.getBundleApplicationContext(bundle);
@@ -102,5 +105,87 @@ public class IocContext {
 			log.error("未发现有注册的IocFrameworkService服务！");
 			throw new RuntimeException("未发现有注册的IocFrameworkService服务！");
 		}
+	}
+
+	/**
+	 * IoC容器中是否包含指定的bean名称
+	 * 
+	 * @param bundle
+	 * @param beanName
+	 * @return
+	 */
+	public static boolean containsBean(Bundle bundle, String beanName) {
+		checkIocFrameworkExist();
+		return iocFrameworkService.containsBean(bundle, beanName);
+	}
+
+	/**
+	 * 根据类型得到bean的对象
+	 * 
+	 * @param bundle
+	 * @param clazz
+	 * @return
+	 */
+	public static <T> T getBean(Bundle bundle, Class<T> clazz) {
+		checkIocFrameworkExist();
+		return iocFrameworkService.getBean(bundle, clazz);
+	}
+
+	/**
+	 * 根据名称得到bean的对象
+	 * 
+	 * @param bundle
+	 * @param beanName
+	 * @return
+	 */
+	public static Object getBean(Bundle bundle, String beanName) {
+		checkIocFrameworkExist();
+		return iocFrameworkService.getBean(bundle, beanName);
+	}
+
+	/**
+	 * 得到IoC容器中bean定义的数量
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public static int getBeanDefinitionCount(Bundle bundle) {
+		checkIocFrameworkExist();
+		return iocFrameworkService.getBeanDefinitionCount(bundle);
+	}
+
+	/**
+	 * 得到IoC容器中所有定义的bean的名称
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public static String[] getBeanDefinitionNames(Bundle bundle) {
+		checkIocFrameworkExist();
+		return iocFrameworkService.getBeanDefinitionNames(bundle);
+	}
+
+	/**
+	 * 得到指定类型的所有bean的名称
+	 * 
+	 * @param bundle
+	 * @param clazz
+	 * @return
+	 */
+	public static String[] getBeanNamesForType(Bundle bundle, Class<?> clazz) {
+		checkIocFrameworkExist();
+		return iocFrameworkService.getBeanNamesForType(bundle, clazz);
+	}
+
+	/**
+	 * 得到指定类型的所有bean的Map
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	public static <T> Map<String, T> getBeansOfType(Bundle bundle,
+			Class<T> clazz) {
+		checkIocFrameworkExist();
+		return iocFrameworkService.getBeansOfType(bundle, clazz);
 	}
 }
