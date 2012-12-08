@@ -44,6 +44,11 @@ public class SpringIocFrameworkService implements IocFrameworkService {
 		bundleApplicationContextMap.remove(bundle);
 	}
 
+	@Override
+	public boolean containsBundle(Bundle bundle) {
+		return bundleApplicationContextMap.containsKey(bundle);
+	}
+
 	/**
 	 * 
 	 */

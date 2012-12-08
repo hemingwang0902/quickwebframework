@@ -108,6 +108,17 @@ public class IocContext {
 	}
 
 	/**
+	 * 是否已包含对应的Bundle
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public static boolean containsBundle(Bundle bundle) {
+		checkIocFrameworkExist();
+		return iocFrameworkService.containsBundle(bundle);
+	}
+
+	/**
 	 * IoC容器中是否包含指定的bean名称
 	 * 
 	 * @param bundle
