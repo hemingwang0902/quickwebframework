@@ -100,23 +100,23 @@ public class PluginManageServlet extends QwfServlet {
 
 		Bundle[] bundles = bundleContext.getBundles();
 
-		StringBuilder sbPart0 = new StringBuilder();
-		sbPart0.append("<table border=\"1\">");
-		sbPart0.append("<thead>");
-		sbPart0.append("<tr>");
-		sbPart0.append("<th>ID</th>");
-		sbPart0.append("<th>符号名称</th>");
-		sbPart0.append("<th>名称</th>");
-		sbPart0.append("<th>版本</th>");
-		sbPart0.append("<th>状态</th>");
-		sbPart0.append("<th>操作</th>");
-		sbPart0.append("</tr>");
-		sbPart0.append("</thead>");
-		sbPart0.append("<tbody>");
+		StringBuilder sbPart1 = new StringBuilder();
+		sbPart1.append("<table border=\"1\">");
+		sbPart1.append("<thead>");
+		sbPart1.append("<tr>");
+		sbPart1.append("<th>ID</th>");
+		sbPart1.append("<th>符号名称</th>");
+		sbPart1.append("<th>名称</th>");
+		sbPart1.append("<th>版本</th>");
+		sbPart1.append("<th>状态</th>");
+		sbPart1.append("<th>操作</th>");
+		sbPart1.append("</tr>");
+		sbPart1.append("</thead>");
+		sbPart1.append("<tbody>");
 		for (Bundle bundle : bundles) {
-			sbPart0.append("<tr>");
-			sbPart0.append("<td>").append(bundle.getBundleId()).append("</td>");
-			sbPart0.append("<td>").append(bundle.getSymbolicName())
+			sbPart1.append("<tr>");
+			sbPart1.append("<td>").append(bundle.getBundleId()).append("</td>");
+			sbPart1.append("<td>").append(bundle.getSymbolicName())
 					.append("</td>");
 			String bundleName = "";
 			try {
@@ -126,9 +126,9 @@ public class PluginManageServlet extends QwfServlet {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			sbPart0.append("<td>").append(bundleName).append("</td>");
-			sbPart0.append("<td>").append(bundle.getVersion()).append("</td>");
-			sbPart0.append("<td>");
+			sbPart1.append("<td>").append(bundleName).append("</td>");
+			sbPart1.append("<td>").append(bundle.getVersion()).append("</td>");
+			sbPart1.append("<td>");
 			String stateString = null;
 			if (bundle.getState() == Bundle.UNINSTALLED)
 				stateString = "已卸载";
@@ -142,62 +142,66 @@ public class PluginManageServlet extends QwfServlet {
 				stateString = "停止中";
 			else if (bundle.getState() == Bundle.ACTIVE)
 				stateString = "激活";
-			sbPart0.append(stateString);
-			sbPart0.append("</td>");
-			sbPart0.append("<td>");
-			sbPart0.append("<div style=\"float:left\">");
-			sbPart0.append("<form method=\"post\">");
-			sbPart0.append("<input id=\"hiddenPluginOperateMod_")
+			sbPart1.append(stateString);
+			sbPart1.append("</td>");
+			sbPart1.append("<td>");
+			sbPart1.append("<div style=\"float:left\">");
+			sbPart1.append("<form method=\"post\">");
+			sbPart1.append("<input id=\"hiddenPluginOperateMod_")
 					.append(bundle.getBundleId())
 					.append("\" type=\"hidden\" name=\"mod\" value=\"\" />");
-			sbPart0.append("<input type=\"hidden\" name=\"pluginId\" value=\"")
+			sbPart1.append("<input type=\"hidden\" name=\"pluginId\" value=\"")
 					.append(bundle.getBundleId()).append("\" />");
 
 			if (bundle.getState() == Bundle.INSTALLED
 					|| bundle.getState() == Bundle.RESOLVED) {
-				sbPart0.append(
+				sbPart1.append(
 						"<input type=\"submit\" class=\"button\" value=\"启动\" onclick=\"document.getElementById('hiddenPluginOperateMod_")
 						.append(bundle.getBundleId())
 						.append("').value='startPlugin'\" />");
 			} else if (bundle.getState() == Bundle.ACTIVE) {
-				sbPart0.append(
+				sbPart1.append(
 						"<input type=\"submit\" class=\"button\" value=\"停止\" onclick=\"document.getElementById('hiddenPluginOperateMod_")
 						.append(bundle.getBundleId())
 						.append("').value='stopPlugin'\" />");
 			}
-			sbPart0.append(
+			sbPart1.append(
 					"<input type=\"submit\" class=\"button\" value=\"卸载\" onclick=\"document.getElementById('hiddenPluginOperateMod_")
 					.append(bundle.getBundleId())
 					.append("').value='uninstallPlugin'\" />");
-			sbPart0.append("</form>");
-			sbPart0.append("</div>");
-			sbPart0.append("</td>");
-			sbPart0.append("</tr>");
+			sbPart1.append("</form>");
+			sbPart1.append("</div>");
+			sbPart1.append("</td>");
+			sbPart1.append("</tr>");
 		}
-		sbPart0.append("</tbody>");
-		sbPart0.append("</table>");
+		sbPart1.append("</tbody>");
+		sbPart1.append("</table>");
 
 		Object messageObj = request.getAttribute("message");
 		if (messageObj != null) {
-			sbPart0.append("<table border=\"1\">");
-			sbPart0.append("<thead>");
-			sbPart0.append("<tr>");
-			sbPart0.append("<th>消息</th>");
-			sbPart0.append("</tr>");
-			sbPart0.append("</thead>");
-			sbPart0.append("<tbody>");
-			sbPart0.append("<tr>");
-			sbPart0.append("<td>");
-			sbPart0.append("<p>").append(messageObj).append("</p>");
-			sbPart0.append("</td>");
-			sbPart0.append("</tr>");
-			sbPart0.append("</tbody>");
-			sbPart0.append("</table>");
+			sbPart1.append("<table border=\"1\">");
+			sbPart1.append("<thead>");
+			sbPart1.append("<tr>");
+			sbPart1.append("<th>消息</th>");
+			sbPart1.append("</tr>");
+			sbPart1.append("</thead>");
+			sbPart1.append("<tbody>");
+			sbPart1.append("<tr>");
+			sbPart1.append("<td>");
+			sbPart1.append("<p>").append(messageObj).append("</p>");
+			sbPart1.append("</td>");
+			sbPart1.append("</tr>");
+			sbPart1.append("</tbody>");
+			sbPart1.append("</table>");
 		}
 
 		String outputString = templateString;
-		outputString = outputString.replace("{0}", sbPart0.toString());
-
+		String contextPath = request.getSession().getServletContext()
+				.getContextPath();
+		if (contextPath.isEmpty())
+			contextPath = "/";
+		outputString = outputString.replace("{0}", contextPath);
+		outputString = outputString.replace("{1}", sbPart1.toString());
 		try {
 			response.setCharacterEncoding("utf-8");
 			response.setContentType("text/html");

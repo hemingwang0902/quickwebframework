@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 
 import com.quickwebframework.stereotype.FilterSetting;
 
-//@Component
+@Component
 @FilterSetting(index = 1, returnToController = true)
 public class HelloFilter implements Filter {
 
 	public void destroy() {
-		// TODO Auto-generated method stub
+		System.out.println("HelloFilter -> Hello1 -> destroy()");
 	}
 
 	public void doFilter(ServletRequest arg0, ServletResponse arg1,
@@ -29,5 +29,6 @@ public class HelloFilter implements Filter {
 	}
 
 	public void init(FilterConfig arg0) throws ServletException {
+		System.out.println("HelloFilter -> Hello1 -> init():" + arg0);
 	}
 }

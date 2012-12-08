@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
@@ -16,6 +18,38 @@ import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.stereotype.FilterSetting;
 
 public class FilterContext {
+
+	/**
+	 * 从上层传递下来的过滤器配置
+	 */
+	private static FilterConfig filterConfig;
+
+	/**
+	 * 得到过滤器配置
+	 * 
+	 * @return
+	 */
+	public static FilterConfig getFilterConfig() {
+		return filterConfig;
+	}
+
+	/**
+	 * 设置过滤器配置
+	 * 
+	 * @param filterConfig
+	 */
+	public static void setFilterConfig(FilterConfig filterConfig) {
+		FilterContext.filterConfig = filterConfig;
+		if (filterConfig == null)
+			return;
+		for (Filter filter : FilterContext.getFilterList()) {
+			try {
+				filter.init(filterConfig);
+			} catch (ServletException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
 
 	private static Log log = LogFactory.getLog(FilterContext.class);
 
@@ -95,6 +129,8 @@ public class FilterContext {
 
 		// 从所有的过滤器列表中移除
 		filterList.remove(filter);
+		// 销毁过滤器
+		filter.destroy();
 		log.debug(String.format("已成功移除插件[%s]的过滤器[%s]！",
 				bundle.getSymbolicName(), filter));
 	}
@@ -106,7 +142,13 @@ public class FilterContext {
 	 * @param filter
 	 */
 	public static void addFilter(Bundle bundle, Filter filter) {
-
+		if (filterConfig != null) {
+			try {
+				filter.init(filterConfig);
+			} catch (ServletException e) {
+				throw new RuntimeException(e);
+			}
+		}
 		String filterClassName = filter.getClass().getName();
 		// 是否存在同类名实例
 		boolean hasSameClassNameObject = false;
