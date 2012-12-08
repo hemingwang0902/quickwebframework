@@ -9,5 +9,15 @@ import javax.sql.DataSource;
  * 
  */
 public interface DatabaseService {
+	/**
+	 * 得到数据源对象
+	 * 
+	 * @return
+	 */
 	public DataSource getDataSource();
+
+	/**
+	 * 重新加载配置
+	 */
+	public void reloadConfig();
 }

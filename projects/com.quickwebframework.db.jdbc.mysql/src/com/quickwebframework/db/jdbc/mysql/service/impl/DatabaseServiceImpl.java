@@ -1,5 +1,11 @@
 package com.quickwebframework.db.jdbc.mysql.service.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -12,7 +18,27 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 	private DataSource dataSource;
 
-	public DatabaseServiceImpl(Properties prop) {
+	private String jdbcPropertyFilePath;
+
+	public DatabaseServiceImpl(String jdbcPropertyFilePath) {
+		this.jdbcPropertyFilePath = jdbcPropertyFilePath;
+		reloadConfig();
+	}
+
+	private void initDataSource() throws IOException {
+		File jdbcPropertyFile = new File(jdbcPropertyFilePath);
+		if (!jdbcPropertyFile.exists() || !jdbcPropertyFile.isFile()) {
+			String message = String.format("Config file [%s] not exist!",
+					jdbcPropertyFilePath);
+			throw new IOException(message);
+		}
+
+		InputStream inputStream = new FileInputStream(jdbcPropertyFile);
+		Reader reader = new InputStreamReader(inputStream, "utf-8");
+		Properties prop = new Properties();
+		prop.load(reader);
+		reader.close();
+		inputStream.close();
 
 		// 初始化Datasource
 		BasicDataSource basicDataSource = new BasicDataSource();
@@ -60,5 +86,15 @@ public class DatabaseServiceImpl implements DatabaseService {
 	@Override
 	public DataSource getDataSource() {
 		return dataSource;
+	}
+
+	@Override
+	public void reloadConfig() {
+		dataSource = null;
+		try {
+			initDataSource();
+		} catch (IOException e) {
+			throw new RuntimeException("加载数据库配置文件时出错，原因：" + e.getMessage(), e);
+		}
 	}
 }
