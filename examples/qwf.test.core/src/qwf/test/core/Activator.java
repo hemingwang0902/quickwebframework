@@ -14,6 +14,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
+import com.quickwebframework.framework.IocContext;
 import com.quickwebframework.ioc.spring.util.ApplicationContextListener;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 
@@ -66,6 +67,8 @@ public class Activator implements BundleActivator {
 
 				});
 
+		log.warn("-----"
+				+ IocContext.getBeanDefinitionCount(bundleContext.getBundle()));
 		log.info("qwf.test.core插件已启动!");
 	}
 
