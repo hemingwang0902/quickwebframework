@@ -51,11 +51,12 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		String bundleName = bundle.getSymbolicName();
 
 		// 如果IoC框架中还没有此Bundle,则添加到IoC框架中
-		if (IocContext.getBundleApplicationContext(bundle) == null)
+		if (!IocContext.containsBundle(bundle))
 			IocContext.addBundle(bundle);
 
 		ApplicationContext applicationContext = BundleApplicationContextUtils
 				.getBundleApplicationContext(bundle);
+		
 
 		if (applicationContext == null) {
 			throw new RuntimeException("找不到此Bundle对应的ApplicationContext对象！");

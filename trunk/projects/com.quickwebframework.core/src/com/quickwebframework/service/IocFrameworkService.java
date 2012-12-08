@@ -36,6 +36,14 @@ public interface IocFrameworkService {
 	public Object getBundleApplicationContext(Bundle bundle);
 
 	/**
+	 * IoC窗口中是否已包含指定的Bundle
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public boolean containsBundle(Bundle bundle);
+
+	/**
 	 * IoC容器中是否包含指定的bean名称
 	 * 
 	 * @param bundle
