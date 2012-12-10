@@ -11,6 +11,8 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.osgi.framework.ServiceException;
+import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.db.jdbc.mysql.Activator;
 import com.quickwebframework.db.jdbc.mysql.util.JdbcPropertiesInitializer;
@@ -114,13 +116,25 @@ public class DatabaseServiceImpl implements DatabaseService {
 		} catch (IOException e) {
 			throw new RuntimeException("加载数据库配置文件时出错，原因：" + e.getMessage(), e);
 		}
-		// 重新注册
+		// 如果已经注册，则先取消注册
+		unregisterService();
+		// 重新注册服务
 		registerService();
 	}
 
-	// 注册服务
+	private ServiceRegistration<?> databaseServiceRegistration;
+
+	// 注册
 	public void registerService() {
-		Activator.getContext().registerService(DatabaseService.class.getName(),
-				this, null);
+		databaseServiceRegistration = Activator.getContext().registerService(
+				DatabaseService.class.getName(), this, null);
+	}
+
+	// 取消注册
+	public void unregisterService() {
+		if (databaseServiceRegistration != null) {
+			databaseServiceRegistration.unregister();
+			databaseServiceRegistration = null;
+		}
 	}
 }
