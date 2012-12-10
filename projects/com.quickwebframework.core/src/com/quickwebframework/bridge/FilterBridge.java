@@ -87,11 +87,7 @@ public abstract class FilterBridge extends ServletBridge implements
 
 	@Override
 	public void destroy() {
-		// 销毁Servlet
-		((javax.servlet.GenericServlet) this).destroy();
-		// 销毁过滤器
-		for (Filter filter : FilterContext.getFilterList()) {
-			filter.destroy();
-		}
+		// 移除所有的过滤器
+		FilterContext.removeAllFilter();
 	}
 }

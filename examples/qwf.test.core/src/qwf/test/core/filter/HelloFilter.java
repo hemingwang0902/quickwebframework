@@ -20,6 +20,7 @@ public class HelloFilter implements Filter {
 
 	public void destroy() {
 		System.out.println("HelloFilter -> Hello1 -> destroy()");
+		//new RuntimeException().printStackTrace();
 	}
 
 	public void doFilter(ServletRequest arg0, ServletResponse arg1,

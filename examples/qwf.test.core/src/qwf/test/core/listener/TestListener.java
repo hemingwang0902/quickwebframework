@@ -6,7 +6,7 @@ import javax.servlet.http.HttpSessionEvent;
 
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class TestListener implements javax.servlet.ServletRequestListener,
 		javax.servlet.ServletContextListener,
 		javax.servlet.http.HttpSessionListener {

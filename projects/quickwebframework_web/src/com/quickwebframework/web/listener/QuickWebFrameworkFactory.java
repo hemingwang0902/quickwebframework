@@ -315,10 +315,12 @@ public abstract class QuickWebFrameworkFactory {
 	 */
 	public void stopOSGiFramework() {
 		try {
-			if (framework != null)
+			if (framework != null) {
 				framework.stop();
+				framework.waitForStop(0);
+			}
 			logger.info("停止OSGi Framework成功！");
-		} catch (BundleException e) {
+		} catch (Exception e) {
 			throw new RuntimeException("停止OSGi Framework失败！", e);
 		}
 	}
