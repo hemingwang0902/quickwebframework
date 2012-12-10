@@ -14,6 +14,8 @@ import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 public class CommonFilter implements Filter {
 
 	private Filter frameworkBridgeFilter;
+	// QuickwebFramework的过滤器配置状态
+	public static final String QUICKWEBFRAMEWORK_STATE_FILTERCONFIG = "com.quickwebframework.state.FILTERCONFIG";
 
 	@Override
 	public void destroy() {
@@ -25,11 +27,12 @@ public class CommonFilter implements Filter {
 		Object frameworkBridgeObject = QuickWebFrameworkLoaderListener
 				.getFrameworkBridgeObject();
 		if (frameworkBridgeObject == null) {
-			throw new RuntimeException(
-					"Cann't found frameworkBridgeObject!Make sure init QuickWebFrameworkLoaderListener before CommonFilter!");
+			arg0.getServletContext().setAttribute(
+					QUICKWEBFRAMEWORK_STATE_FILTERCONFIG, arg0);
+		} else {
+			frameworkBridgeFilter = (Filter) frameworkBridgeObject;
+			frameworkBridgeFilter.init(arg0);
 		}
-		frameworkBridgeFilter = (Filter) frameworkBridgeObject;
-		frameworkBridgeFilter.init(arg0);
 	}
 
 	@Override
