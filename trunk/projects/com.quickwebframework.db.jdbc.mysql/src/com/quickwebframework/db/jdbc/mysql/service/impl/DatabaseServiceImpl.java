@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
+import com.quickwebframework.db.jdbc.mysql.util.JdbcPropertiesInitializer;
 import com.quickwebframework.service.DatabaseService;
 
 public class DatabaseServiceImpl implements DatabaseService {
@@ -19,6 +20,17 @@ public class DatabaseServiceImpl implements DatabaseService {
 	private DataSource dataSource;
 
 	private String jdbcPropertyFilePath;
+
+	private JdbcPropertiesInitializer jdbcPropertiesInitializer;
+
+	public JdbcPropertiesInitializer getJdbcPropertiesInitializer() {
+		return jdbcPropertiesInitializer;
+	}
+
+	public void setJdbcPropertiesInitializer(
+			JdbcPropertiesInitializer jdbcPropertiesInitializer) {
+		this.jdbcPropertiesInitializer = jdbcPropertiesInitializer;
+	}
 
 	public DatabaseServiceImpl(String jdbcPropertyFilePath) {
 		this.jdbcPropertyFilePath = jdbcPropertyFilePath;
@@ -39,6 +51,11 @@ public class DatabaseServiceImpl implements DatabaseService {
 		prop.load(reader);
 		reader.close();
 		inputStream.close();
+
+		// 初始化配置
+		if (jdbcPropertiesInitializer != null) {
+			jdbcPropertiesInitializer.init(prop);
+		}
 
 		// 初始化Datasource
 		BasicDataSource basicDataSource = new BasicDataSource();
@@ -96,5 +113,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 		} catch (IOException e) {
 			throw new RuntimeException("加载数据库配置文件时出错，原因：" + e.getMessage(), e);
 		}
+	}
+
+	public void reloadConfig(Properties prop) {
+
 	}
 }
