@@ -15,6 +15,12 @@ public class Activator implements BundleActivator {
 		return context;
 	}
 
+	private static DatabaseServiceImpl databaseService;
+
+	public static DatabaseServiceImpl getDatabaseService() {
+		return databaseService;
+	}
+
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
 
@@ -34,8 +40,7 @@ public class Activator implements BundleActivator {
 					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.db.jdbc.properties'！");
 		}
 
-		DatabaseService databaseService = new DatabaseServiceImpl(
-				jdbcPropertyFilePath);
+		databaseService = new DatabaseServiceImpl(jdbcPropertyFilePath);
 		context.registerService(DatabaseService.class.getName(),
 				databaseService, null);
 	}
