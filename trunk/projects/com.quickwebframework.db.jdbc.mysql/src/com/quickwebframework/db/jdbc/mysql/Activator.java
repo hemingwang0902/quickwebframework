@@ -5,13 +5,12 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.db.jdbc.mysql.service.impl.DatabaseServiceImpl;
-import com.quickwebframework.service.DatabaseService;
 
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;
 
-	static BundleContext getContext() {
+	public static BundleContext getContext() {
 		return context;
 	}
 
@@ -41,8 +40,7 @@ public class Activator implements BundleActivator {
 		}
 
 		databaseService = new DatabaseServiceImpl(jdbcPropertyFilePath);
-		context.registerService(DatabaseService.class.getName(),
-				databaseService, null);
+		databaseService.registerService();
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {

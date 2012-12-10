@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
+import com.quickwebframework.db.jdbc.mysql.Activator;
 import com.quickwebframework.db.jdbc.mysql.util.JdbcPropertiesInitializer;
 import com.quickwebframework.service.DatabaseService;
 
@@ -113,9 +114,13 @@ public class DatabaseServiceImpl implements DatabaseService {
 		} catch (IOException e) {
 			throw new RuntimeException("加载数据库配置文件时出错，原因：" + e.getMessage(), e);
 		}
+		// 重新注册
+		registerService();
 	}
 
-	public void reloadConfig(Properties prop) {
-
+	// 注册服务
+	public void registerService() {
+		Activator.getContext().registerService(DatabaseService.class.getName(),
+				this, null);
 	}
 }
