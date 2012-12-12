@@ -6,7 +6,8 @@ Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: com.quickwebframework.db.orm.quickorm.Activator
 Bundle-Vendor: aaaSoft
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: javax.sql,
+Import-Package: javax.servlet,
+ javax.sql,
  org.osgi.framework;version="1.3.0"
 Require-Bundle: com.quickwebframework.core;bundle-version="1.0.0"
 Bundle-ClassPath: quickorm_1.1.0.201205081106.jar,

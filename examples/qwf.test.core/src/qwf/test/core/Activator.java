@@ -17,6 +17,7 @@ import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.framework.IocContext;
 import com.quickwebframework.ioc.spring.util.ApplicationContextListener;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
+import com.quickwebframework.service.DatabaseService;
 
 public class Activator implements BundleActivator {
 
@@ -43,6 +44,11 @@ public class Activator implements BundleActivator {
 
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
+
+		DatabaseService databaseService = (DatabaseService) bundleContext
+				.getService(bundleContext
+						.getServiceReference(DatabaseService.class.getName()));
+		databaseService.reloadConfig();
 
 		// 添加一个ApplicationContext监听器
 		BundleApplicationContextUtils

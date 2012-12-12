@@ -5,6 +5,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.db.jdbc.mysql.service.impl.DatabaseServiceImpl;
+import com.quickwebframework.framework.WebContext;
 
 public class Activator implements BundleActivator {
 
@@ -27,7 +28,7 @@ public class Activator implements BundleActivator {
 
 		ServiceReference<?>[] serviceReferences = context
 				.getServiceReferences(String.class.getName(),
-						"(quickwebframework.pluginConfigFile=com.quickwebframework.db.jdbc.properties)");
+						"(quickwebframework.config=com.quickwebframework.db.jdbc.properties)");
 
 		if (serviceReferences != null && serviceReferences.length > 0) {
 			jdbcPropertyFilePath = (String) context
@@ -36,9 +37,10 @@ public class Activator implements BundleActivator {
 
 		if (jdbcPropertyFilePath == null || jdbcPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
-					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.db.jdbc.properties'！");
+					"Can't found property 'quickwebframework.config.com.quickwebframework.db.jdbc.properties'！");
 		}
-
+		jdbcPropertyFilePath = WebContext.getServletContext().getRealPath(
+				jdbcPropertyFilePath);
 		databaseService = new DatabaseServiceImpl(jdbcPropertyFilePath);
 		databaseService.registerService();
 	}

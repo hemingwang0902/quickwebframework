@@ -19,18 +19,24 @@ public class DefaultLogImpl implements Log {
 
 	public DefaultLogImpl(BundleContext bundleContext, final String name) {
 		this.bundleContext = bundleContext;
+
 		defaultLog = new JavaLoggerImpl(name);
 		refreshCurrentLog(name);
+		if (bundleContext == null)
+			return;
 
-		bundleContext.addServiceListener(new ServiceListener() {
-			@Override
-			public void serviceChanged(ServiceEvent arg0) {
-				if (arg0.getServiceReference().toString()
-						.contains(LogService.class.getName())) {
-					refreshCurrentLog(name);
+		try {
+			bundleContext.addServiceListener(new ServiceListener() {
+				@Override
+				public void serviceChanged(ServiceEvent arg0) {
+					if (arg0.getServiceReference().toString()
+							.contains(LogService.class.getName())) {
+						refreshCurrentLog(name);
+					}
 				}
-			}
-		});
+			});
+		} catch (Exception ex) {
+		}
 	}
 
 	private void refreshCurrentLog(String name) {

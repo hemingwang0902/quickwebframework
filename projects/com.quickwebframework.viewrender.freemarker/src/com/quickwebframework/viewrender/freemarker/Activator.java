@@ -12,6 +12,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.viewrender.freemarker.service.impl.ViewRenderServiceImpl;
 
@@ -33,7 +34,7 @@ public class Activator implements BundleActivator {
 		ServiceReference<?>[] serviceReferences = context
 				.getServiceReferences(
 						String.class.getName(),
-						"(quickwebframework.pluginConfigFile=com.quickwebframework.viewrender.freemarker.properties)");
+						"(quickwebframework.config=com.quickwebframework.viewrender.freemarker.properties)");
 		if (serviceReferences != null && serviceReferences.length > 0) {
 			freemarkerPropertyFilePath = (String) context
 					.getService(serviceReferences[0]);
@@ -41,13 +42,15 @@ public class Activator implements BundleActivator {
 		if (freemarkerPropertyFilePath == null
 				|| freemarkerPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
-					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.viewrender.freemarker.properties'！");
+					"Can't found property 'quickwebframework.config.com.quickwebframework.viewrender.freemarker.properties'！");
 		}
+		freemarkerPropertyFilePath = WebContext.getServletContext()
+				.getRealPath(freemarkerPropertyFilePath);
+
 		// 得到viewrender配置文件路径
 		serviceReferences = context
-				.getServiceReferences(
-						String.class.getName(),
-						"(quickwebframework.pluginConfigFile=com.quickwebframework.viewrender.properties)");
+				.getServiceReferences(String.class.getName(),
+						"(quickwebframework.config=com.quickwebframework.viewrender.properties)");
 		if (serviceReferences != null && serviceReferences.length > 0) {
 			viewrenderPropertyFilePath = (String) context
 					.getService(serviceReferences[0]);
@@ -55,8 +58,10 @@ public class Activator implements BundleActivator {
 		if (viewrenderPropertyFilePath == null
 				|| viewrenderPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
-					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.viewrender.properties'！");
+					"Can't found property 'quickwebframework.config.com.quickwebframework.viewrender.properties'！");
 		}
+		viewrenderPropertyFilePath = WebContext.getServletContext()
+				.getRealPath(viewrenderPropertyFilePath);
 
 		// 读取freemarker配置文件
 		File freemarkerPropertyFile = new File(freemarkerPropertyFilePath);
@@ -73,6 +78,7 @@ public class Activator implements BundleActivator {
 		freemarkerProp.load(reader);
 		reader.close();
 		inputStream.close();
+
 		// 读取viewrender配置文件
 		File viewrenderPropertyFile = new File(viewrenderPropertyFilePath);
 		if (!viewrenderPropertyFile.exists()

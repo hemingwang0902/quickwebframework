@@ -8,6 +8,11 @@ import com.quickwebframework.entity.Log;
 
 public class JavaLoggerImpl implements Log {
 
+	/**
+	 * java日志器处理级别
+	 */
+	public static Level javaLoggerLevel = Level.INFO;
+
 	// Java默认控制台日志输出处理程序
 	private ConsoleHandler consoleHandler;
 
@@ -21,70 +26,76 @@ public class JavaLoggerImpl implements Log {
 	}
 
 	private LogRecord getLogRecord(Level level, Object message) {
-		LogRecord logRecord = new LogRecord(Level.FINER, message.toString());
+		LogRecord logRecord = new LogRecord(level, message.toString());
 		logRecord.setLoggerName(sourceClassName);
 		logRecord.setSourceClassName(sourceClassName);
 		logRecord.setSourceMethodName(sourceMethodName);
 		return logRecord;
 	}
 
+	private void recordLog(LogRecord logRecord) {
+		if (!consoleHandler.getLevel().equals(javaLoggerLevel))
+			consoleHandler.setLevel(javaLoggerLevel);
+		consoleHandler.publish(logRecord);
+	}
+
 	@Override
 	public void debug(Object message) {
-		consoleHandler.publish(getLogRecord(Level.FINER, message));
+		recordLog(getLogRecord(Level.CONFIG, message));
 	}
 
 	@Override
 	public void debug(Object message, Throwable exception) {
-		consoleHandler.publish(getLogRecord(Level.FINER, message));
+		recordLog(getLogRecord(Level.CONFIG, message));
 	}
 
 	@Override
 	public void error(Object message) {
-		consoleHandler.publish(getLogRecord(Level.SEVERE, message));
+		recordLog(getLogRecord(Level.SEVERE, message));
 	}
 
 	@Override
 	public void error(Object message, Throwable exception) {
-		consoleHandler.publish(getLogRecord(Level.SEVERE, message));
+		recordLog(getLogRecord(Level.SEVERE, message));
 	}
 
 	@Override
 	public void fatal(Object message) {
-		consoleHandler.publish(getLogRecord(Level.SEVERE, message));
+		recordLog(getLogRecord(Level.SEVERE, message));
 	}
 
 	@Override
 	public void fatal(Object message, Throwable exception) {
-		consoleHandler.publish(getLogRecord(Level.SEVERE, message));
+		recordLog(getLogRecord(Level.SEVERE, message));
 	}
 
 	@Override
 	public void info(Object message) {
-		consoleHandler.publish(getLogRecord(Level.INFO, message));
+		recordLog(getLogRecord(Level.INFO, message));
 	}
 
 	@Override
 	public void info(Object message, Throwable exception) {
-		consoleHandler.publish(getLogRecord(Level.INFO, message));
+		recordLog(getLogRecord(Level.INFO, message));
 	}
 
 	@Override
 	public void trace(Object message) {
-		consoleHandler.publish(getLogRecord(Level.FINEST, message));
+		recordLog(getLogRecord(Level.FINEST, message));
 	}
 
 	@Override
 	public void trace(Object message, Throwable exception) {
-		consoleHandler.publish(getLogRecord(Level.FINEST, message));
+		recordLog(getLogRecord(Level.FINEST, message));
 	}
 
 	@Override
 	public void warn(Object message) {
-		consoleHandler.publish(getLogRecord(Level.WARNING, message));
+		recordLog(getLogRecord(Level.WARNING, message));
 	}
 
 	@Override
 	public void warn(Object message, Throwable exception) {
-		consoleHandler.publish(getLogRecord(Level.WARNING, message));
+		recordLog(getLogRecord(Level.WARNING, message));
 	}
 }

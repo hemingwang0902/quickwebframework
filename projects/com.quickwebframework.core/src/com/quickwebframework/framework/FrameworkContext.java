@@ -10,6 +10,7 @@ import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 
+import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 
@@ -30,10 +31,10 @@ public class FrameworkContext {
 		return null;
 	}
 
-	public static void init(Bundle coreBundle) {
-		FrameworkContext.coreBundle = coreBundle;
+	public static void init() {
+		BundleContext bundleContext = Activator.getContext();
+		FrameworkContext.coreBundle = bundleContext.getBundle();
 
-		BundleContext bundleContext = coreBundle.getBundleContext();
 		// 添加OSGi插件监听器
 		bundleContext.addBundleListener(new BundleListener() {
 
@@ -74,10 +75,15 @@ public class FrameworkContext {
 			}
 		});
 
+		LogContext.init();
 		IocContext.init();
 		ListenerContext.init();
 		FilterContext.init();
 		WebContext.init();
 		ThreadContext.init();
+	}
+
+	public static void destroy() {
+		FilterContext.destory();
 	}
 }

@@ -14,6 +14,7 @@ import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.db.orm.quickorm.service.DatabaseService;
 import com.quickwebframework.db.orm.quickorm.service.impl.DatabaseServiceImpl;
+import com.quickwebframework.framework.WebContext;
 
 public class Activator implements BundleActivator {
 
@@ -29,9 +30,8 @@ public class Activator implements BundleActivator {
 		String quickormPropertyFilePath = null;
 
 		ServiceReference<?>[] serviceReferences = context
-				.getServiceReferences(
-						String.class.getName(),
-						"(quickwebframework.pluginConfigFile=com.quickwebframework.db.quickorm.properties)");
+				.getServiceReferences(String.class.getName(),
+						"(quickwebframework.config=com.quickwebframework.db.quickorm.properties)");
 
 		if (serviceReferences != null && serviceReferences.length > 0) {
 			quickormPropertyFilePath = (String) context
@@ -41,9 +41,10 @@ public class Activator implements BundleActivator {
 		if (quickormPropertyFilePath == null
 				|| quickormPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
-					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.db.quickorm.properties'！");
+					"Can't found property 'quickwebframework.config.com.quickwebframework.db.quickorm.properties'！");
 		}
-
+		quickormPropertyFilePath = WebContext.getServletContext().getRealPath(
+				quickormPropertyFilePath);
 		File quickormPropertyFile = new File(quickormPropertyFilePath);
 		if (!quickormPropertyFile.exists() || !quickormPropertyFile.isFile()) {
 			String message = String.format("Config file [%s] not exist!",

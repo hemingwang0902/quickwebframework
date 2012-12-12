@@ -7,6 +7,7 @@ Bundle-Activator: com.quickwebframework.db.jdbc.mysql.Activator
 Bundle-Vendor: aaaSoft
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: javax.naming,
+ javax.servlet,
  javax.sql,
  org.osgi.framework;version="1.3.0"
 Require-Bundle: com.quickwebframework.core;bundle-version="1.0.0"
