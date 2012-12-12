@@ -11,7 +11,7 @@ import javax.servlet.ServletResponse;
 
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
-import com.quickwebframework.framework.FilterContext;
+import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.stereotype.FilterSetting;
 
 public class ServletFilterBridge implements javax.servlet.Filter {
@@ -58,8 +58,8 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
-		ArrayFilterChain arrayFilterChain = new ArrayFilterChain(FilterContext
-				.getFilterList().toArray(new Filter[0]));
+		ArrayFilterChain arrayFilterChain = new ArrayFilterChain(WebContext
+				.getInstance().getFilterList().toArray(new Filter[0]));
 		arrayFilterChain.doFilter(request, response);
 		if (arrayFilterChain.isContinueFilterChain())
 			filterChain.doFilter(request, response);
@@ -81,12 +81,12 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 	// 过滤器初始化
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {
-		FilterContext.setFilterConfig(arg0);
+		WebContext.getInstance().setFilterConfig(arg0);
 	}
 
 	@Override
 	public void destroy() {
 		// 移除所有的过滤器
-		FilterContext.removeAllFilter();
+		WebContext.getInstance().removeAllListener();
 	}
 }

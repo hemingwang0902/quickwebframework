@@ -18,7 +18,7 @@ import com.quickwebframework.entity.HttpMethodInfo;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
-import com.quickwebframework.framework.FrameworkContext;
+import com.quickwebframework.framework.OsgiContext;
 import com.quickwebframework.framework.WebContext;
 
 public class HttpServletBridge extends HttpServlet {
@@ -41,11 +41,13 @@ public class HttpServletBridge extends HttpServlet {
 	public void renderView(MvcModelAndView mav, HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			if (WebContext.getViewRenderService() != null) {
+			if (WebContext.getInstance().getViewRenderService() != null) {
 				// 渲染视图
-				WebContext.getViewRenderService().renderView(
-						mav.getBundle().getSymbolicName(), mav.getViewName(),
-						request, response);
+				WebContext
+						.getInstance()
+						.getViewRenderService()
+						.renderView(mav.getBundle().getSymbolicName(),
+								mav.getViewName(), request, response);
 			} else {
 				response.sendError(500,
 						"[com.quickwebframework.core.DispatcherServlet] cannot found ViewRender!");
@@ -57,11 +59,12 @@ public class HttpServletBridge extends HttpServlet {
 
 	private void handleUrlNotFound(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		if (WebContext.getUrlNotFoundHandleServlet() == null)
+		if (WebContext.getInstance().getUrlNotFoundHandleServlet() == null)
 			response.sendError(404, "URL " + request.getRequestURI()
 					+ " not found!");
 		else
-			WebContext.getUrlNotFoundHandleServlet().service(request, response);
+			WebContext.getInstance().getUrlNotFoundHandleServlet()
+					.service(request, response);
 	}
 
 	private void processHttp(HttpServletRequest request,
@@ -74,7 +77,8 @@ public class HttpServletBridge extends HttpServlet {
 			}
 
 			try {
-				MvcModelAndView mav = WebContext.getMvcFrameworkService()
+				MvcModelAndView mav = WebContext.getInstance()
+						.getMvcFrameworkService()
 						.handle(request, response, bundleName, methodName);
 				if (mav == null) {
 					return;
@@ -86,7 +90,7 @@ public class HttpServletBridge extends HttpServlet {
 					renderView(mav, request, response);
 				}
 			} catch (Exception ex) {
-				HandlerExceptionResolver resolver = WebContext
+				HandlerExceptionResolver resolver = WebContext.getInstance()
 						.getHandlerExceptionResolver();
 
 				if (resolver == null)
@@ -134,13 +138,13 @@ public class HttpServletBridge extends HttpServlet {
 	// 处理根URL："/"请求
 	private void serviceRootUrl(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		if (WebContext.getRootUrlHandleServlet() == null) {
+		if (WebContext.getInstance().getRootUrlHandleServlet() == null) {
 			response.setContentType("text/html;charset=utf-8");
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
-			if (WebContext.getMvcFrameworkService() != null) {
+			if (WebContext.getInstance().getMvcFrameworkService() != null) {
 				Map<String, List<HttpMethodInfo>> map = WebContext
-						.getMvcFrameworkService()
+						.getInstance().getMvcFrameworkService()
 						.getBundleHttpMethodInfoListMap();
 				sb.append("<table>");
 				for (String bundleName : map.keySet()) {
@@ -167,13 +171,14 @@ public class HttpServletBridge extends HttpServlet {
 			response.getWriter().write(sb.toString());
 			return;
 		}
-		WebContext.getRootUrlHandleServlet().service(request, response);
+		WebContext.getInstance().getRootUrlHandleServlet()
+				.service(request, response);
 	}
 
 	// 得到Bundle资源
 	private InputStream getBundleResource(String bundleName, String resourcePath)
 			throws IOException {
-		Bundle bundle = FrameworkContext.getBundleByName(bundleName);
+		Bundle bundle = OsgiContext.getInstance().getBundleByName(bundleName);
 		URL resourceUrl = bundle.getResource(resourcePath);
 		if (resourceUrl == null)
 			return null;

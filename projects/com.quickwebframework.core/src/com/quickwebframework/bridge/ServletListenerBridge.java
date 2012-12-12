@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import com.quickwebframework.framework.ListenerContext;
+import com.quickwebframework.framework.WebContext;
 
 public class ServletListenerBridge implements ServletContextListener,
 		ServletContextAttributeListener, ServletRequestListener,
@@ -28,7 +28,7 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 ServletContextListener
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		List<ServletContextListener> list = ListenerContext
+		List<ServletContextListener> list = WebContext.getInstance()
 				.getListenerList(ServletContextListener.class);
 		if (list == null)
 			return;
@@ -39,7 +39,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		List<ServletContextListener> list = ListenerContext
+		List<ServletContextListener> list = WebContext.getInstance()
 				.getListenerList(ServletContextListener.class);
 		if (list == null)
 			return;
@@ -53,7 +53,7 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 ServletContextAttributeListener
 	@Override
 	public void attributeAdded(ServletContextAttributeEvent arg0) {
-		List<ServletContextAttributeListener> list = ListenerContext
+		List<ServletContextAttributeListener> list = WebContext.getInstance()
 				.getListenerList(ServletContextAttributeListener.class);
 		if (list == null)
 			return;
@@ -64,7 +64,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void attributeRemoved(ServletContextAttributeEvent arg0) {
-		List<ServletContextAttributeListener> list = ListenerContext
+		List<ServletContextAttributeListener> list = WebContext.getInstance()
 				.getListenerList(ServletContextAttributeListener.class);
 		if (list == null)
 			return;
@@ -75,7 +75,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void attributeReplaced(ServletContextAttributeEvent arg0) {
-		List<ServletContextAttributeListener> list = ListenerContext
+		List<ServletContextAttributeListener> list = WebContext.getInstance()
 				.getListenerList(ServletContextAttributeListener.class);
 		if (list == null)
 			return;
@@ -89,7 +89,7 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 ServletRequestListener
 	@Override
 	public void requestDestroyed(ServletRequestEvent arg0) {
-		List<ServletRequestListener> list = ListenerContext
+		List<ServletRequestListener> list = WebContext.getInstance()
 				.getListenerList(ServletRequestListener.class);
 		if (list == null)
 			return;
@@ -100,7 +100,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void requestInitialized(ServletRequestEvent arg0) {
-		List<ServletRequestListener> list = ListenerContext
+		List<ServletRequestListener> list = WebContext.getInstance()
 				.getListenerList(ServletRequestListener.class);
 		if (list == null)
 			return;
@@ -114,7 +114,7 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 ServletRequestAttributeListener
 	@Override
 	public void attributeAdded(ServletRequestAttributeEvent arg0) {
-		List<ServletRequestAttributeListener> list = ListenerContext
+		List<ServletRequestAttributeListener> list = WebContext.getInstance()
 				.getListenerList(ServletRequestAttributeListener.class);
 		if (list == null)
 			return;
@@ -125,7 +125,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void attributeRemoved(ServletRequestAttributeEvent arg0) {
-		List<ServletRequestAttributeListener> list = ListenerContext
+		List<ServletRequestAttributeListener> list = WebContext.getInstance()
 				.getListenerList(ServletRequestAttributeListener.class);
 		if (list == null)
 			return;
@@ -136,7 +136,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void attributeReplaced(ServletRequestAttributeEvent arg0) {
-		List<ServletRequestAttributeListener> list = ListenerContext
+		List<ServletRequestAttributeListener> list = WebContext.getInstance()
 				.getListenerList(ServletRequestAttributeListener.class);
 		if (list == null)
 			return;
@@ -150,7 +150,7 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 HttpSessionActivationListener
 	@Override
 	public void sessionDidActivate(HttpSessionEvent arg0) {
-		List<HttpSessionActivationListener> list = ListenerContext
+		List<HttpSessionActivationListener> list = WebContext.getInstance()
 				.getListenerList(HttpSessionActivationListener.class);
 		if (list == null)
 			return;
@@ -161,7 +161,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void sessionWillPassivate(HttpSessionEvent arg0) {
-		List<HttpSessionActivationListener> list = ListenerContext
+		List<HttpSessionActivationListener> list = WebContext.getInstance()
 				.getListenerList(HttpSessionActivationListener.class);
 		if (list == null)
 			return;
@@ -175,7 +175,7 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 HttpSessionAttributeListener
 	@Override
 	public void attributeAdded(HttpSessionBindingEvent arg0) {
-		List<HttpSessionAttributeListener> list = ListenerContext
+		List<HttpSessionAttributeListener> list = WebContext.getInstance()
 				.getListenerList(HttpSessionAttributeListener.class);
 		if (list == null)
 			return;
@@ -186,7 +186,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void attributeRemoved(HttpSessionBindingEvent arg0) {
-		List<HttpSessionAttributeListener> list = ListenerContext
+		List<HttpSessionAttributeListener> list = WebContext.getInstance()
 				.getListenerList(HttpSessionAttributeListener.class);
 		if (list == null)
 			return;
@@ -197,7 +197,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void attributeReplaced(HttpSessionBindingEvent arg0) {
-		List<HttpSessionAttributeListener> list = ListenerContext
+		List<HttpSessionAttributeListener> list = WebContext.getInstance()
 				.getListenerList(HttpSessionAttributeListener.class);
 		if (list == null)
 			return;
@@ -211,7 +211,7 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 HttpSessionBindingListener
 	@Override
 	public void valueBound(HttpSessionBindingEvent arg0) {
-		List<HttpSessionBindingListener> list = ListenerContext
+		List<HttpSessionBindingListener> list = WebContext.getInstance()
 				.getListenerList(HttpSessionBindingListener.class);
 		if (list == null)
 			return;
@@ -222,7 +222,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void valueUnbound(HttpSessionBindingEvent arg0) {
-		List<HttpSessionBindingListener> list = ListenerContext
+		List<HttpSessionBindingListener> list = WebContext.getInstance()
 				.getListenerList(HttpSessionBindingListener.class);
 		if (list == null)
 			return;
@@ -236,7 +236,7 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 HttpSessionListener
 	@Override
 	public void sessionCreated(HttpSessionEvent arg0) {
-		List<HttpSessionListener> list = ListenerContext
+		List<HttpSessionListener> list = WebContext.getInstance()
 				.getListenerList(HttpSessionListener.class);
 		if (list == null)
 			return;
@@ -247,7 +247,7 @@ public class ServletListenerBridge implements ServletContextListener,
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent arg0) {
-		List<HttpSessionListener> list = ListenerContext
+		List<HttpSessionListener> list = WebContext.getInstance()
 				.getListenerList(HttpSessionListener.class);
 		if (list == null)
 			return;
