@@ -7,7 +7,10 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
-import com.quickwebframework.bridge.FrameworkBridge;
+import com.quickwebframework.bridge.HttpServletBridge;
+import com.quickwebframework.bridge.LogBridge;
+import com.quickwebframework.bridge.ServletFilterBridge;
+import com.quickwebframework.bridge.ServletListenerBridge;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.framework.FilterContext;
@@ -72,10 +75,15 @@ public class Activator implements BundleActivator {
 		// 初始化FrameworkContext
 		FrameworkContext.init(context.getBundle());
 
-		// 注册FrameworkBridge对象为服务
-		FrameworkBridge frameworkBridge = new FrameworkBridge();
-		context.registerService(FrameworkBridge.class.getName(),
-				frameworkBridge, null);
+		// 注册各FrameworkBridge对象为服务
+		context.registerService(HttpServletBridge.class.getName(),
+				new HttpServletBridge(), null);
+		context.registerService(LogBridge.class.getName(), new LogBridge(),
+				null);
+		context.registerService(ServletFilterBridge.class.getName(),
+				new ServletFilterBridge(), null);
+		context.registerService(ServletListenerBridge.class.getName(),
+				new ServletListenerBridge(), null);
 
 		// 启动时，从ServletContext中读取相关运行时状态
 		Object filterConfigObject = getServletContext().getAttribute(
@@ -83,7 +91,7 @@ public class Activator implements BundleActivator {
 		if (filterConfigObject != null)
 			FilterContext.setFilterConfig((FilterConfig) filterConfigObject);
 
-		log.info("Started [com.quickwebframework.bundle].");
+		log.info("Started [com.quickwebframework.core].");
 	}
 
 	/*
@@ -93,11 +101,10 @@ public class Activator implements BundleActivator {
 	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+		log.info("Stoping [com.quickwebframework.core]...");
 		// 停止时，保存相关运行时状态到ServletContext中。
 		getServletContext().setAttribute(QUICKWEBFRAMEWORK_STATE_FILTERCONFIG,
 				FilterContext.getFilterConfig());
-
-		log.info("Stoping [com.quickwebframework.core]...");
 		Activator.context = null;
 		log.info("Stoped [com.quickwebframework.core].");
 	}

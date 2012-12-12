@@ -15,25 +15,18 @@ public class CommonFilter implements Filter {
 	// QuickwebFramework的过滤器配置状态
 	public static final String QUICKWEBFRAMEWORK_STATE_FILTERCONFIG = "com.quickwebframework.state.FILTERCONFIG";
 
-	private Filter getFrameworkBridgeFilter() {
-		Object frameworkBridgeObject = QuickWebFrameworkLoaderListener
-				.getFrameworkBridgeObject();
-		if (frameworkBridgeObject == null) {
-			return null;
-		}
-		return (Filter) frameworkBridgeObject;
-	}
-
 	@Override
 	public void destroy() {
-		Filter frameworkBridgeFilter = getFrameworkBridgeFilter();
+		Filter frameworkBridgeFilter = QuickWebFrameworkLoaderListener
+				.getServletFilterBridgeObject();
 		if (frameworkBridgeFilter != null)
 			frameworkBridgeFilter.destroy();
 	}
 
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {
-		Filter frameworkBridgeFilter = getFrameworkBridgeFilter();
+		Filter frameworkBridgeFilter = QuickWebFrameworkLoaderListener
+				.getServletFilterBridgeObject();
 		if (frameworkBridgeFilter == null)
 			arg0.getServletContext().setAttribute(
 					QUICKWEBFRAMEWORK_STATE_FILTERCONFIG, arg0);
@@ -44,7 +37,8 @@ public class CommonFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest arg0, ServletResponse arg1,
 			FilterChain arg2) throws IOException, ServletException {
-		Filter frameworkBridgeFilter = getFrameworkBridgeFilter();
+		Filter frameworkBridgeFilter = QuickWebFrameworkLoaderListener
+				.getServletFilterBridgeObject();
 		if (frameworkBridgeFilter == null)
 			arg2.doFilter(arg0, arg1);
 		else

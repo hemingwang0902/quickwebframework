@@ -9,21 +9,24 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.Filter;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleListener;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
@@ -35,10 +38,43 @@ import com.quickwebframework.web.servlet.QwfServlet;
 import com.quickwebframework.web.thread.BundleAutoManageThread;
 
 public abstract class QuickWebFrameworkFactory {
-	static Logger logger = Logger.getLogger(QuickWebFrameworkFactory.class
-			.getName());
+	static {
+		loggerMap = new HashMap<String, Logger>();
+	}
 
-	public final static String CONST_FRAMEWORK_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.FrameworkBridge";
+	public static Logger logger = QuickWebFrameworkFactory
+			.getLogger(QuickWebFrameworkFactory.class.getName());
+
+	private static Map<String, Logger> loggerMap;
+
+	/**
+	 * 得到日志器
+	 * 
+	 * @param loggerName
+	 * @return
+	 */
+	public static Logger getLogger(String loggerName) {
+		if (loggerMap.containsKey(loggerName)) {
+			return loggerMap.get(loggerName);
+		}
+		Logger tmpLogger = Logger.getLogger(loggerName);
+		tmpLogger.setLevel(Level.FINEST);
+		if (logBridgeObject != null)
+			tmpLogger.addHandler(logBridgeObject);
+		loggerMap.put(loggerName, tmpLogger);
+		return tmpLogger;
+	}
+
+	public final static String CONST_FRAMEWORK_CORE_BUNDLE_NAME = "com.quickwebframework.core";
+	// HttpServlet桥接对象类名
+	public final static String CONST_HTTP_SERVLET_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.HttpServletBridge";
+	// 日志桥接对象类名
+	public final static String CONST_LOG_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.LogBridge";
+	// 过滤器桥接对象类名
+	public final static String CONST_SERVLET_FILTER_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.ServletFilterBridge";
+	// 监听器桥接对象类名
+	public final static String CONST_SERVLET_LISTENER_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.ServletListenerBridge";
+
 	public final static String PLUGIN_CONFIG_FILES_PROPERTY_KEY = "quickwebframework.pluginConfigFiles.";
 
 	// 配置文件路径参数名称
@@ -68,24 +104,64 @@ public abstract class QuickWebFrameworkFactory {
 		return framework.getBundleContext();
 	}
 
-	private static Object frameworkBridgeObject;
+	// HttpServlet桥接对象
+	private static HttpServlet httpServletBridgeObject;
+	// 日志桥接对象
+	private static Handler logBridgeObject;
+	// Servlet过滤器桥接对象
+	private static Filter servletFilterBridgeObject;
+	// Servlet监听器桥接对象
+	private static EventListener servletListenerBridgeObject;
 
-	/**
-	 * 得到框架桥接对象 此对象是HttpServlet,Filter,以及Servlet八大Listener的继承类或实现
-	 * 
-	 * @return
-	 */
-	public static Object getFrameworkBridgeObject() {
-		return frameworkBridgeObject;
+	public static HttpServlet getHttpServletBridgeObject() {
+		return httpServletBridgeObject;
 	}
 
-	// 刷新框架桥接对象
+	public static Handler getLogBridgeObject() {
+		return logBridgeObject;
+	}
+
+	public static Filter getServletFilterBridgeObject() {
+		return servletFilterBridgeObject;
+	}
+
+	public static EventListener getServletListenerBridgeObject() {
+		return servletListenerBridgeObject;
+	}
+
+	// 刷新框架各桥接对象
 	private static void refreshFrameworkBridgeObject() {
-		ServiceReference<?> serviceReference = getBundleContext()
-				.getServiceReference(CONST_FRAMEWORK_BRIDGE_CLASS_NAME);
+		httpServletBridgeObject = (HttpServlet) getOsgiServiceObject(CONST_HTTP_SERVLET_BRIDGE_CLASS_NAME);
+		logBridgeObject = (Handler) getOsgiServiceObject(CONST_LOG_BRIDGE_CLASS_NAME);
+		servletFilterBridgeObject = (Filter) getOsgiServiceObject(CONST_SERVLET_FILTER_BRIDGE_CLASS_NAME);
+		servletListenerBridgeObject = (EventListener) getOsgiServiceObject(CONST_SERVLET_LISTENER_BRIDGE_CLASS_NAME);
+
+		// 刷新各日志的处理器
+		if (logBridgeObject != null) {
+			synchronized (loggerMap) {
+				for (String tmpLoggerName : loggerMap.keySet()) {
+					Logger tmpLogger = loggerMap.get(tmpLoggerName);
+
+					// 先移除所有的处理器
+					Handler[] tmpLoggerHandlers = tmpLogger.getHandlers();
+					for (Handler tmpLoggerHandler : tmpLoggerHandlers) {
+						tmpLogger.removeHandler(tmpLoggerHandler);
+					}
+					// 添加框架中的日志处理器
+					tmpLogger.addHandler(logBridgeObject);
+				}
+			}
+		}
+	}
+
+	// 得到OSGi服务对象
+	private static Object getOsgiServiceObject(String serviceName) {
+		BundleContext bundleContext = getBundleContext();
+		ServiceReference<?> serviceReference = bundleContext
+				.getServiceReference(serviceName);
 		if (serviceReference == null)
-			return;
-		frameworkBridgeObject = getBundleContext().getService(serviceReference);
+			return null;
+		return bundleContext.getService(serviceReference);
 	}
 
 	// 相应的Servlet
@@ -279,16 +355,12 @@ public abstract class QuickWebFrameworkFactory {
 
 			// Bundle监听器
 			getBundleContext().addBundleListener(new BundleListener() {
-				public void bundleChanged(BundleEvent arg0) {
-				}
-			});
-			// Service监听器
-			getBundleContext().addServiceListener(new ServiceListener() {
-				public void serviceChanged(ServiceEvent arg0) {
-					// 如果是DispatcherServlet服务更改
-					if (arg0.getServiceReference().toString()
-							.contains(CONST_FRAMEWORK_BRIDGE_CLASS_NAME)) {
-						refreshFrameworkBridgeObject();
+				public void bundleChanged(BundleEvent event) {
+					if (event.getType() == BundleEvent.STARTED) {
+						if (event.getBundle().getSymbolicName()
+								.equals(CONST_FRAMEWORK_CORE_BUNDLE_NAME)) {
+							refreshFrameworkBridgeObject();
+						}
 					}
 				}
 			});

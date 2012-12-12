@@ -7,13 +7,14 @@ import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
 
+import com.quickwebframework.web.listener.QuickWebFrameworkFactory;
 import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 import com.quickwebframework.web.util.BundleUtil;
 
 public class BundleAutoManageThread extends Thread {
 
-	static Logger logger = Logger.getLogger(BundleAutoManageThread.class
-			.getName());
+	static Logger logger = QuickWebFrameworkFactory
+			.getLogger(BundleAutoManageThread.class.getName());
 
 	public final static String METAINF_FILE_PATH = "META-INF/MANIFEST.MF";
 
