@@ -1,89 +1,101 @@
 package com.quickwebframework.framework;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 
 import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
+import com.quickwebframework.util.BundleContextUtil;
 
-public class FrameworkContext {
+public abstract class FrameworkContext {
 
-	private static Log log = LogFactory.getLog(FrameworkContext.class);
-	// 核心Bundle
-	static Bundle coreBundle;
+	private static Log log = LogFactory
+			.getLog(FrameworkContext.class.getName());
+	private static List<FrameworkContext> contextList;
+	private ServiceListener serviceListener;
+	private Map<String, Field> serviceFieldMap;
 
-	// 插件名称插件Map
-	private static Map<String, Bundle> bundleNameBundleMap = new HashMap<String, Bundle>();
+	/**
+	 * 销毁时方法
+	 */
+	public abstract void destory();
 
-	// 根据插件名称得到Bundle
-	public static Bundle getBundleByName(String bundleName) {
-		if (bundleNameBundleMap.containsKey(bundleName)) {
-			return bundleNameBundleMap.get(bundleName);
-		}
-		return null;
-	}
+	public FrameworkContext() {
+		serviceFieldMap = new HashMap<String, Field>();
 
-	public static void init() {
-		BundleContext bundleContext = Activator.getContext();
-		FrameworkContext.coreBundle = bundleContext.getBundle();
-
-		// 添加OSGi插件监听器
-		bundleContext.addBundleListener(new BundleListener() {
-
+		final BundleContext bundleContext = Activator.getContext();
+		serviceListener = new ServiceListener() {
 			@Override
-			public void bundleChanged(BundleEvent arg0) {
-				int eventType = arg0.getType();
-				Bundle bundle = arg0.getBundle();
-				String bundleName = bundle.getSymbolicName();
-
-				// 如果插件已经启动
-				if (eventType == BundleEvent.STARTED) {
-					bundleNameBundleMap.put(bundleName, bundle);
-				}
-				// 如果插件的状态是正在停止或已经停止
-				else if (eventType == BundleEvent.STOPPED
-						|| eventType == BundleEvent.STOPPING) {
-					if (bundleNameBundleMap.containsKey(bundleName)) {
-						bundleNameBundleMap.remove(bundleName);
+			public void serviceChanged(ServiceEvent event) {
+				String changedServiceName = event.getServiceReference()
+						.toString();
+				for (String serviceName : serviceFieldMap.keySet()) {
+					if (changedServiceName.contains(serviceName)) {
+						Field field = serviceFieldMap.get(serviceName);
+						setServiceObjectToField(serviceName, field);
 					}
 				}
 			}
-		});
+		};
+		bundleContext.addServiceListener(serviceListener);
 
-		// 服务注册和取消时提示
-		bundleContext.addServiceListener(new ServiceListener() {
-			@Override
-			public void serviceChanged(ServiceEvent arg0) {
-				int serviceEventType = arg0.getType();
-				if (serviceEventType == ServiceEvent.REGISTERED) {
-					log.debug(String.format("[%s]插件的[%s]服务已注册", arg0
-							.getServiceReference().getBundle()
-							.getSymbolicName(), arg0.getServiceReference()));
-				} else if (serviceEventType == ServiceEvent.UNREGISTERING) {
-					log.debug(String.format("[%s]插件的[%s]服务正在取消注册", arg0
-							.getServiceReference().getBundle()
-							.getSymbolicName(), arg0.getServiceReference()));
-				}
-			}
-		});
+		if (contextList == null)
+			contextList = new ArrayList<FrameworkContext>();
 
-		LogContext.init();
-		IocContext.init();
-		ListenerContext.init();
-		FilterContext.init();
-		WebContext.init();
-		ThreadContext.init();
+		synchronized (contextList) {
+			contextList.add(this);
+		}
 	}
 
-	public static void destroy() {
-		FilterContext.destory();
+	@Override
+	public void finalize() {
+		BundleContext bundleContext = Activator.getContext();
+		bundleContext.removeServiceListener(serviceListener);
+		synchronized (contextList) {
+			contextList.remove(this);
+		}
+	}
+
+	// 得到所有的Context对象
+	public static FrameworkContext[] getContexts() {
+		if (contextList == null)
+			return new FrameworkContext[0];
+		return contextList.toArray(new FrameworkContext[0]);
+	}
+
+	private void setServiceObjectToField(String serviceName, Field field) {
+		field.setAccessible(true);
+		try {
+			field.set(this, BundleContextUtil.getServiceObject(
+					Activator.getContext(), serviceName));
+		} catch (Exception ex) {
+			log.error("给绑定OSGi服务的字段赋值时出现异常：" + ex.getMessage(), ex);
+		}
+	}
+
+	public void addSimpleServiceFieldLink(String serviceName, String fieldName) {
+		try {
+			Class<?> clazz = this.getClass();
+			Field field = clazz.getDeclaredField(fieldName);
+			serviceFieldMap.put(serviceName, field);
+			setServiceObjectToField(serviceName, field);
+		} catch (Exception ex) {
+			log.error("得到类的字段时出错，原因：" + ex.getMessage(), ex);
+			ex.printStackTrace();
+		}
+	}
+
+	public static void destoryAllContext() {
+		for (FrameworkContext context : getContexts()) {
+			context.destory();
+		}
 	}
 }

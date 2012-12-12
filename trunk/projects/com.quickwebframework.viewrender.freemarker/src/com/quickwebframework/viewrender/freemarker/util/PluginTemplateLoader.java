@@ -7,7 +7,7 @@ import java.net.URL;
 
 import org.osgi.framework.Bundle;
 
-import com.quickwebframework.framework.FrameworkContext;
+import com.quickwebframework.framework.OsgiContext;
 
 import freemarker.cache.TemplateLoader;
 
@@ -51,7 +51,7 @@ public class PluginTemplateLoader implements TemplateLoader {
 		// 对视图名称进行处理(添加前后缀)
 		path = viewNamePrefix + path + viewNameSuffix;
 
-		Bundle bundle = FrameworkContext.getBundleByName(pluginName);
+		Bundle bundle = OsgiContext.getInstance().getBundleByName(pluginName);
 
 		if (bundle == null) {
 			throw new RuntimeException(String.format(

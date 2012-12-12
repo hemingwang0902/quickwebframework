@@ -6,24 +6,35 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
 
+import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.service.IocFrameworkService;
 
-public class IocContext {
+public class IocContext extends FrameworkContext {
+	private static IocContext instance;
+
+	public static IocContext getInstance() {
+		if (instance == null) {
+			instance = new IocContext();
+			// instance.init();
+		}
+		return instance;
+	}
+
+	// ======变量部分开始
 	private static Log log = LogFactory.getLog(IocContext.class);
 
-	private static IocFrameworkService iocFrameworkService;
+	private IocFrameworkService iocFrameworkService;
 
-	public static void init() {
-		final BundleContext bundleContext = FrameworkContext.coreBundle
-				.getBundleContext();
-		// 刷新IoC框架服务
-		refreshIocFrameworkService(bundleContext);
+	// ======变量部分结束
+
+	public IocContext() {
+		super.addSimpleServiceFieldLink(IocFrameworkService.class.getName(),
+				"iocFrameworkService");
+
+		final BundleContext bundleContext = Activator.getContext();
 
 		bundleContext.addBundleListener(new BundleListener() {
 			@Override
@@ -38,34 +49,11 @@ public class IocContext {
 				}
 			}
 		});
-
-		bundleContext.addServiceListener(new ServiceListener() {
-			@Override
-			public void serviceChanged(ServiceEvent arg0) {
-				String serviceReferenceName = arg0.getServiceReference()
-						.toString();
-				// 如果IoC框架服务改变，刷新IoC框架
-				if (serviceReferenceName.contains(IocFrameworkService.class
-						.getName())) {
-					refreshIocFrameworkService(bundleContext);
-				}
-			}
-		});
 	}
 
-	// 刷新IoC框架服务
-	private static void refreshIocFrameworkService(BundleContext bundleContext) {
-		try {
-			ServiceReference<?> iocFrameworkServiceReference = bundleContext
-					.getServiceReference(IocFrameworkService.class.getName());
-			if (iocFrameworkServiceReference == null) {
-				iocFrameworkService = null;
-			} else {
-				iocFrameworkService = (IocFrameworkService) bundleContext
-						.getService(iocFrameworkServiceReference);
-			}
-		} catch (Exception ex) {
-		}
+	@Override
+	public void destory() {
+
 	}
 
 	/**
@@ -73,7 +61,7 @@ public class IocContext {
 	 * 
 	 * @param bundle
 	 */
-	public static void addBundle(Bundle bundle) {
+	public void addBundle(Bundle bundle) {
 		checkIocFrameworkExist();
 		iocFrameworkService.addBundle(bundle);
 	}
@@ -83,7 +71,7 @@ public class IocContext {
 	 * 
 	 * @param bundle
 	 */
-	public static void removeBundle(Bundle bundle) {
+	public void removeBundle(Bundle bundle) {
 		checkIocFrameworkExist();
 		iocFrameworkService.removeBundle(bundle);
 	}
@@ -95,12 +83,12 @@ public class IocContext {
 	 * @return
 	 */
 	@Deprecated
-	public static Object getBundleApplicationContext(Bundle bundle) {
+	public Object getBundleApplicationContext(Bundle bundle) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.getBundleApplicationContext(bundle);
 	}
 
-	private static void checkIocFrameworkExist() {
+	private void checkIocFrameworkExist() {
 		if (iocFrameworkService == null) {
 			log.error("未发现有注册的IocFrameworkService服务！");
 			throw new RuntimeException("未发现有注册的IocFrameworkService服务！");
@@ -113,7 +101,7 @@ public class IocContext {
 	 * @param bundle
 	 * @return
 	 */
-	public static boolean containsBundle(Bundle bundle) {
+	public boolean containsBundle(Bundle bundle) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.containsBundle(bundle);
 	}
@@ -125,7 +113,7 @@ public class IocContext {
 	 * @param beanName
 	 * @return
 	 */
-	public static boolean containsBean(Bundle bundle, String beanName) {
+	public boolean containsBean(Bundle bundle, String beanName) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.containsBean(bundle, beanName);
 	}
@@ -137,7 +125,7 @@ public class IocContext {
 	 * @param clazz
 	 * @return
 	 */
-	public static <T> T getBean(Bundle bundle, Class<T> clazz) {
+	public <T> T getBean(Bundle bundle, Class<T> clazz) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.getBean(bundle, clazz);
 	}
@@ -149,7 +137,7 @@ public class IocContext {
 	 * @param beanName
 	 * @return
 	 */
-	public static Object getBean(Bundle bundle, String beanName) {
+	public Object getBean(Bundle bundle, String beanName) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.getBean(bundle, beanName);
 	}
@@ -160,7 +148,7 @@ public class IocContext {
 	 * @param bundle
 	 * @return
 	 */
-	public static int getBeanDefinitionCount(Bundle bundle) {
+	public int getBeanDefinitionCount(Bundle bundle) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.getBeanDefinitionCount(bundle);
 	}
@@ -171,7 +159,7 @@ public class IocContext {
 	 * @param bundle
 	 * @return
 	 */
-	public static String[] getBeanDefinitionNames(Bundle bundle) {
+	public String[] getBeanDefinitionNames(Bundle bundle) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.getBeanDefinitionNames(bundle);
 	}
@@ -183,7 +171,7 @@ public class IocContext {
 	 * @param clazz
 	 * @return
 	 */
-	public static String[] getBeanNamesForType(Bundle bundle, Class<?> clazz) {
+	public String[] getBeanNamesForType(Bundle bundle, Class<?> clazz) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.getBeanNamesForType(bundle, clazz);
 	}
@@ -194,8 +182,7 @@ public class IocContext {
 	 * @param clazz
 	 * @return
 	 */
-	public static <T> Map<String, T> getBeansOfType(Bundle bundle,
-			Class<T> clazz) {
+	public <T> Map<String, T> getBeansOfType(Bundle bundle, Class<T> clazz) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.getBeansOfType(bundle, clazz);
 	}

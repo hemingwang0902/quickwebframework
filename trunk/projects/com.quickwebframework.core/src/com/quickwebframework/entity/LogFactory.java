@@ -4,10 +4,10 @@ import com.quickwebframework.framework.LogContext;
 
 public class LogFactory {
 	public static Log getLog(Class<?> clazz) {
-		return LogContext.getLog(clazz);
+		return LogContext.getInstance().getLog(clazz);
 	}
 
 	public static Log getLog(String name) {
-		return LogContext.getLog(name);
+		return LogContext.getInstance().getLog(name);
 	}
 }

@@ -7,10 +7,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
 
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
@@ -74,7 +71,8 @@ public class Activator implements BundleActivator {
 				});
 
 		log.warn("-----"
-				+ IocContext.getBeanDefinitionCount(bundleContext.getBundle()));
+				+ IocContext.getInstance().getBeanDefinitionCount(
+						bundleContext.getBundle()));
 		log.info("qwf.test.core插件已启动!");
 	}
 

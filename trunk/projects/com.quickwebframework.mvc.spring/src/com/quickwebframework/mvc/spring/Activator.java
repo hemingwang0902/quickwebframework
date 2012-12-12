@@ -41,7 +41,7 @@ public class Activator implements BundleActivator {
 				if (BundleEvent.STARTING == bundleEventType) {
 					Bundle startingBundle = arg0.getBundle();
 					// 添加到MVC框架中
-					WebContext.addBundle(startingBundle);
+					WebContext.getInstance().addBundle(startingBundle);
 				}
 			}
 		});

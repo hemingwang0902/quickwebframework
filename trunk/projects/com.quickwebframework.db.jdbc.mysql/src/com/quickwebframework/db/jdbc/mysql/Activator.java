@@ -39,8 +39,8 @@ public class Activator implements BundleActivator {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.db.jdbc.properties'！");
 		}
-		jdbcPropertyFilePath = WebContext.getServletContext().getRealPath(
-				jdbcPropertyFilePath);
+		jdbcPropertyFilePath = WebContext.getInstance().getServletContext()
+				.getRealPath(jdbcPropertyFilePath);
 		databaseService = new DatabaseServiceImpl(jdbcPropertyFilePath);
 		databaseService.registerService();
 	}

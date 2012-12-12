@@ -9,49 +9,71 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 
+import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 
-public abstract class ThreadContext {
-	private static Log log = LogFactory.getLog(ThreadContext.class);
+public class ThreadContext extends FrameworkContext {
 
-	public static void init() {
-		final Bundle coreBundle = FrameworkContext.coreBundle;
-		coreBundle.getBundleContext().addBundleListener(new BundleListener() {
-			@Override
-			public void bundleChanged(BundleEvent arg0) {
-				int eventType = arg0.getType();
-				Bundle bundle = arg0.getBundle();
+	private static ThreadContext instance;
 
-				// 如果插件的状态是正在停止或已经停止
-				if (eventType == BundleEvent.STOPPED
-						|| eventType == BundleEvent.STOPPING) {
-					if (bundle.equals(coreBundle)) {
-						removeAllFilter();
-					} else {
-						removeBundleAllThread(bundle);
-					}
-				}
-			}
-		});
+	public static ThreadContext getInstance() {
+		if (instance == null) {
+			instance = new ThreadContext();
+			// instance.init();
+		}
+		return instance;
 	}
 
-	private static List<Thread> threadList = new ArrayList<Thread>();
-	private static Map<Bundle, List<Thread>> bundleThreadListMap = new HashMap<Bundle, List<Thread>>();
+	private static Log log = LogFactory.getLog(ThreadContext.class);
+	// ====== 变量部分开始
+	private List<Thread> threadList;
+	private Map<Bundle, List<Thread>> bundleThreadListMap;
+	private BundleListener bundleListener;
 
 	/**
 	 * 得到线程列表
 	 * 
 	 * @return
 	 */
-	public static List<Thread> getThreadList() {
+	public List<Thread> getThreadList() {
 		return threadList;
+	}
+
+	// ====== 变量部分结束
+
+	public ThreadContext() {
+		threadList = new ArrayList<Thread>();
+		bundleThreadListMap = new HashMap<Bundle, List<Thread>>();
+		bundleListener = new BundleListener() {
+			@Override
+			public void bundleChanged(BundleEvent arg0) {
+				int eventType = arg0.getType();
+				Bundle bundle = arg0.getBundle();
+				Bundle coreBundle = Activator.getContext().getBundle();
+				// 如果插件的状态是正在停止或已经停止
+				if (eventType == BundleEvent.STOPPED
+						|| eventType == BundleEvent.STOPPING) {
+					if (bundle.equals(coreBundle)) {
+						removeAllThread();
+					} else {
+						removeBundleAllThread(bundle);
+					}
+				}
+			}
+		};
+		Activator.getContext().addBundleListener(bundleListener);
+	}
+
+	@Override
+	public void destory() {
+		Activator.getContext().removeBundleListener(bundleListener);
 	}
 
 	/**
 	 * 移除所有的线程
 	 */
-	public static void removeAllFilter() {
+	public void removeAllThread() {
 		for (Bundle bundle : bundleThreadListMap.keySet()
 				.toArray(new Bundle[0])) {
 			removeBundleAllThread(bundle);
@@ -63,7 +85,7 @@ public abstract class ThreadContext {
 	 * 
 	 * @param bundle
 	 */
-	public static void removeBundleAllThread(Bundle bundle) {
+	public void removeBundleAllThread(Bundle bundle) {
 		if (!bundleThreadListMap.containsKey(bundle))
 			return;
 		Thread[] bundleThreadArray = bundleThreadListMap.get(bundle).toArray(
@@ -81,7 +103,7 @@ public abstract class ThreadContext {
 	 * @param bundle
 	 * @param thread
 	 */
-	public static void removeThread(Bundle bundle, Thread thread) {
+	public void removeThread(Bundle bundle, Thread thread) {
 
 		// 从Bundle对应的线程列表中移除
 		if (!bundleThreadListMap.containsKey(bundle))
@@ -115,7 +137,7 @@ public abstract class ThreadContext {
 	 * @param bundle
 	 * @param thread
 	 */
-	public static void addThread(Bundle bundle, Thread thread) {
+	public void addThread(Bundle bundle, Thread thread) {
 
 		String threadClassName = thread.getClass().getName();
 		// 是否存在同类名实例
