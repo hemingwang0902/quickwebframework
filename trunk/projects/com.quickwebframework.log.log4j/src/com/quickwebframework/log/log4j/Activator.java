@@ -7,6 +7,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.log.log4j.service.impl.LogServiceImpl;
 import com.quickwebframework.service.LogService;
 
@@ -22,9 +23,8 @@ public class Activator implements BundleActivator {
 		String log4jConfigFilePath = null;
 
 		ServiceReference<?>[] serviceReferences = context
-				.getServiceReferences(
-						String.class.getName(),
-						"(quickwebframework.pluginConfigFile=com.quickwebframework.log.log4j.properties)");
+				.getServiceReferences(String.class.getName(),
+						"(quickwebframework.config=com.quickwebframework.log.log4j.properties)");
 		if (serviceReferences != null && serviceReferences.length > 0) {
 			log4jConfigFilePath = (String) context
 					.getService(serviceReferences[0]);
@@ -32,10 +32,11 @@ public class Activator implements BundleActivator {
 
 		if (log4jConfigFilePath == null || log4jConfigFilePath.isEmpty()) {
 			throw new RuntimeException(
-					"Can't found property 'quickwebframework.pluginConfigFile.com.quickwebframework.log.log4j.properties'！");
-		} else {
-			PropertyConfigurator.configure(log4jConfigFilePath);
+					"Can't found property 'quickwebframework.config.com.quickwebframework.log.log4j.properties'！");
 		}
+		log4jConfigFilePath = WebContext.getServletContext().getRealPath(
+				log4jConfigFilePath);
+		PropertyConfigurator.configure(log4jConfigFilePath);
 
 		// 注册为服务
 		LogService logService = new LogServiceImpl();

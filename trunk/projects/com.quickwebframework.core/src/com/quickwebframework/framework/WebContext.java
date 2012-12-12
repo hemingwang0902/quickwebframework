@@ -11,6 +11,7 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 
+import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.HandlerExceptionResolver;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
@@ -19,6 +20,7 @@ import com.quickwebframework.service.ViewRenderService;
 
 public class WebContext {
 	private static Log log = LogFactory.getLog(WebContext.class);
+	public static final String BUNDLE_METHOD_URL_TEMPLATE = "com.quickwebframework.util.BUNDLE_METHOD_URL_TEMPLATE";
 
 	// 插件方法URL模板
 	public static String bundleMethodUrlTemplate;
@@ -161,8 +163,15 @@ public class WebContext {
 	}
 
 	public static void init() {
-		final BundleContext bundleContext = FrameworkContext.coreBundle
-				.getBundleContext();
+		final BundleContext bundleContext = Activator.getContext();
+
+		// 设置插件方法URL模板
+		ServletContext servletContext = getServletContext();
+		Object tmpObj = servletContext.getAttribute(BUNDLE_METHOD_URL_TEMPLATE);
+		if (tmpObj != null) {
+			WebContext.bundleMethodUrlTemplate = tmpObj.toString();
+		}
+
 		// 刷新视图渲染器
 		refreshViewRenderService(bundleContext);
 		// 刷新MVC框架服务
@@ -204,4 +213,7 @@ public class WebContext {
 		});
 	}
 
+	public static void destory() {
+
+	}
 }

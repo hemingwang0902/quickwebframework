@@ -75,7 +75,8 @@ public abstract class QuickWebFrameworkFactory {
 	// 监听器桥接对象类名
 	public final static String CONST_SERVLET_LISTENER_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.ServletListenerBridge";
 
-	public final static String PLUGIN_CONFIG_FILES_PROPERTY_KEY = "quickwebframework.pluginConfigFiles.";
+	// 插件配置
+	public final static String PLUGIN_CONFIG_PROPERTY_KEY = "quickwebframework.config";
 
 	// 配置文件路径参数名称
 	public final static String CONFIG_LOCATION_PARAMETER_NAME = "quickwebframeworkConfigLocation";
@@ -338,16 +339,16 @@ public abstract class QuickWebFrameworkFactory {
 			while (quickWebFrameworkPropertieNameEnumeration.hasMoreElements()) {
 				String propertieName = (String) quickWebFrameworkPropertieNameEnumeration
 						.nextElement();
-				if (propertieName.startsWith(PLUGIN_CONFIG_FILES_PROPERTY_KEY)) {
+				if (propertieName.startsWith(PLUGIN_CONFIG_PROPERTY_KEY + ".")) {
 					String propName = propertieName
-							.substring(PLUGIN_CONFIG_FILES_PROPERTY_KEY
+							.substring((PLUGIN_CONFIG_PROPERTY_KEY + ".")
 									.length());
-					String filePath = quickWebFrameworkProperties
+					String propValue = quickWebFrameworkProperties
 							.getProperty(propertieName);
 					Dictionary<String, String> dict = new Hashtable<String, String>();
-					dict.put("quickwebframework.pluginConfigFile", propName);
+					dict.put(PLUGIN_CONFIG_PROPERTY_KEY, propName);
 					getBundleContext().registerService(String.class.getName(),
-							servletContext.getRealPath(filePath), dict);
+							propValue, dict);
 				}
 			}
 			// 设置WEB根目录到系统配置中

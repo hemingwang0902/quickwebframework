@@ -10,14 +10,19 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 
+import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.stereotype.FilterSetting;
 
 public class FilterContext {
+
+	// QuickwebFramework的过滤器配置状态
+	public static final String QUICKWEBFRAMEWORK_STATE_FILTERCONFIG = "com.quickwebframework.state.FILTERCONFIG";
 
 	/**
 	 * 从上层传递下来的过滤器配置
@@ -53,8 +58,11 @@ public class FilterContext {
 
 	private static Log log = LogFactory.getLog(FilterContext.class);
 
+	// 初始化方法
 	public static void init() {
-		final Bundle coreBundle = FrameworkContext.coreBundle;
+		BundleContext bundleContext = Activator.getContext();
+		final Bundle coreBundle = bundleContext.getBundle();
+
 		coreBundle.getBundleContext().addBundleListener(new BundleListener() {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
@@ -72,6 +80,21 @@ public class FilterContext {
 				}
 			}
 		});
+
+		// 启动时，从ServletContext中读取相关运行时状态
+		Object filterConfigObject = WebContext.getServletContext()
+				.getAttribute(QUICKWEBFRAMEWORK_STATE_FILTERCONFIG);
+		if (filterConfigObject != null)
+			FilterContext.setFilterConfig((FilterConfig) filterConfigObject);
+
+	}
+
+	// 销毁方法
+	public static void destory() {
+		// 停止时，保存相关运行时状态到ServletContext中。
+		WebContext.getServletContext().setAttribute(
+				QUICKWEBFRAMEWORK_STATE_FILTERCONFIG,
+				FilterContext.getFilterConfig());
 	}
 
 	private static List<Filter> filterList = new ArrayList<Filter>();
