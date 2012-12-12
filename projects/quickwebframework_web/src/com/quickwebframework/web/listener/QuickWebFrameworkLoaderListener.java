@@ -27,15 +27,15 @@ public class QuickWebFrameworkLoaderListener extends QuickWebFrameworkFactory
 		// 启动OSGi框架
 		startOSGiFreamwork(arg0.getServletContext());
 
-		if (getFrameworkBridgeObject() != null)
-			((ServletContextListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((ServletContextListener) getServletListenerBridgeObject())
 					.contextInitialized(arg0);
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((ServletContextListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((ServletContextListener) getServletListenerBridgeObject())
 					.contextDestroyed(arg0);
 
 		// 停止OSGi框架
@@ -47,22 +47,22 @@ public class QuickWebFrameworkLoaderListener extends QuickWebFrameworkFactory
 	// 开始 ServletContextAttributeListener
 	@Override
 	public void attributeAdded(ServletContextAttributeEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((ServletContextAttributeListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((ServletContextAttributeListener) getServletListenerBridgeObject())
 					.attributeAdded(arg0);
 	}
 
 	@Override
 	public void attributeRemoved(ServletContextAttributeEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((ServletContextAttributeListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((ServletContextAttributeListener) getServletListenerBridgeObject())
 					.attributeRemoved(arg0);
 	}
 
 	@Override
 	public void attributeReplaced(ServletContextAttributeEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((ServletContextAttributeListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((ServletContextAttributeListener) getServletListenerBridgeObject())
 					.attributeReplaced(arg0);
 	}
 
@@ -71,15 +71,15 @@ public class QuickWebFrameworkLoaderListener extends QuickWebFrameworkFactory
 	// 开始 ServletRequestListener
 	@Override
 	public void requestDestroyed(ServletRequestEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((ServletRequestListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((ServletRequestListener) getServletListenerBridgeObject())
 					.requestDestroyed(arg0);
 	}
 
 	@Override
 	public void requestInitialized(ServletRequestEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((ServletRequestListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((ServletRequestListener) getServletListenerBridgeObject())
 					.requestInitialized(arg0);
 	}
 
@@ -88,22 +88,22 @@ public class QuickWebFrameworkLoaderListener extends QuickWebFrameworkFactory
 	// 开始 ServletRequestAttributeListener
 	@Override
 	public void attributeAdded(ServletRequestAttributeEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((ServletRequestAttributeListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((ServletRequestAttributeListener) getServletListenerBridgeObject())
 					.attributeAdded(arg0);
 	}
 
 	@Override
 	public void attributeRemoved(ServletRequestAttributeEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((ServletRequestAttributeListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((ServletRequestAttributeListener) getServletListenerBridgeObject())
 					.attributeRemoved(arg0);
 	}
 
 	@Override
 	public void attributeReplaced(ServletRequestAttributeEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((ServletRequestAttributeListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((ServletRequestAttributeListener) getServletListenerBridgeObject())
 					.attributeReplaced(arg0);
 	}
 
@@ -112,15 +112,15 @@ public class QuickWebFrameworkLoaderListener extends QuickWebFrameworkFactory
 	// 开始 HttpSessionActivationListener
 	@Override
 	public void sessionDidActivate(HttpSessionEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((HttpSessionActivationListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((HttpSessionActivationListener) getServletListenerBridgeObject())
 					.sessionDidActivate(arg0);
 	}
 
 	@Override
 	public void sessionWillPassivate(HttpSessionEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((HttpSessionActivationListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((HttpSessionActivationListener) getServletListenerBridgeObject())
 					.sessionWillPassivate(arg0);
 	}
 
@@ -129,22 +129,22 @@ public class QuickWebFrameworkLoaderListener extends QuickWebFrameworkFactory
 	// 开始 HttpSessionAttributeListener
 	@Override
 	public void attributeAdded(HttpSessionBindingEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((HttpSessionAttributeListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((HttpSessionAttributeListener) getServletListenerBridgeObject())
 					.attributeAdded(arg0);
 	}
 
 	@Override
 	public void attributeRemoved(HttpSessionBindingEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((HttpSessionAttributeListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((HttpSessionAttributeListener) getServletListenerBridgeObject())
 					.attributeRemoved(arg0);
 	}
 
 	@Override
 	public void attributeReplaced(HttpSessionBindingEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((HttpSessionAttributeListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((HttpSessionAttributeListener) getServletListenerBridgeObject())
 					.attributeReplaced(arg0);
 	}
 
@@ -153,15 +153,15 @@ public class QuickWebFrameworkLoaderListener extends QuickWebFrameworkFactory
 	// 开始 HttpSessionBindingListener
 	@Override
 	public void valueBound(HttpSessionBindingEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((HttpSessionBindingListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((HttpSessionBindingListener) getServletListenerBridgeObject())
 					.valueBound(arg0);
 	}
 
 	@Override
 	public void valueUnbound(HttpSessionBindingEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((HttpSessionBindingListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((HttpSessionBindingListener) getServletListenerBridgeObject())
 					.valueUnbound(arg0);
 	}
 
@@ -170,15 +170,15 @@ public class QuickWebFrameworkLoaderListener extends QuickWebFrameworkFactory
 	// 开始 HttpSessionListener
 	@Override
 	public void sessionCreated(HttpSessionEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((HttpSessionListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((HttpSessionListener) getServletListenerBridgeObject())
 					.sessionCreated(arg0);
 	}
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent arg0) {
-		if (getFrameworkBridgeObject() != null)
-			((HttpSessionListener) getFrameworkBridgeObject())
+		if (getServletListenerBridgeObject() != null)
+			((HttpSessionListener) getServletListenerBridgeObject())
 					.sessionDestroyed(arg0);
 	}
 	// 结束 HttpSessionListener

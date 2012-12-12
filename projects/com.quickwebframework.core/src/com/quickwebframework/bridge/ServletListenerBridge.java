@@ -19,16 +19,11 @@ import javax.servlet.http.HttpSessionListener;
 
 import com.quickwebframework.framework.ListenerContext;
 
-public abstract class ListenerBridge extends FilterBridge implements
-		ServletContextListener, ServletContextAttributeListener,
-		ServletRequestListener, ServletRequestAttributeListener,
-		HttpSessionActivationListener, HttpSessionAttributeListener,
-		HttpSessionBindingListener, HttpSessionListener {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3779917967114677693L;
+public class ServletListenerBridge implements ServletContextListener,
+		ServletContextAttributeListener, ServletRequestListener,
+		ServletRequestAttributeListener, HttpSessionActivationListener,
+		HttpSessionAttributeListener, HttpSessionBindingListener,
+		HttpSessionListener {
 
 	// 开始 ServletContextListener
 	@Override

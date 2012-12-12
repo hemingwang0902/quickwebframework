@@ -9,16 +9,15 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import com.quickwebframework.entity.Log;
+import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.framework.FilterContext;
 import com.quickwebframework.stereotype.FilterSetting;
 
-public abstract class FilterBridge extends ServletBridge implements
-		javax.servlet.Filter {
+public class ServletFilterBridge implements javax.servlet.Filter {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7816449987888773855L;
+	private static Log log = LogFactory.getLog(ServletFilterBridge.class
+			.getName());
 
 	public class ArrayFilterChain implements FilterChain {
 		private Filter[] filters;

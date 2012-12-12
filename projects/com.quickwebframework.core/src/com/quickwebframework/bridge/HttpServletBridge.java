@@ -21,13 +21,13 @@ import com.quickwebframework.entity.MvcModelAndView;
 import com.quickwebframework.framework.FrameworkContext;
 import com.quickwebframework.framework.WebContext;
 
-public class ServletBridge extends HttpServlet {
+public class HttpServletBridge extends HttpServlet {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -6484809258029142503L;
 
-	public static Log log = LogFactory.getLog(ServletBridge.class);
+	public static Log log = LogFactory.getLog(HttpServletBridge.class);
 	public static final String ARG_BUNDLE_NAME = "com.quickwebframework.util.ARG_BUNDLE_NAME";
 	public static final String ARG_METHOD_NAME = "com.quickwebframework.util.ARG_METHOD_NAME";
 	public static final String ARG_RESOURCE_PATH = "com.quickwebframework.util.ARG_RESOURCE_PATH";
@@ -153,8 +153,12 @@ public class ServletBridge extends HttpServlet {
 						String url = httpMethodInfo.getMappingUrl();
 						String httpMethod = httpMethodInfo.getHttpMethod();
 						sb.append("<tr><td><a style=\"margin-left:20px\" href=\""
-								+ url + "\">" + url + "</a>(" +  httpMethod
-								 + ")</td></tr>");
+								+ url
+								+ "\">"
+								+ url
+								+ "</a>("
+								+ httpMethod
+								+ ")</td></tr>");
 					}
 				}
 				sb.append("</table>");

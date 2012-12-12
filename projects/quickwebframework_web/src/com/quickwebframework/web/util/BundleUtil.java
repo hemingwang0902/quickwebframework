@@ -22,6 +22,8 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
 import org.osgi.framework.wiring.FrameworkWiring;
 
+import com.quickwebframework.web.listener.QuickWebFrameworkFactory;
+
 /**
  * 插件辅助类
  * 
@@ -29,7 +31,9 @@ import org.osgi.framework.wiring.FrameworkWiring;
  * 
  */
 public class BundleUtil {
-	static Logger logger = Logger.getLogger(BundleUtil.class.getName());
+	static Logger logger = QuickWebFrameworkFactory.getLogger(BundleUtil.class
+			.getName());
+
 	// 插件方法URL模板
 	public static String bundleMethodUrlTemplate;
 
