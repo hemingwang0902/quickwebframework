@@ -30,21 +30,16 @@ public class OsgiContext extends FrameworkContext {
 	// static Bundle coreBundle;
 	// 插件名称插件Map
 	private static Map<String, Bundle> bundleNameBundleMap;
+	// 插件监听器
+	private BundleListener bundleListener;
+	// 服务监听器
+	private ServiceListener serviceListener;
 
 	// ======变量开始结束
 
 	public OsgiContext() {
 		bundleNameBundleMap = new HashMap<String, Bundle>();
-	}
-
-	@Override
-	public void init() {
-
-		BundleContext bundleContext = Activator.getContext();
-		// coreBundle = bundleContext.getBundle();
-
-		// 添加OSGi插件监听器
-		bundleContext.addBundleListener(new BundleListener() {
+		bundleListener = new BundleListener() {
 
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
@@ -52,41 +47,59 @@ public class OsgiContext extends FrameworkContext {
 				Bundle bundle = arg0.getBundle();
 				String bundleName = bundle.getSymbolicName();
 
-				// 如果插件已经启动
-				if (eventType == BundleEvent.STARTED) {
+				if (eventType == BundleEvent.STARTING) {
+					log.debug(String.format("正在启动插件[%s]...", bundleName));
+				} else if (eventType == BundleEvent.STARTED) {
+					log.debug(String.format("插件[%s]已启动", bundleName));
 					bundleNameBundleMap.put(bundleName, bundle);
-				}
-				// 如果插件的状态是正在停止或已经停止
-				else if (eventType == BundleEvent.STOPPED
-						|| eventType == BundleEvent.STOPPING) {
+				} else if (eventType == BundleEvent.STOPPING) {
+					log.debug(String.format("正在停止插件[%s]...", bundleName));
+				} else if (eventType == BundleEvent.STOPPED) {
+					log.debug(String.format("插件[%s]已停止", bundleName));
 					if (bundleNameBundleMap.containsKey(bundleName)) {
 						bundleNameBundleMap.remove(bundleName);
 					}
 				}
 			}
-		});
+		};
 
-		// 服务注册和取消时提示
-		bundleContext.addServiceListener(new ServiceListener() {
+		serviceListener = new ServiceListener() {
 			@Override
 			public void serviceChanged(ServiceEvent arg0) {
 				int serviceEventType = arg0.getType();
 				if (serviceEventType == ServiceEvent.REGISTERED) {
-					log.debug(String.format("[%s]插件的[%s]服务已注册", arg0
+					log.debug(String.format("[%s]插件的[%s]服务已经注册", arg0
+							.getServiceReference().getBundle()
+							.getSymbolicName(), arg0.getServiceReference()));
+				} else if (serviceEventType == ServiceEvent.MODIFIED) {
+					log.debug(String.format("[%s]插件的[%s]服务已变更", arg0
 							.getServiceReference().getBundle()
 							.getSymbolicName(), arg0.getServiceReference()));
 				} else if (serviceEventType == ServiceEvent.UNREGISTERING) {
-					log.debug(String.format("[%s]插件的[%s]服务正在取消注册", arg0
+					log.debug(String.format("[%s]插件的[%s]服务正在取消注册...", arg0
 							.getServiceReference().getBundle()
 							.getSymbolicName(), arg0.getServiceReference()));
 				}
 			}
-		});
+		};
+	}
+
+	@Override
+	public void init() {
+		BundleContext bundleContext = Activator.getContext();
+		// 添加OSGi插件监听器
+		bundleContext.addBundleListener(bundleListener);
+		// 添加OSGi服务监听器
+		bundleContext.addServiceListener(serviceListener);
 	}
 
 	@Override
 	public void destory() {
-
+		BundleContext bundleContext = Activator.getContext();
+		// 移除OSGi插件监听器
+		bundleContext.removeBundleListener(bundleListener);
+		// 移除OSGi服务监听器
+		bundleContext.removeServiceListener(serviceListener);
 	}
 
 	// 根据插件名称得到Bundle

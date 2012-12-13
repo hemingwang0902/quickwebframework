@@ -11,14 +11,11 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 
 import com.quickwebframework.core.Activator;
-import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.util.BundleContextUtil;
 
 public abstract class FrameworkContext {
 
-	private static Log log = LogFactory
-			.getLog(FrameworkContext.class.getName());
 	private static List<FrameworkContext> contextList;
 	private ServiceListener serviceListener;
 	private Map<String, Field> serviceFieldMap;
@@ -82,26 +79,29 @@ public abstract class FrameworkContext {
 			field.set(null, BundleContextUtil.getServiceObject(
 					Activator.getContext(), serviceName));
 		} catch (Exception ex) {
-			log.error("给绑定OSGi服务的字段赋值时出现异常：" + ex.getMessage(), ex);
+			LogFactory.getLog(FrameworkContext.class.getName()).error(
+					"给绑定OSGi服务的字段赋值时出现异常：" + ex.getMessage(), ex);
 		}
 	}
 
-	public void addSimpleServiceStaticFieldLink(String serviceName, String fieldName) {
+	public void addSimpleServiceStaticFieldLink(String serviceName,
+			String fieldName) {
 		try {
 			Class<?> clazz = this.getClass();
 			Field field = clazz.getDeclaredField(fieldName);
 			serviceFieldMap.put(serviceName, field);
 			setServiceObjectToStaticField(serviceName, field);
 		} catch (Exception ex) {
-			log.error("得到类的字段时出错，原因：" + ex.getMessage(), ex);
+			LogFactory.getLog(FrameworkContext.class.getName()).error(
+					"得到类的字段时出错，原因：" + ex.getMessage(), ex);
 			ex.printStackTrace();
 		}
 	}
 
 	public static void initAllContext() {
+		LogContext.getInstance();
 		WebContext.getInstance();
 		IocContext.getInstance();
-		LogContext.getInstance();
 		OsgiContext.getInstance();
 		ThreadContext.getInstance();
 

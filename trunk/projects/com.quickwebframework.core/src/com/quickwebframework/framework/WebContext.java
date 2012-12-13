@@ -16,6 +16,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.bridge.HttpServletBridge;
 import com.quickwebframework.bridge.ServletFilterBridge;
@@ -62,6 +63,8 @@ public class WebContext extends FrameworkContext {
 	private static HttpServlet urlNotFoundHandleServlet;
 	// 得到处理器异常解决器
 	private static HandlerExceptionResolver handlerExceptionResolver;
+	// HttpServlet桥接对象
+	private ServiceRegistration<?> httpServletBridgeServiceRegistration;
 
 	public static MvcFrameworkService getMvcFrameworkService() {
 		return mvcFrameworkService;
@@ -108,6 +111,8 @@ public class WebContext extends FrameworkContext {
 	private static FilterConfig filterConfig;
 	private static List<Filter> filterList;
 	private static Map<Bundle, List<Filter>> bundleFilterListMap;
+	// 过滤器桥接对象
+	private ServiceRegistration<?> servletFilterBridgeServiceRegistration;
 
 	/**
 	 * 得到过滤器配置
@@ -151,6 +156,8 @@ public class WebContext extends FrameworkContext {
 	private static List<EventListener> listenerList;
 	private static Map<String, List<EventListener>> typeNameListenerListMap;
 	private static Map<Bundle, List<EventListener>> bundleListenerListMap;
+	// 监听器桥接对象
+	private ServiceRegistration<?> servletListenerBridgeServiceRegistration;
 
 	// ===== 监听器变量部分结束
 
@@ -160,26 +167,6 @@ public class WebContext extends FrameworkContext {
 		listenerList = new ArrayList<EventListener>();
 		typeNameListenerListMap = new HashMap<String, List<EventListener>>();
 		bundleListenerListMap = new HashMap<Bundle, List<EventListener>>();
-	}
-
-	@Override
-	public void init() {
-		super.addSimpleServiceStaticFieldLink(ServletContext.class.getName(),
-				"servletContext");
-		super.addSimpleServiceStaticFieldLink(
-				ViewRenderService.class.getName(), "viewRenderService");
-		super.addSimpleServiceStaticFieldLink(
-				MvcFrameworkService.class.getName(), "mvcFrameworkService");
-
-		final BundleContext bundleContext = Activator.getContext();
-
-		// 设置插件方法URL模板
-		ServletContext servletContext = getServletContext();
-		Object tmpObj = servletContext.getAttribute(BUNDLE_METHOD_URL_TEMPLATE);
-		if (tmpObj != null) {
-			bundleMethodUrlTemplate = tmpObj.toString();
-		}
-
 		bundleListener = new BundleListener() {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
@@ -209,6 +196,27 @@ public class WebContext extends FrameworkContext {
 				}
 			}
 		};
+	}
+
+	@Override
+	public void init() {
+		super.addSimpleServiceStaticFieldLink(ServletContext.class.getName(),
+				"servletContext");
+		super.addSimpleServiceStaticFieldLink(
+				ViewRenderService.class.getName(), "viewRenderService");
+		super.addSimpleServiceStaticFieldLink(
+				MvcFrameworkService.class.getName(), "mvcFrameworkService");
+
+		final BundleContext bundleContext = Activator.getContext();
+
+		// 设置插件方法URL模板
+		ServletContext servletContext = getServletContext();
+		Object tmpObj = servletContext.getAttribute(BUNDLE_METHOD_URL_TEMPLATE);
+		if (tmpObj != null) {
+			bundleMethodUrlTemplate = tmpObj.toString();
+		}
+
+		// 添加插件监听器
 		bundleContext.addBundleListener(bundleListener);
 
 		// 启动时，从ServletContext中读取相关运行时状态
@@ -218,20 +226,26 @@ public class WebContext extends FrameworkContext {
 			setFilterConfig((FilterConfig) filterConfigObject);
 
 		// 注册HttpServlet桥接对象
-		bundleContext.registerService(HttpServletBridge.class.getName(),
-				new HttpServletBridge(), null);
+		httpServletBridgeServiceRegistration = bundleContext.registerService(
+				HttpServletBridge.class.getName(), new HttpServletBridge(),
+				null);
 		// 注册过滤器桥接对象
-		bundleContext.registerService(ServletFilterBridge.class.getName(),
-				new ServletFilterBridge(), null);
+		servletFilterBridgeServiceRegistration = bundleContext.registerService(
+				ServletFilterBridge.class.getName(), new ServletFilterBridge(),
+				null);
 		// 注册监听器桥接对象
-		bundleContext.registerService(ServletListenerBridge.class.getName(),
-				new ServletListenerBridge(), null);
+		servletListenerBridgeServiceRegistration = bundleContext
+				.registerService(ServletListenerBridge.class.getName(),
+						new ServletListenerBridge(), null);
 	}
 
 	@Override
 	public void destory() {
-		if (bundleListener != null)
-			Activator.getContext().removeBundleListener(bundleListener);
+		Activator.getContext().removeBundleListener(bundleListener);
+		httpServletBridgeServiceRegistration.unregister();
+		servletFilterBridgeServiceRegistration.unregister();
+		servletListenerBridgeServiceRegistration.unregister();
+
 		// 停止时，保存相关运行时状态到ServletContext中。
 		getServletContext().setAttribute(QUICKWEBFRAMEWORK_STATE_FILTERCONFIG,
 				getFilterConfig());

@@ -43,11 +43,6 @@ public class ThreadContext extends FrameworkContext {
 	public ThreadContext() {
 		threadList = new ArrayList<Thread>();
 		bundleThreadListMap = new HashMap<Bundle, List<Thread>>();
-	}
-
-	@Override
-	public void init() {
-
 		bundleListener = new BundleListener() {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
@@ -65,6 +60,11 @@ public class ThreadContext extends FrameworkContext {
 				}
 			}
 		};
+	}
+
+	@Override
+	public void init() {
+		// 注册
 		Activator.getContext().addBundleListener(bundleListener);
 	}
 
