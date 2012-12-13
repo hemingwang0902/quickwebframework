@@ -254,9 +254,17 @@ public class BundleUtil {
 						+ bundle.getSymbolicName());
 			}
 			frameworkWiring.refreshBundles(null);
+
 		} catch (Error error) {
 			logger.warning("RemovalPendingBundle error." + error.getMessage());
 		}
+
+		// 休息1秒钟
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+
 		// 重新排出启动或刷新顺序
 		List<BundleInfo> shouldStartBundleInfoList = getShouldRefreshBundleInfoList(
 				bundleInfoList, BundleUtil.getAllBundleInfoList(bundleContext));

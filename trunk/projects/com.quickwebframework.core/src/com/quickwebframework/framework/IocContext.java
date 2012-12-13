@@ -11,6 +11,7 @@ import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.service.IocFrameworkService;
+import com.quickwebframework.util.BundleContextUtil;
 
 public class IocContext extends FrameworkContext {
 	private static IocContext instance;
@@ -96,8 +97,15 @@ public class IocContext extends FrameworkContext {
 
 	private static void checkIocFrameworkExist() {
 		if (iocFrameworkService == null) {
-			log.error("未发现有注册的IocFrameworkService服务！");
-			throw new RuntimeException("未发现有注册的IocFrameworkService服务！");
+			// 再尝试获取一次
+			Object obj = BundleContextUtil
+					.getServiceObject(Activator.getContext(),
+							IocFrameworkService.class.getName());
+			if (obj == null) {
+				log.error("未发现有注册的IocFrameworkService服务！");
+				throw new RuntimeException("未发现有注册的IocFrameworkService服务！");
+			}
+			iocFrameworkService = (IocFrameworkService) obj;
 		}
 	}
 

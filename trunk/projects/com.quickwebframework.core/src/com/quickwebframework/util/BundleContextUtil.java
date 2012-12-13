@@ -25,6 +25,9 @@ public class BundleContextUtil {
 	// 得到OSGi服务对象
 	public static Object getServiceObject(BundleContext bundleContext,
 			String serviceName) {
+		if (bundleContext == null) {
+			throw new RuntimeException("参数bundleContext为null!");
+		}
 		ServiceReference<?> serviceReference = bundleContext
 				.getServiceReference(serviceName);
 		if (serviceReference == null)
