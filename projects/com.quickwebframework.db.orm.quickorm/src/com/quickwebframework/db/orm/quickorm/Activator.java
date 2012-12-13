@@ -43,7 +43,7 @@ public class Activator implements BundleActivator {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.db.quickorm.properties'！");
 		}
-		quickormPropertyFilePath = WebContext.getInstance().getServletContext()
+		quickormPropertyFilePath = WebContext.getServletContext()
 				.getRealPath(quickormPropertyFilePath);
 		File quickormPropertyFile = new File(quickormPropertyFilePath);
 		if (!quickormPropertyFile.exists() || !quickormPropertyFile.isFile()) {

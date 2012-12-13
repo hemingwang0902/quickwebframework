@@ -71,7 +71,7 @@ public class Activator implements BundleActivator {
 				});
 
 		log.warn("-----"
-				+ IocContext.getInstance().getBeanDefinitionCount(
+				+ IocContext.getBeanDefinitionCount(
 						bundleContext.getBundle()));
 		log.info("qwf.test.core插件已启动!");
 	}

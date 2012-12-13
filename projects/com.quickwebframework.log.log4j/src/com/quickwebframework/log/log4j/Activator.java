@@ -34,7 +34,7 @@ public class Activator implements BundleActivator {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.log.log4j.properties'！");
 		}
-		log4jConfigFilePath = WebContext.getInstance().getServletContext()
+		log4jConfigFilePath = WebContext.getServletContext()
 				.getRealPath(log4jConfigFilePath);
 		PropertyConfigurator.configure(log4jConfigFilePath);
 
