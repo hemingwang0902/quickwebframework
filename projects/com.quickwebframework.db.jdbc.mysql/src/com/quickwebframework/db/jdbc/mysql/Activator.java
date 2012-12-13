@@ -21,8 +21,8 @@ public class Activator implements BundleActivator {
 		return databaseService;
 	}
 
-	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
+	public void start(BundleContext context) throws Exception {
+		Activator.context = context;
 
 		String jdbcPropertyFilePath = null;
 
@@ -39,13 +39,16 @@ public class Activator implements BundleActivator {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.db.jdbc.properties'！");
 		}
-		jdbcPropertyFilePath = WebContext.getServletContext()
-				.getRealPath(jdbcPropertyFilePath);
+		jdbcPropertyFilePath = WebContext.getServletContext().getRealPath(
+				jdbcPropertyFilePath);
+		// 注册为数据库服务
 		databaseService = new DatabaseServiceImpl(jdbcPropertyFilePath);
 		databaseService.registerService();
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
+		// 取消注册为数据库服务
+		databaseService.unregisterService();
 		Activator.context = null;
 	}
 }

@@ -18,13 +18,4 @@ public interface LogService {
 	 * @return
 	 */
 	public Log getLog(String name);
-
-	/**
-	 * 得到日志对象
-	 * 
-	 * @param clazz
-	 *            类名
-	 * @return
-	 */
-	public Log getLog(Class<?> clazz);
 }

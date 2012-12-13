@@ -1,24 +1,19 @@
 package com.quickwebframework.log.log4j;
 
-import java.util.Properties;
-
 import org.apache.log4j.PropertyConfigurator;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.log.log4j.service.impl.LogServiceImpl;
 import com.quickwebframework.service.LogService;
 
 public class Activator implements BundleActivator {
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext
-	 * )
-	 */
+
+	private ServiceRegistration<?> logServiceRegistration;
+
 	public void start(BundleContext context) throws Exception {
 		String log4jConfigFilePath = null;
 
@@ -34,39 +29,19 @@ public class Activator implements BundleActivator {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.log.log4j.properties'！");
 		}
-		log4jConfigFilePath = WebContext.getServletContext()
-				.getRealPath(log4jConfigFilePath);
+		log4jConfigFilePath = WebContext.getServletContext().getRealPath(
+				log4jConfigFilePath);
+		// 让log4j重新加载配置文件
 		PropertyConfigurator.configure(log4jConfigFilePath);
 
-		// 注册为服务
+		// 注册日志服务
 		LogService logService = new LogServiceImpl();
-		context.registerService(LogService.class.getName(), logService, null);
+		logServiceRegistration = context.registerService(
+				LogService.class.getName(), logService, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
 	public void stop(BundleContext context) throws Exception {
-		try {
-			Properties prop = new Properties();
-			prop.setProperty("log4j.rootLogger", "INFO,C");
-			prop.setProperty("log4j.appender.C",
-					"org.apache.log4j.ConsoleAppender");
-			prop.setProperty("log4j.appender.C.layout",
-					"org.apache.log4j.PatternLayout");
-			prop.setProperty("log4j.appender.C.layout.ConversionPattern",
-					"%-d{yyyy-MM-dd HH:mm:ss,SSS} [%c]-[%p] %m%n");
-
-			PropertyConfigurator.configure(prop);
-		} catch (IllegalStateException ex) {
-			System.out
-					.println("[Info]com.quickwebframework.log.log4j的Activator在Stop时出现异常。");
-		} catch (Exception ex) {
-			System.out
-					.println("[Info]com.quickwebframework.log.log4j的Activator在Stop时出现异常。");
-		}
+		// 取消注册日志服务
+		logServiceRegistration.unregister();
 	}
 }

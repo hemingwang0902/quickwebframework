@@ -11,6 +11,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.db.jdbc.mysql.Activator;
@@ -125,7 +126,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 	// 注册
 	public void registerService() {
-		databaseServiceRegistration = Activator.getContext().registerService(
+		BundleContext context = Activator.getContext();
+		databaseServiceRegistration = context.registerService(
 				DatabaseService.class.getName(), this, null);
 	}
 

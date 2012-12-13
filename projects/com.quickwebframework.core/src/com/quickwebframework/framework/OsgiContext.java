@@ -63,20 +63,20 @@ public class OsgiContext extends FrameworkContext {
 
 		serviceListener = new ServiceListener() {
 			@Override
-			public void serviceChanged(ServiceEvent arg0) {
-				int serviceEventType = arg0.getType();
+			public void serviceChanged(ServiceEvent event) {
+				int serviceEventType = event.getType();
 				if (serviceEventType == ServiceEvent.REGISTERED) {
-					log.debug(String.format("[%s]插件的[%s]服务已经注册", arg0
+					log.debug(String.format("插件[%s]的服务[%s]已经注册", event
 							.getServiceReference().getBundle()
-							.getSymbolicName(), arg0.getServiceReference()));
+							.getSymbolicName(), event.getServiceReference()));
 				} else if (serviceEventType == ServiceEvent.MODIFIED) {
-					log.debug(String.format("[%s]插件的[%s]服务已变更", arg0
+					log.debug(String.format("插件[%s]的服务[%s]已变更", event
 							.getServiceReference().getBundle()
-							.getSymbolicName(), arg0.getServiceReference()));
+							.getSymbolicName(), event.getServiceReference()));
 				} else if (serviceEventType == ServiceEvent.UNREGISTERING) {
-					log.debug(String.format("[%s]插件的[%s]服务正在取消注册...", arg0
+					log.debug(String.format("插件[%s]的服务[%s]正在取消注册...", event
 							.getServiceReference().getBundle()
-							.getSymbolicName(), arg0.getServiceReference()));
+							.getSymbolicName(), event.getServiceReference()));
 				}
 			}
 		};
@@ -98,6 +98,8 @@ public class OsgiContext extends FrameworkContext {
 		bundleContext.removeBundleListener(bundleListener);
 		// 移除OSGi服务监听器
 		bundleContext.removeServiceListener(serviceListener);
+		log.debug(String.format("插件[%s]已停止", bundleContext.getBundle()
+				.getSymbolicName()));
 	}
 
 	// 根据插件名称得到Bundle

@@ -32,7 +32,8 @@ public class LogContext extends FrameworkContext {
 	// ======变量部分结束
 
 	public LogContext() {
-		logMap = new HashMap<String, Log>();
+		if (logMap == null)
+			logMap = new HashMap<String, Log>();
 	}
 
 	@Override
@@ -70,6 +71,8 @@ public class LogContext extends FrameworkContext {
 
 	public static Log getLog(String name) {
 		Log log = null;
+		if (logMap == null)
+			logMap = new HashMap<String, Log>();
 		synchronized (logMap) {
 			if (logMap.containsKey(name)) {
 				log = logMap.get(name);
