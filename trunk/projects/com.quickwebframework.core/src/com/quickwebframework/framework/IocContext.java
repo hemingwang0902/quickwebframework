@@ -15,7 +15,7 @@ import com.quickwebframework.service.IocFrameworkService;
 public class IocContext extends FrameworkContext {
 	private static IocContext instance;
 
-	public static IocContext getInstance() {
+	protected static IocContext getInstance() {
 		if (instance == null)
 			instance = new IocContext();
 		return instance;
@@ -46,7 +46,7 @@ public class IocContext extends FrameworkContext {
 	}
 
 	@Override
-	public void init() {
+	protected void init() {
 		super.addSimpleServiceStaticFieldLink(
 				IocFrameworkService.class.getName(), "iocFrameworkService");
 
@@ -56,7 +56,7 @@ public class IocContext extends FrameworkContext {
 	}
 
 	@Override
-	public void destory() {
+	protected void destory() {
 		// 移除插件监听器
 		BundleContext bundleContext = Activator.getContext();
 		bundleContext.removeBundleListener(bundleListener);

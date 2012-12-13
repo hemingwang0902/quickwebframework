@@ -9,6 +9,7 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
+import org.osgi.framework.SynchronousBundleListener;
 
 import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.Log;
@@ -18,7 +19,7 @@ public class OsgiContext extends FrameworkContext {
 
 	private static OsgiContext instance;
 
-	public static OsgiContext getInstance() {
+	protected static OsgiContext getInstance() {
 		if (instance == null)
 			instance = new OsgiContext();
 		return instance;
@@ -26,8 +27,6 @@ public class OsgiContext extends FrameworkContext {
 
 	// ======变量开始部分
 	private static Log log = LogFactory.getLog(OsgiContext.class);
-	// 核心Bundle
-	// static Bundle coreBundle;
 	// 插件名称插件Map
 	private static Map<String, Bundle> bundleNameBundleMap;
 	// 插件监听器
@@ -39,8 +38,7 @@ public class OsgiContext extends FrameworkContext {
 
 	public OsgiContext() {
 		bundleNameBundleMap = new HashMap<String, Bundle>();
-		bundleListener = new BundleListener() {
-
+		bundleListener = new SynchronousBundleListener() {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
 				int eventType = arg0.getType();
@@ -85,7 +83,7 @@ public class OsgiContext extends FrameworkContext {
 	}
 
 	@Override
-	public void init() {
+	protected void init() {
 		BundleContext bundleContext = Activator.getContext();
 		// 添加OSGi插件监听器
 		bundleContext.addBundleListener(bundleListener);
@@ -94,7 +92,7 @@ public class OsgiContext extends FrameworkContext {
 	}
 
 	@Override
-	public void destory() {
+	protected void destory() {
 		BundleContext bundleContext = Activator.getContext();
 		// 移除OSGi插件监听器
 		bundleContext.removeBundleListener(bundleListener);

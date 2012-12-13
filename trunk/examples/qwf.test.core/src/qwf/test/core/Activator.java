@@ -71,15 +71,11 @@ public class Activator implements BundleActivator {
 				});
 
 		log.warn("-----"
-				+ IocContext.getBeanDefinitionCount(
-						bundleContext.getBundle()));
-		log.info("qwf.test.core插件已启动!");
+				+ IocContext.getBeanDefinitionCount(bundleContext.getBundle()));
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
 		Activator.context = null;
-
-		log.info("qwf.test.core插件已停止!");
 	}
 
 }
