@@ -29,9 +29,11 @@ import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.stereotype.FilterSetting;
 
 public class WebContext extends FrameworkContext {
-	private static WebContext instance = new WebContext();;
+	private static WebContext instance;
 
 	public static WebContext getInstance() {
+		if (instance == null)
+			instance = new WebContext();
 		return instance;
 	}
 
@@ -157,7 +159,10 @@ public class WebContext extends FrameworkContext {
 		listenerList = new ArrayList<EventListener>();
 		typeNameListenerListMap = new HashMap<String, List<EventListener>>();
 		bundleListenerListMap = new HashMap<Bundle, List<EventListener>>();
+	}
 
+	@Override
+	public void init() {
 		super.addSimpleServiceFieldLink(ServletContext.class.getName(),
 				"servletContext");
 		super.addSimpleServiceFieldLink(ViewRenderService.class.getName(),

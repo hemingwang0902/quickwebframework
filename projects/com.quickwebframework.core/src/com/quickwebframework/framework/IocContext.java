@@ -16,10 +16,8 @@ public class IocContext extends FrameworkContext {
 	private static IocContext instance;
 
 	public static IocContext getInstance() {
-		if (instance == null) {
+		if (instance == null)
 			instance = new IocContext();
-			// instance.init();
-		}
 		return instance;
 	}
 
@@ -31,6 +29,11 @@ public class IocContext extends FrameworkContext {
 	// ======变量部分结束
 
 	public IocContext() {
+
+	}
+
+	@Override
+	public void init() {
 		super.addSimpleServiceFieldLink(IocFrameworkService.class.getName(),
 				"iocFrameworkService");
 

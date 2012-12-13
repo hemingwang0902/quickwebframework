@@ -27,7 +27,7 @@ public class Activator implements BundleActivator {
 
 		log = LogFactory.getLog(Activator.class);
 		log.info("Starting [com.quickwebframework.core]...");
-
+		FrameworkContext.initAllContext();
 		log.info("Started [com.quickwebframework.core].");
 	}
 

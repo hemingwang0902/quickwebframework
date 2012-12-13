@@ -19,10 +19,8 @@ public class OsgiContext extends FrameworkContext {
 	private static OsgiContext instance;
 
 	public static OsgiContext getInstance() {
-		if (instance == null) {
+		if (instance == null)
 			instance = new OsgiContext();
-			// instance.init();
-		}
 		return instance;
 	}
 
@@ -37,6 +35,11 @@ public class OsgiContext extends FrameworkContext {
 
 	public OsgiContext() {
 		bundleNameBundleMap = new HashMap<String, Bundle>();
+	}
+
+	@Override
+	public void init() {
+
 		BundleContext bundleContext = Activator.getContext();
 		// coreBundle = bundleContext.getBundle();
 
