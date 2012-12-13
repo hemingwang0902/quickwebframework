@@ -44,11 +44,10 @@ public class BundleUtil {
 	 *            起始路径，一般为"/"
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	public static List<String> getPathListInBundle(Bundle bundle,
 			String startPath) {
 		List<String> rtnList = new ArrayList<String>();
-		Enumeration urlEnum = bundle.getEntryPaths(startPath);
+		Enumeration<?> urlEnum = bundle.getEntryPaths(startPath);
 		if (urlEnum == null)
 			return rtnList;
 		while (urlEnum.hasMoreElements()) {

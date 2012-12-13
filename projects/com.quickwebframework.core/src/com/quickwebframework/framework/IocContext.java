@@ -25,16 +25,12 @@ public class IocContext extends FrameworkContext {
 	private static Log log = LogFactory.getLog(IocContext.class);
 
 	private static IocFrameworkService iocFrameworkService;
+	private BundleListener bundleListener;
 
 	// ======变量部分结束
-	@Override
-	public void init() {
-		super.addSimpleServiceStaticFieldLink(
-				IocFrameworkService.class.getName(), "iocFrameworkService");
 
-		final BundleContext bundleContext = Activator.getContext();
-
-		bundleContext.addBundleListener(new BundleListener() {
+	public IocContext() {
+		bundleListener = new BundleListener() {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
 				Bundle bundle = arg0.getBundle();
@@ -46,12 +42,24 @@ public class IocContext extends FrameworkContext {
 					removeBundle(bundle);
 				}
 			}
-		});
+		};
+	}
+
+	@Override
+	public void init() {
+		super.addSimpleServiceStaticFieldLink(
+				IocFrameworkService.class.getName(), "iocFrameworkService");
+
+		// 添加插件监听器
+		BundleContext bundleContext = Activator.getContext();
+		bundleContext.addBundleListener(bundleListener);
 	}
 
 	@Override
 	public void destory() {
-
+		// 移除插件监听器
+		BundleContext bundleContext = Activator.getContext();
+		bundleContext.removeBundleListener(bundleListener);
 	}
 
 	/**
