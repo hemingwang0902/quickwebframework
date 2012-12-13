@@ -24,6 +24,11 @@ public abstract class FrameworkContext {
 	private Map<String, Field> serviceFieldMap;
 
 	/**
+	 * 初始化方法
+	 */
+	public abstract void init();
+
+	/**
 	 * 销毁时方法
 	 */
 	public abstract void destory();
@@ -90,6 +95,18 @@ public abstract class FrameworkContext {
 		} catch (Exception ex) {
 			log.error("得到类的字段时出错，原因：" + ex.getMessage(), ex);
 			ex.printStackTrace();
+		}
+	}
+
+	public static void initAllContext() {
+		WebContext.getInstance();
+		IocContext.getInstance();
+		LogContext.getInstance();
+		OsgiContext.getInstance();
+		ThreadContext.getInstance();
+
+		for (FrameworkContext context : getContexts()) {
+			context.init();
 		}
 	}
 

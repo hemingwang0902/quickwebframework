@@ -18,10 +18,8 @@ public class ThreadContext extends FrameworkContext {
 	private static ThreadContext instance;
 
 	public static ThreadContext getInstance() {
-		if (instance == null) {
+		if (instance == null)
 			instance = new ThreadContext();
-			// instance.init();
-		}
 		return instance;
 	}
 
@@ -45,6 +43,11 @@ public class ThreadContext extends FrameworkContext {
 	public ThreadContext() {
 		threadList = new ArrayList<Thread>();
 		bundleThreadListMap = new HashMap<Bundle, List<Thread>>();
+	}
+
+	@Override
+	public void init() {
+
 		bundleListener = new BundleListener() {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {

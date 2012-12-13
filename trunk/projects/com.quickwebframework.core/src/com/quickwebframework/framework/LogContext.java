@@ -18,10 +18,8 @@ public class LogContext extends FrameworkContext {
 	private static LogContext instance;
 
 	public static LogContext getInstance() {
-		if (instance == null) {
+		if (instance == null)
 			instance = new LogContext();
-			// instance.init();
-		}
 		return instance;
 	}
 
@@ -34,7 +32,10 @@ public class LogContext extends FrameworkContext {
 
 	public LogContext() {
 		logMap = new HashMap<String, Log>();
+	}
 
+	@Override
+	public void init() {
 		BundleContext bundleContext = Activator.getContext();
 		// 设置默认的Java日志记录器配置
 		try {
