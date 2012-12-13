@@ -11,12 +11,15 @@ import java.util.Properties;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.viewrender.freemarker.service.impl.ViewRenderServiceImpl;
 
 public class Activator implements BundleActivator {
+
+	private ServiceRegistration<?> viewRenderServiceRegistration;
 
 	public void start(BundleContext context) throws Exception {
 
@@ -88,12 +91,15 @@ public class Activator implements BundleActivator {
 		reader.close();
 		inputStream.close();
 
+		// 注册视图渲染服务
 		ViewRenderService viewRenderService = new ViewRenderServiceImpl(
-				context, freemarkerProp, viewrenderProp);
-		context.registerService(ViewRenderService.class.getName(),
-				viewRenderService, null);
+				freemarkerProp, viewrenderProp);
+		viewRenderServiceRegistration = context.registerService(
+				ViewRenderService.class.getName(), viewRenderService, null);
 	}
 
 	public void stop(BundleContext context) throws Exception {
+		// 取消注册视图渲染服务
+		viewRenderServiceRegistration.unregister();
 	}
 }

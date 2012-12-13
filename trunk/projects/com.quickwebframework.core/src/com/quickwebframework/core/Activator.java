@@ -3,7 +3,7 @@ package com.quickwebframework.core;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
-import com.quickwebframework.framework.FrameworkContext;
+import com.quickwebframework.framework.ContextManager;
 
 public class Activator implements BundleActivator {
 	private static BundleContext context;
@@ -21,7 +21,7 @@ public class Activator implements BundleActivator {
 	 */
 	public void start(BundleContext context) throws Exception {
 		Activator.context = context;
-		FrameworkContext.initAllContext();
+		ContextManager.initAllContext();
 	}
 
 	/*
@@ -31,7 +31,7 @@ public class Activator implements BundleActivator {
 	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		FrameworkContext.destoryAllContext();
+		ContextManager.destoryAllContext();
 		Activator.context = null;
 	}
 }

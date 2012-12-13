@@ -67,7 +67,7 @@ public abstract class FrameworkContext {
 	}
 
 	// 得到所有的Context对象
-	public static FrameworkContext[] getContexts() {
+	protected static FrameworkContext[] getContexts() {
 		if (contextList == null)
 			return new FrameworkContext[0];
 		return contextList.toArray(new FrameworkContext[0]);
@@ -84,7 +84,7 @@ public abstract class FrameworkContext {
 		}
 	}
 
-	public void addSimpleServiceStaticFieldLink(String serviceName,
+	protected void addSimpleServiceStaticFieldLink(String serviceName,
 			String fieldName) {
 		try {
 			Class<?> clazz = this.getClass();
@@ -95,24 +95,6 @@ public abstract class FrameworkContext {
 			LogFactory.getLog(FrameworkContext.class.getName()).error(
 					"得到类的字段时出错，原因：" + ex.getMessage(), ex);
 			ex.printStackTrace();
-		}
-	}
-
-	public static void initAllContext() {
-		LogContext.getInstance();
-		WebContext.getInstance();
-		IocContext.getInstance();
-		OsgiContext.getInstance();
-		ThreadContext.getInstance();
-
-		for (FrameworkContext context : getContexts()) {
-			context.init();
-		}
-	}
-
-	public static void destoryAllContext() {
-		for (FrameworkContext context : getContexts()) {
-			context.destory();
 		}
 	}
 }

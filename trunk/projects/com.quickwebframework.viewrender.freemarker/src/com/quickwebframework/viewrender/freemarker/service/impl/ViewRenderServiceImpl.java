@@ -5,8 +5,6 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.osgi.framework.BundleContext;
-
 import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.viewrender.freemarker.util.FreemarkerViewRender;
 import com.quickwebframework.viewrender.freemarker.util.PluginTemplateLoader;
@@ -16,8 +14,8 @@ import freemarker.template.Configuration;
 public class ViewRenderServiceImpl implements ViewRenderService {
 	private FreemarkerViewRender viewRender;
 
-	public ViewRenderServiceImpl(BundleContext bundleContext,
-			Properties freeMarkerProp, Properties viewRenderProp) {
+	public ViewRenderServiceImpl(Properties freeMarkerProp,
+			Properties viewRenderProp) {
 		Configuration configuration = new Configuration();
 		// 配置Freemarker
 		try {

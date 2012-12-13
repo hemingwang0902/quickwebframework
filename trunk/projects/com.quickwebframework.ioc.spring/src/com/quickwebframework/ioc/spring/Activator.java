@@ -4,6 +4,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 
 import com.quickwebframework.ioc.spring.service.impl.SpringIocFrameworkService;
@@ -12,49 +14,48 @@ import com.quickwebframework.service.IocFrameworkService;
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;
+	private SpringIocFrameworkService springIocFrameworkService;
+	private ServiceRegistration<?> iocFrameworkServiceRegistration;
+	private BundleListener bundleListener;
 
 	static BundleContext getContext() {
 		return context;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext
-	 * )
-	 */
-	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
-		final SpringIocFrameworkService springIocFrameworkService = new SpringIocFrameworkService();
-
-		// 注册为IocFrameworkService服务
-		bundleContext.registerService(IocFrameworkService.class.getName(),
-				springIocFrameworkService, null);
-
-		bundleContext.addBundleListener(new SynchronousBundleListener() {
+	public Activator() {
+		bundleListener = new SynchronousBundleListener() {
 
 			@Override
-			public void bundleChanged(BundleEvent arg0) {
-				Bundle startingBundle = arg0.getBundle();
-				int bundleEventType = arg0.getType();
+			public void bundleChanged(BundleEvent event) {
+				Bundle startingBundle = event.getBundle();
+				int bundleEventType = event.getType();
 				if (BundleEvent.STARTING == bundleEventType) {
 					springIocFrameworkService.addBundle(startingBundle);
 				} else if (BundleEvent.STOPPING == bundleEventType) {
 					springIocFrameworkService.removeBundle(startingBundle);
 				}
 			}
-		});
+		};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext bundleContext) throws Exception {
+	public void start(BundleContext context) throws Exception {
+		Activator.context = context;
+
+		// 注册依赖注入服务
+		springIocFrameworkService = new SpringIocFrameworkService();
+		iocFrameworkServiceRegistration = context.registerService(
+				IocFrameworkService.class.getName(), springIocFrameworkService,
+				null);
+		// 添加插件监听器
+		context.addBundleListener(bundleListener);
+	}
+
+	public void stop(BundleContext context) throws Exception {
 		Activator.context = null;
+		// 取消注册依赖注入服务
+		iocFrameworkServiceRegistration.unregister();
+		// 移除插件监听器
+		context.removeBundleListener(bundleListener);
 	}
 
 }

@@ -11,6 +11,7 @@ import java.util.Properties;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.db.orm.quickorm.service.DatabaseService;
 import com.quickwebframework.db.orm.quickorm.service.impl.DatabaseServiceImpl;
@@ -19,13 +20,14 @@ import com.quickwebframework.framework.WebContext;
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;
+	private ServiceRegistration<?> databaseServiceRegistration;
 
 	public static BundleContext getContext() {
 		return context;
 	}
 
-	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
+	public void start(BundleContext context) throws Exception {
+		Activator.context = context;
 
 		String quickormPropertyFilePath = null;
 
@@ -43,8 +45,8 @@ public class Activator implements BundleActivator {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.db.quickorm.properties'！");
 		}
-		quickormPropertyFilePath = WebContext.getServletContext()
-				.getRealPath(quickormPropertyFilePath);
+		quickormPropertyFilePath = WebContext.getServletContext().getRealPath(
+				quickormPropertyFilePath);
 		File quickormPropertyFile = new File(quickormPropertyFilePath);
 		if (!quickormPropertyFile.exists() || !quickormPropertyFile.isFile()) {
 			String message = String.format("Config file [%s] not exist!",
@@ -59,13 +61,15 @@ public class Activator implements BundleActivator {
 		reader.close();
 		inputStream.close();
 
-		// 注册为服务
+		// 注册数据库服务
 		DatabaseService databaseService = new DatabaseServiceImpl(context, prop);
-		context.registerService(DatabaseService.class.getName(),
-				databaseService, null);
+		databaseServiceRegistration = context.registerService(
+				DatabaseService.class.getName(), databaseService, null);
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
+		// 取消注册数据库服务
+		databaseServiceRegistration.unregister();
 		Activator.context = null;
 	}
 }

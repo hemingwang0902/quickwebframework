@@ -12,7 +12,6 @@ public class LogServiceImpl implements LogService {
 
 	public LogServiceImpl() {
 		logMap = new HashMap<String, Log>();
-
 	}
 
 	@Override
@@ -27,10 +26,5 @@ public class LogServiceImpl implements LogService {
 			}
 		}
 		return log;
-	}
-
-	@Override
-	public Log getLog(Class<?> clazz) {
-		return getLog(clazz.getName());
 	}
 }
