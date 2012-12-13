@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 
@@ -17,7 +18,7 @@ public class ThreadContext extends FrameworkContext {
 
 	private static ThreadContext instance;
 
-	public static ThreadContext getInstance() {
+	protected static ThreadContext getInstance() {
 		if (instance == null)
 			instance = new ThreadContext();
 		return instance;
@@ -48,7 +49,10 @@ public class ThreadContext extends FrameworkContext {
 			public void bundleChanged(BundleEvent arg0) {
 				int eventType = arg0.getType();
 				Bundle bundle = arg0.getBundle();
-				Bundle coreBundle = Activator.getContext().getBundle();
+				BundleContext bundleContext = Activator.getContext();
+				if (bundleContext == null)
+					return;
+				Bundle coreBundle = bundleContext.getBundle();
 				// 如果插件的状态是正在停止或已经停止
 				if (eventType == BundleEvent.STOPPED
 						|| eventType == BundleEvent.STOPPING) {
@@ -63,13 +67,13 @@ public class ThreadContext extends FrameworkContext {
 	}
 
 	@Override
-	public void init() {
+	protected void init() {
 		// 注册
 		Activator.getContext().addBundleListener(bundleListener);
 	}
 
 	@Override
-	public void destory() {
+	protected void destory() {
 		Activator.getContext().removeBundleListener(bundleListener);
 	}
 

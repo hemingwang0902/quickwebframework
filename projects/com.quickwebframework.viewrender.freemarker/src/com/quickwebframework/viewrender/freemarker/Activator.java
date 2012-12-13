@@ -18,13 +18,6 @@ import com.quickwebframework.viewrender.freemarker.service.impl.ViewRenderServic
 
 public class Activator implements BundleActivator {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext
-	 * )
-	 */
 	public void start(BundleContext context) throws Exception {
 
 		String freemarkerPropertyFilePath = null;
@@ -44,8 +37,8 @@ public class Activator implements BundleActivator {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.viewrender.freemarker.properties'！");
 		}
-		freemarkerPropertyFilePath = WebContext
-				.getServletContext().getRealPath(freemarkerPropertyFilePath);
+		freemarkerPropertyFilePath = WebContext.getServletContext()
+				.getRealPath(freemarkerPropertyFilePath);
 
 		// 得到viewrender配置文件路径
 		serviceReferences = context
@@ -60,8 +53,8 @@ public class Activator implements BundleActivator {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.viewrender.properties'！");
 		}
-		viewrenderPropertyFilePath = WebContext
-				.getServletContext().getRealPath(viewrenderPropertyFilePath);
+		viewrenderPropertyFilePath = WebContext.getServletContext()
+				.getRealPath(viewrenderPropertyFilePath);
 
 		// 读取freemarker配置文件
 		File freemarkerPropertyFile = new File(freemarkerPropertyFilePath);
@@ -101,12 +94,6 @@ public class Activator implements BundleActivator {
 				viewRenderService, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
 	public void stop(BundleContext context) throws Exception {
 	}
 }

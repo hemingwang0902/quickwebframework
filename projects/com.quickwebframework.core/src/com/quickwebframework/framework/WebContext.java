@@ -17,6 +17,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.SynchronousBundleListener;
 
 import com.quickwebframework.bridge.HttpServletBridge;
 import com.quickwebframework.bridge.ServletFilterBridge;
@@ -32,7 +33,7 @@ import com.quickwebframework.stereotype.FilterSetting;
 public class WebContext extends FrameworkContext {
 	private static WebContext instance;
 
-	public static WebContext getInstance() {
+	protected static WebContext getInstance() {
 		if (instance == null)
 			instance = new WebContext();
 		return instance;
@@ -167,15 +168,16 @@ public class WebContext extends FrameworkContext {
 		listenerList = new ArrayList<EventListener>();
 		typeNameListenerListMap = new HashMap<String, List<EventListener>>();
 		bundleListenerListMap = new HashMap<Bundle, List<EventListener>>();
-		bundleListener = new BundleListener() {
+		bundleListener = new SynchronousBundleListener() {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
 				Bundle bundle = arg0.getBundle();
 				int bundleEventType = arg0.getType();
 
-				Bundle coreBundle = Activator.getContext().getBundle();
-
-				// 如果插件的状态是正在停止
+				BundleContext bundleContext = Activator.getContext();
+				if (bundleContext == null)
+					return;
+				Bundle coreBundle = bundleContext.getBundle();
 				if (bundleEventType == BundleEvent.STOPPING) {
 					// 移除插件的控制器
 					if (mvcFrameworkService == null)
@@ -199,7 +201,7 @@ public class WebContext extends FrameworkContext {
 	}
 
 	@Override
-	public void init() {
+	protected void init() {
 		super.addSimpleServiceStaticFieldLink(ServletContext.class.getName(),
 				"servletContext");
 		super.addSimpleServiceStaticFieldLink(
@@ -240,7 +242,7 @@ public class WebContext extends FrameworkContext {
 	}
 
 	@Override
-	public void destory() {
+	protected void destory() {
 		Activator.getContext().removeBundleListener(bundleListener);
 		httpServletBridgeServiceRegistration.unregister();
 		servletFilterBridgeServiceRegistration.unregister();
@@ -272,9 +274,9 @@ public class WebContext extends FrameworkContext {
 	 */
 	public static void addBundle(Bundle bundle) {
 		if (mvcFrameworkService == null) {
-			log.error("注册WebApp时，未发现有注册的MvcFrameworkService服务！");
-			throw new RuntimeException(
-					"注册WebApp时，未发现有注册的MvcFrameworkService服务！");
+			String message = String.format("将插件[%s]添加到MVC框架时，未发现有注册的MVC框架服务！",
+					bundle.getSymbolicName());
+			throw new RuntimeException(message);
 		}
 		// 注册服务
 		mvcFrameworkService.addBundle(bundle);

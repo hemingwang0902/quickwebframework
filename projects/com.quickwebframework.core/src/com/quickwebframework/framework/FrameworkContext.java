@@ -23,12 +23,12 @@ public abstract class FrameworkContext {
 	/**
 	 * 初始化方法
 	 */
-	public abstract void init();
+	protected abstract void init();
 
 	/**
 	 * 销毁时方法
 	 */
-	public abstract void destory();
+	protected abstract void destory();
 
 	public FrameworkContext() {
 		serviceFieldMap = new HashMap<String, Field>();

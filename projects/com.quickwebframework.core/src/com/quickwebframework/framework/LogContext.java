@@ -18,7 +18,7 @@ import com.quickwebframework.util.BundleContextUtil;
 public class LogContext extends FrameworkContext {
 	private static LogContext instance;
 
-	public static LogContext getInstance() {
+	protected static LogContext getInstance() {
 		if (instance == null)
 			instance = new LogContext();
 		return instance;
@@ -36,7 +36,7 @@ public class LogContext extends FrameworkContext {
 	}
 
 	@Override
-	public void init() {
+	protected void init() {
 		BundleContext bundleContext = Activator.getContext();
 		// 设置默认的Java日志记录器配置
 		try {
@@ -59,7 +59,7 @@ public class LogContext extends FrameworkContext {
 	}
 
 	@Override
-	public void destory() {
+	protected void destory() {
 		// 取消注册日志桥接对象
 		logBridgeServiceRegistration.unregister();
 	}
