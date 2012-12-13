@@ -49,8 +49,8 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		String bundleName = bundle.getSymbolicName();
 
 		// 如果IoC框架中还没有此Bundle,则添加到IoC框架中
-		if (!IocContext.getInstance().containsBundle(bundle))
-			IocContext.getInstance().addBundle(bundle);
+		if (!IocContext.containsBundle(bundle))
+			IocContext.addBundle(bundle);
 
 		ApplicationContext applicationContext = BundleApplicationContextUtils
 				.getBundleApplicationContext(bundle);
@@ -63,21 +63,21 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		Map<String, EventListener> listenerMap = applicationContext
 				.getBeansOfType(EventListener.class);
 		for (EventListener listener : listenerMap.values()) {
-			WebContext.getInstance().addListener(bundle, listener);
+			WebContext.addListener(bundle, listener);
 		}
 
 		// 从ApplicationContext得到过滤器列表
 		Map<String, Filter> filterMap = applicationContext
 				.getBeansOfType(Filter.class);
 		for (Filter filter : filterMap.values()) {
-			WebContext.getInstance().addFilter(bundle, filter);
+			WebContext.addFilter(bundle, filter);
 		}
 
 		// 从ApplicationContext得到线程列表
 		Map<String, Thread> threadMap = applicationContext
 				.getBeansOfType(Thread.class);
 		for (Thread thread : threadMap.values()) {
-			ThreadContext.getInstance().addThread(bundle, thread);
+			ThreadContext.addThread(bundle, thread);
 		}
 
 		// 从ApplicationContext得到MVC控制器列表
@@ -129,7 +129,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 							HttpMethodInfo httpMethodInfo = new HttpMethodInfo();
 							httpMethodInfo.setHttpMethod(requestMethod.name());
 							httpMethodInfo.setMappingUrl(WebContext
-									.getInstance().getBundleMethodUrl(
+									.getBundleMethodUrl(
 											bundleName, methodName));
 							pluginControllerInfo.getHttpMethodInfoList().add(
 									httpMethodInfo);

@@ -45,7 +45,7 @@ public abstract class FrameworkContext {
 				for (String serviceName : serviceFieldMap.keySet()) {
 					if (changedServiceName.contains(serviceName)) {
 						Field field = serviceFieldMap.get(serviceName);
-						setServiceObjectToField(serviceName, field);
+						setServiceObjectToStaticField(serviceName, field);
 					}
 				}
 			}
@@ -76,22 +76,22 @@ public abstract class FrameworkContext {
 		return contextList.toArray(new FrameworkContext[0]);
 	}
 
-	private void setServiceObjectToField(String serviceName, Field field) {
+	private void setServiceObjectToStaticField(String serviceName, Field field) {
 		field.setAccessible(true);
 		try {
-			field.set(this, BundleContextUtil.getServiceObject(
+			field.set(null, BundleContextUtil.getServiceObject(
 					Activator.getContext(), serviceName));
 		} catch (Exception ex) {
 			log.error("给绑定OSGi服务的字段赋值时出现异常：" + ex.getMessage(), ex);
 		}
 	}
 
-	public void addSimpleServiceFieldLink(String serviceName, String fieldName) {
+	public void addSimpleServiceStaticFieldLink(String serviceName, String fieldName) {
 		try {
 			Class<?> clazz = this.getClass();
 			Field field = clazz.getDeclaredField(fieldName);
 			serviceFieldMap.put(serviceName, field);
-			setServiceObjectToField(serviceName, field);
+			setServiceObjectToStaticField(serviceName, field);
 		} catch (Exception ex) {
 			log.error("得到类的字段时出错，原因：" + ex.getMessage(), ex);
 			ex.printStackTrace();

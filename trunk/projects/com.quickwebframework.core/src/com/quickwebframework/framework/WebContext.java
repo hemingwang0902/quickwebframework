@@ -46,74 +46,75 @@ public class WebContext extends FrameworkContext {
 	// ===== 常量结束
 
 	// ===== WEB相关变量部分开始
-	private BundleListener bundleListener;
+	private static BundleListener bundleListener;
 
 	// 插件方法URL模板
-	public String bundleMethodUrlTemplate;
+	public static String bundleMethodUrlTemplate;
 	// MVC框架服务
-	private MvcFrameworkService mvcFrameworkService;
+	private static MvcFrameworkService mvcFrameworkService;
 	// 视图渲染服务
-	private ViewRenderService viewRenderService;
+	private static ViewRenderService viewRenderService;
 	// WEB项目的ServletContext
-	private ServletContext servletContext;
+	private static ServletContext servletContext;
 	// 根URL处理Servlet
-	private HttpServlet rootUrlHandleServlet;
+	private static HttpServlet rootUrlHandleServlet;
 	// URL未找到处理Servlet
-	private HttpServlet urlNotFoundHandleServlet;
+	private static HttpServlet urlNotFoundHandleServlet;
 	// 得到处理器异常解决器
-	private HandlerExceptionResolver handlerExceptionResolver;
+	private static HandlerExceptionResolver handlerExceptionResolver;
 
-	public MvcFrameworkService getMvcFrameworkService() {
+	public static MvcFrameworkService getMvcFrameworkService() {
 		return mvcFrameworkService;
 	}
 
-	public ServletContext getServletContext() {
+	public static ServletContext getServletContext() {
 		return servletContext;
 	}
 
-	public ViewRenderService getViewRenderService() {
+	public static ViewRenderService getViewRenderService() {
 		return viewRenderService;
 	}
 
-	public HttpServlet getRootUrlHandleServlet() {
+	public static HttpServlet getRootUrlHandleServlet() {
 		return rootUrlHandleServlet;
 	}
 
-	public void setRootUrlHandleServlet(HttpServlet rootUrlHandleServlet) {
-		this.rootUrlHandleServlet = rootUrlHandleServlet;
+	public static void setRootUrlHandleServlet(HttpServlet rootUrlHandleServlet) {
+		WebContext.rootUrlHandleServlet = rootUrlHandleServlet;
 	}
 
-	public HttpServlet getUrlNotFoundHandleServlet() {
+	public static HttpServlet getUrlNotFoundHandleServlet() {
 		return urlNotFoundHandleServlet;
 	}
 
-	public void setUrlNotFoundHandleServlet(HttpServlet urlNotFoundHandleServlet) {
-		this.urlNotFoundHandleServlet = urlNotFoundHandleServlet;
+	public static void setUrlNotFoundHandleServlet(
+			HttpServlet urlNotFoundHandleServlet) {
+		WebContext.urlNotFoundHandleServlet = urlNotFoundHandleServlet;
 	}
 
-	public HandlerExceptionResolver getHandlerExceptionResolver() {
+	public static HandlerExceptionResolver getHandlerExceptionResolver() {
 		return handlerExceptionResolver;
 	}
 
-	public void setHandlerExceptionResolver(
+	public static void setHandlerExceptionResolver(
 			HandlerExceptionResolver handlerExceptionResolver) {
-		this.handlerExceptionResolver = handlerExceptionResolver;
+		WebContext.handlerExceptionResolver = handlerExceptionResolver;
 	}
 
 	// ===== WEB相关变量部分结束
 
 	// ===== 过滤器变量部分开始
 	// 从上层传递下来的过滤器配置
-	private FilterConfig filterConfig;
-	private List<Filter> filterList;
-	private Map<Bundle, List<Filter>> bundleFilterListMap;
+	private static FilterConfig filterConfig;
+	private static List<Filter> filterList;
+	private static Map<Bundle, List<Filter>> bundleFilterListMap;
 
 	/**
 	 * 得到过滤器配置
 	 * 
 	 * @return
 	 */
-	public FilterConfig getFilterConfig() {
+	public static FilterConfig getFilterConfig() {
 		return filterConfig;
 	}
 
@@ -122,8 +123,8 @@ public class WebContext extends FrameworkContext {
 	 * 
 	 * @param filterConfig
 	 */
-	public void setFilterConfig(FilterConfig filterConfig) {
-		this.filterConfig = filterConfig;
+	public static void setFilterConfig(FilterConfig filterConfig) {
+		WebContext.filterConfig = filterConfig;
 		if (filterConfig == null)
 			return;
 		for (Filter filter : getFilterList()) {
@@ -140,16 +141,16 @@ public class WebContext extends FrameworkContext {
 	 * 
 	 * @return
 	 */
-	public List<Filter> getFilterList() {
+	public static List<Filter> getFilterList() {
 		return filterList;
 	}
 
 	// ===== 过滤器变量部分结束
 
 	// ===== 监听器变量部分开始
-	private List<EventListener> listenerList;
-	private Map<String, List<EventListener>> typeNameListenerListMap;
-	private Map<Bundle, List<EventListener>> bundleListenerListMap;
+	private static List<EventListener> listenerList;
+	private static Map<String, List<EventListener>> typeNameListenerListMap;
+	private static Map<Bundle, List<EventListener>> bundleListenerListMap;
 
 	// ===== 监听器变量部分结束
 
@@ -163,12 +164,12 @@ public class WebContext extends FrameworkContext {
 
 	@Override
 	public void init() {
-		super.addSimpleServiceFieldLink(ServletContext.class.getName(),
+		super.addSimpleServiceStaticFieldLink(ServletContext.class.getName(),
 				"servletContext");
-		super.addSimpleServiceFieldLink(ViewRenderService.class.getName(),
-				"viewRenderService");
-		super.addSimpleServiceFieldLink(MvcFrameworkService.class.getName(),
-				"mvcFrameworkService");
+		super.addSimpleServiceStaticFieldLink(
+				ViewRenderService.class.getName(), "viewRenderService");
+		super.addSimpleServiceStaticFieldLink(
+				MvcFrameworkService.class.getName(), "mvcFrameworkService");
 
 		final BundleContext bundleContext = Activator.getContext();
 
@@ -243,7 +244,7 @@ public class WebContext extends FrameworkContext {
 	 * @param methodName
 	 * @return
 	 */
-	public String getBundleMethodUrl(String bundleName, String methodName) {
+	public static String getBundleMethodUrl(String bundleName, String methodName) {
 		if (bundleMethodUrlTemplate == null
 				|| bundleMethodUrlTemplate.isEmpty())
 			return "Missing bundleMethodUrlTemplate";
@@ -255,7 +256,7 @@ public class WebContext extends FrameworkContext {
 	 * 
 	 * @param bundleContext
 	 */
-	public void addBundle(Bundle bundle) {
+	public static void addBundle(Bundle bundle) {
 		if (mvcFrameworkService == null) {
 			log.error("注册WebApp时，未发现有注册的MvcFrameworkService服务！");
 			throw new RuntimeException(
@@ -268,7 +269,7 @@ public class WebContext extends FrameworkContext {
 	/**
 	 * 移除所有的过滤器
 	 */
-	public void removeAllFilter() {
+	public static void removeAllFilter() {
 		for (Bundle bundle : bundleFilterListMap.keySet()
 				.toArray(new Bundle[0])) {
 			removeBundleAllFilter(bundle);
@@ -280,7 +281,7 @@ public class WebContext extends FrameworkContext {
 	 * 
 	 * @param bundle
 	 */
-	public void removeBundleAllFilter(Bundle bundle) {
+	public static void removeBundleAllFilter(Bundle bundle) {
 		if (!bundleFilterListMap.containsKey(bundle))
 			return;
 		Filter[] bundleFilterArray = bundleFilterListMap.get(bundle).toArray(
@@ -298,7 +299,7 @@ public class WebContext extends FrameworkContext {
 	 * @param bundle
 	 * @param filter
 	 */
-	public void removeFilter(Bundle bundle, Filter filter) {
+	public static void removeFilter(Bundle bundle, Filter filter) {
 
 		// 从Bundle对应的过滤器列表中移除
 		if (!bundleFilterListMap.containsKey(bundle))
@@ -320,7 +321,7 @@ public class WebContext extends FrameworkContext {
 	 * @param bundle
 	 * @param filter
 	 */
-	public void addFilter(Bundle bundle, Filter filter) {
+	public static void addFilter(Bundle bundle, Filter filter) {
 		if (filterConfig != null) {
 			try {
 				filter.init(filterConfig);
@@ -442,7 +443,8 @@ public class WebContext extends FrameworkContext {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends EventListener> List<T> getListenerList(Class<T> clazz) {
+	public static <T extends EventListener> List<T> getListenerList(
+			Class<T> clazz) {
 		String listenerTypeName = getServletInterface(clazz).getName();
 		if (!typeNameListenerListMap.containsKey(listenerTypeName))
 			return null;
@@ -452,7 +454,7 @@ public class WebContext extends FrameworkContext {
 	/**
 	 * 移除所有监听器
 	 */
-	public void removeAllListener() {
+	public static void removeAllListener() {
 		for (Bundle bundle : bundleListenerListMap.keySet().toArray(
 				new Bundle[0])) {
 			removeBundleAllListener(bundle);
@@ -464,7 +466,7 @@ public class WebContext extends FrameworkContext {
 	 * 
 	 * @param bundle
 	 */
-	public void removeBundleAllListener(Bundle bundle) {
+	public static void removeBundleAllListener(Bundle bundle) {
 		if (!bundleListenerListMap.containsKey(bundle))
 			return;
 		EventListener[] bundleListenerArray = bundleListenerListMap.get(bundle)
@@ -481,7 +483,7 @@ public class WebContext extends FrameworkContext {
 	 * 
 	 * @param listener
 	 */
-	public void removeListener(Bundle bundle, EventListener listener) {
+	public static void removeListener(Bundle bundle, EventListener listener) {
 
 		// 从Bundle对应的监听器列表中移除
 		if (!bundleListenerListMap.containsKey(bundle))
@@ -505,7 +507,7 @@ public class WebContext extends FrameworkContext {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Class<? extends EventListener>> getServletInterfaceList(
+	private static List<Class<? extends EventListener>> getServletInterfaceList(
 			Class<? extends EventListener> clazz) {
 		List<Class<? extends EventListener>> rtnList = new ArrayList<Class<? extends EventListener>>();
 		if (clazz.getName().startsWith("javax.servlet."))
@@ -522,7 +524,7 @@ public class WebContext extends FrameworkContext {
 		return rtnList;
 	}
 
-	private Class<? extends EventListener> getServletInterface(
+	private static Class<? extends EventListener> getServletInterface(
 			Class<? extends EventListener> clazz) {
 		List<Class<? extends EventListener>> rtnList = getServletInterfaceList(clazz);
 		if (rtnList == null || rtnList.isEmpty())
@@ -539,7 +541,7 @@ public class WebContext extends FrameworkContext {
 	 * @param listener
 	 *            监听器
 	 */
-	public void addListener(Bundle bundle, EventListener listener) {
+	public static void addListener(Bundle bundle, EventListener listener) {
 
 		String listenerClassName = listener.getClass().getName();
 		// 是否存在同类名实例

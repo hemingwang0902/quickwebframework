@@ -26,12 +26,13 @@ public class LogContext extends FrameworkContext {
 	// ======变量部分开始
 	private static Log log = LogFactory.getLog(LogContext.class.getName());
 	// 日志器Map
-	private Map<String, Log> logMap;
+	private static Map<String, Log> logMap;
 
 	// ======变量部分结束
 
 	public LogContext() {
-		logMap = new HashMap<String, Log>();
+		if (logMap == null)
+			logMap = new HashMap<String, Log>();
 	}
 
 	@Override
@@ -61,12 +62,14 @@ public class LogContext extends FrameworkContext {
 
 	}
 
-	public Log getLog(Class<?> clazz) {
+	public static Log getLog(Class<?> clazz) {
 		return getLog(clazz.getName());
 	}
 
-	public Log getLog(String name) {
+	public static Log getLog(String name) {
 		Log log = null;
+		if (logMap == null)
+			logMap = new HashMap<String, Log>();
 		synchronized (logMap) {
 			if (logMap.containsKey(name)) {
 				log = logMap.get(name);

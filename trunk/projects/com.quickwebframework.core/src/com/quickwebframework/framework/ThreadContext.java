@@ -25,16 +25,16 @@ public class ThreadContext extends FrameworkContext {
 
 	private static Log log = LogFactory.getLog(ThreadContext.class);
 	// ====== 变量部分开始
-	private List<Thread> threadList;
-	private Map<Bundle, List<Thread>> bundleThreadListMap;
-	private BundleListener bundleListener;
+	private static List<Thread> threadList;
+	private static Map<Bundle, List<Thread>> bundleThreadListMap;
+	private static BundleListener bundleListener;
 
 	/**
 	 * 得到线程列表
 	 * 
 	 * @return
 	 */
-	public List<Thread> getThreadList() {
+	public static List<Thread> getThreadList() {
 		return threadList;
 	}
 
@@ -76,7 +76,7 @@ public class ThreadContext extends FrameworkContext {
 	/**
 	 * 移除所有的线程
 	 */
-	public void removeAllThread() {
+	public static void removeAllThread() {
 		for (Bundle bundle : bundleThreadListMap.keySet()
 				.toArray(new Bundle[0])) {
 			removeBundleAllThread(bundle);
@@ -88,7 +88,7 @@ public class ThreadContext extends FrameworkContext {
 	 * 
 	 * @param bundle
 	 */
-	public void removeBundleAllThread(Bundle bundle) {
+	public static void removeBundleAllThread(Bundle bundle) {
 		if (!bundleThreadListMap.containsKey(bundle))
 			return;
 		Thread[] bundleThreadArray = bundleThreadListMap.get(bundle).toArray(
@@ -106,7 +106,7 @@ public class ThreadContext extends FrameworkContext {
 	 * @param bundle
 	 * @param thread
 	 */
-	public void removeThread(Bundle bundle, Thread thread) {
+	public static void removeThread(Bundle bundle, Thread thread) {
 
 		// 从Bundle对应的线程列表中移除
 		if (!bundleThreadListMap.containsKey(bundle))
@@ -140,7 +140,7 @@ public class ThreadContext extends FrameworkContext {
 	 * @param bundle
 	 * @param thread
 	 */
-	public void addThread(Bundle bundle, Thread thread) {
+	public static void addThread(Bundle bundle, Thread thread) {
 
 		String threadClassName = thread.getClass().getName();
 		// 是否存在同类名实例

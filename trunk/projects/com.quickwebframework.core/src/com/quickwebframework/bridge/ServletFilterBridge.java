@@ -59,7 +59,7 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
 		ArrayFilterChain arrayFilterChain = new ArrayFilterChain(WebContext
-				.getInstance().getFilterList().toArray(new Filter[0]));
+				.getFilterList().toArray(new Filter[0]));
 		arrayFilterChain.doFilter(request, response);
 		if (arrayFilterChain.isContinueFilterChain())
 			filterChain.doFilter(request, response);
@@ -81,12 +81,12 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 	// 过滤器初始化
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {
-		WebContext.getInstance().setFilterConfig(arg0);
+		WebContext.setFilterConfig(arg0);
 	}
 
 	@Override
 	public void destroy() {
 		// 移除所有的过滤器
-		WebContext.getInstance().removeAllListener();
+		WebContext.removeAllListener();
 	}
 }

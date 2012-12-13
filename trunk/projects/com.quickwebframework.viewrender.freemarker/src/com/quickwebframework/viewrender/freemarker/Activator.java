@@ -44,7 +44,7 @@ public class Activator implements BundleActivator {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.viewrender.freemarker.properties'！");
 		}
-		freemarkerPropertyFilePath = WebContext.getInstance()
+		freemarkerPropertyFilePath = WebContext
 				.getServletContext().getRealPath(freemarkerPropertyFilePath);
 
 		// 得到viewrender配置文件路径
@@ -60,7 +60,7 @@ public class Activator implements BundleActivator {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.viewrender.properties'！");
 		}
-		viewrenderPropertyFilePath = WebContext.getInstance()
+		viewrenderPropertyFilePath = WebContext
 				.getServletContext().getRealPath(viewrenderPropertyFilePath);
 
 		// 读取freemarker配置文件

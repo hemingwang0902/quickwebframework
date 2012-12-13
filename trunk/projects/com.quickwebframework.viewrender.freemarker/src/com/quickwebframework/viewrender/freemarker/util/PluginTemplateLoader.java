@@ -51,7 +51,7 @@ public class PluginTemplateLoader implements TemplateLoader {
 		// 对视图名称进行处理(添加前后缀)
 		path = viewNamePrefix + path + viewNameSuffix;
 
-		Bundle bundle = OsgiContext.getInstance().getBundleByName(pluginName);
+		Bundle bundle = OsgiContext.getBundleByName(pluginName);
 
 		if (bundle == null) {
 			throw new RuntimeException(String.format(

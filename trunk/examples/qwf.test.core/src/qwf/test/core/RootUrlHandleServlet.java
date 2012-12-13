@@ -17,7 +17,7 @@ public class RootUrlHandleServlet extends HttpServlet {
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			response.sendRedirect(WebContext.getInstance().getBundleMethodUrl(
+			response.sendRedirect(WebContext.getBundleMethodUrl(
 					Activator.getContext().getBundle().getSymbolicName(),
 					"index"));
 		} catch (IOException e) {

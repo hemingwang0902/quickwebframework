@@ -29,7 +29,7 @@ public class OsgiContext extends FrameworkContext {
 	// 核心Bundle
 	// static Bundle coreBundle;
 	// 插件名称插件Map
-	private Map<String, Bundle> bundleNameBundleMap;
+	private static Map<String, Bundle> bundleNameBundleMap;
 
 	// ======变量开始结束
 
@@ -90,7 +90,7 @@ public class OsgiContext extends FrameworkContext {
 	}
 
 	// 根据插件名称得到Bundle
-	public Bundle getBundleByName(String bundleName) {
+	public static Bundle getBundleByName(String bundleName) {
 		if (bundleNameBundleMap.containsKey(bundleName)) {
 			return bundleNameBundleMap.get(bundleName);
 		}

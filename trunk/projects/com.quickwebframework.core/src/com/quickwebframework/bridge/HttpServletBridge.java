@@ -41,13 +41,13 @@ public class HttpServletBridge extends HttpServlet {
 	public void renderView(MvcModelAndView mav, HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			if (WebContext.getInstance().getViewRenderService() != null) {
+			if (WebContext.getViewRenderService() != null) {
 				// 渲染视图
 				WebContext
-						.getInstance()
-						.getViewRenderService()
-						.renderView(mav.getBundle().getSymbolicName(),
-								mav.getViewName(), request, response);
+
+				.getViewRenderService().renderView(
+						mav.getBundle().getSymbolicName(), mav.getViewName(),
+						request, response);
 			} else {
 				response.sendError(500,
 						"[com.quickwebframework.core.DispatcherServlet] cannot found ViewRender!");
@@ -59,12 +59,11 @@ public class HttpServletBridge extends HttpServlet {
 
 	private void handleUrlNotFound(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		if (WebContext.getInstance().getUrlNotFoundHandleServlet() == null)
+		if (WebContext.getUrlNotFoundHandleServlet() == null)
 			response.sendError(404, "URL " + request.getRequestURI()
 					+ " not found!");
 		else
-			WebContext.getInstance().getUrlNotFoundHandleServlet()
-					.service(request, response);
+			WebContext.getUrlNotFoundHandleServlet().service(request, response);
 	}
 
 	private void processHttp(HttpServletRequest request,
@@ -77,8 +76,7 @@ public class HttpServletBridge extends HttpServlet {
 			}
 
 			try {
-				MvcModelAndView mav = WebContext.getInstance()
-						.getMvcFrameworkService()
+				MvcModelAndView mav = WebContext.getMvcFrameworkService()
 						.handle(request, response, bundleName, methodName);
 				if (mav == null) {
 					return;
@@ -90,7 +88,7 @@ public class HttpServletBridge extends HttpServlet {
 					renderView(mav, request, response);
 				}
 			} catch (Exception ex) {
-				HandlerExceptionResolver resolver = WebContext.getInstance()
+				HandlerExceptionResolver resolver = WebContext
 						.getHandlerExceptionResolver();
 
 				if (resolver == null)
@@ -138,13 +136,13 @@ public class HttpServletBridge extends HttpServlet {
 	// 处理根URL："/"请求
 	private void serviceRootUrl(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		if (WebContext.getInstance().getRootUrlHandleServlet() == null) {
+		if (WebContext.getRootUrlHandleServlet() == null) {
 			response.setContentType("text/html;charset=utf-8");
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
-			if (WebContext.getInstance().getMvcFrameworkService() != null) {
+			if (WebContext.getMvcFrameworkService() != null) {
 				Map<String, List<HttpMethodInfo>> map = WebContext
-						.getInstance().getMvcFrameworkService()
+						.getMvcFrameworkService()
 						.getBundleHttpMethodInfoListMap();
 				sb.append("<table>");
 				for (String bundleName : map.keySet()) {
@@ -171,14 +169,13 @@ public class HttpServletBridge extends HttpServlet {
 			response.getWriter().write(sb.toString());
 			return;
 		}
-		WebContext.getInstance().getRootUrlHandleServlet()
-				.service(request, response);
+		WebContext.getRootUrlHandleServlet().service(request, response);
 	}
 
 	// 得到Bundle资源
 	private InputStream getBundleResource(String bundleName, String resourcePath)
 			throws IOException {
-		Bundle bundle = OsgiContext.getInstance().getBundleByName(bundleName);
+		Bundle bundle = OsgiContext.getBundleByName(bundleName);
 		URL resourceUrl = bundle.getResource(resourcePath);
 		if (resourceUrl == null)
 			return null;

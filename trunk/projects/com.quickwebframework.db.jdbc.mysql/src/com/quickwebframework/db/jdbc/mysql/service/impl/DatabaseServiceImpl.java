@@ -11,7 +11,6 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.db.jdbc.mysql.Activator;
