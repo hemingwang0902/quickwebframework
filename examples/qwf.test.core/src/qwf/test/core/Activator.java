@@ -11,7 +11,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
-import com.quickwebframework.framework.IocContext;
 import com.quickwebframework.ioc.spring.util.ApplicationContextListener;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 import com.quickwebframework.service.DatabaseService;
@@ -69,9 +68,6 @@ public class Activator implements BundleActivator {
 					}
 
 				});
-
-		log.warn("-----"
-				+ IocContext.getBeanDefinitionCount(bundleContext.getBundle()));
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
