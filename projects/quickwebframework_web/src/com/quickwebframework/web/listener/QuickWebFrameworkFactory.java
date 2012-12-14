@@ -67,9 +67,7 @@ public abstract class QuickWebFrameworkFactory {
 			tmpLogger.removeHandler(handler);
 		}
 
-		if (logBridgeObject == null)
-			tmpLogger.addHandler(new java.util.logging.ConsoleHandler());
-		else
+		if (logBridgeObject != null)
 			tmpLogger.addHandler(logBridgeObject);
 
 		loggerMap.put(loggerName, tmpLogger);
@@ -402,8 +400,8 @@ public abstract class QuickWebFrameworkFactory {
 			this.addSimpleServiceStaticFieldLink(
 					CONST_HTTP_SERVLET_BRIDGE_CLASS_NAME,
 					"httpServletBridgeObject");
-			this.addSimpleServiceStaticFieldLink(
-					CONST_SERVLET_FILTER_BRIDGE_CLASS_NAME, "logBridgeObject");
+			this.addSimpleServiceStaticFieldLink(CONST_LOG_BRIDGE_CLASS_NAME,
+					"logBridgeObject");
 			this.addSimpleServiceStaticFieldLink(
 					CONST_SERVLET_FILTER_BRIDGE_CLASS_NAME,
 					"servletFilterBridgeObject");
