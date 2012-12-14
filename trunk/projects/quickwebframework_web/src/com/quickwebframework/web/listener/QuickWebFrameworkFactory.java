@@ -57,10 +57,20 @@ public abstract class QuickWebFrameworkFactory {
 		if (loggerMap.containsKey(loggerName)) {
 			return loggerMap.get(loggerName);
 		}
+
 		Logger tmpLogger = Logger.getLogger(loggerName);
 		tmpLogger.setLevel(Level.FINEST);
-		if (logBridgeObject != null)
+
+		Handler[] handlers = tmpLogger.getHandlers();
+		for (Handler handler : handlers) {
+			tmpLogger.removeHandler(handler);
+		}
+
+		if (logBridgeObject == null)
+			tmpLogger.addHandler(new java.util.logging.ConsoleHandler());
+		else
 			tmpLogger.addHandler(logBridgeObject);
+
 		loggerMap.put(loggerName, tmpLogger);
 		return tmpLogger;
 	}

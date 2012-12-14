@@ -172,8 +172,6 @@ public class BundleUtil {
 					bundleInputStreams);
 
 			return bundles;
-		} catch (IOException ex) {
-			throw ex;
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		} finally {
@@ -259,9 +257,9 @@ public class BundleUtil {
 			logger.warning("RemovalPendingBundle error." + error.getMessage());
 		}
 
-		// 休息1秒钟
+		// 休息0.001秒钟
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(1);
 		} catch (InterruptedException e) {
 		}
 

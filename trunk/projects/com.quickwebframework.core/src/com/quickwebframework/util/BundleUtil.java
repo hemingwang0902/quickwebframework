@@ -292,6 +292,12 @@ public class BundleUtil {
 		} catch (InterruptedException e) {
 		}
 
+		// 休息0.001秒钟
+		try {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
+		}
+
 		// 重新排出启动或刷新顺序
 		List<BundleInfo> shouldStartBundleInfoList = getShouldRefreshBundleInfoList(
 				bundleInfoList, BundleUtil.getAllBundleInfoList(bundleContext));
