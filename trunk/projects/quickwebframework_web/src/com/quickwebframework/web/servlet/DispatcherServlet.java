@@ -1,5 +1,6 @@
 package com.quickwebframework.web.servlet;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -27,6 +28,20 @@ public class DispatcherServlet extends HttpServlet {
 	public void init() {
 	}
 
+	private void handleUrlNotFound(HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		// 如果QuickWebFramework视图分发Servlet不为空
+		PluginViewDispatcherServlet pluginViewDispatcherServlet = PluginViewDispatcherServlet
+				.getInstance();
+		if (pluginViewDispatcherServlet != null) {
+			// 交给QuickWebFramework视图分发Servlet
+			pluginViewDispatcherServlet.service(request, response);
+		} else {
+			// 发送错误码
+			response.sendError(404);
+		}
+	}
+
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
@@ -36,7 +51,7 @@ public class DispatcherServlet extends HttpServlet {
 
 			// 保护WEB-INF中的文件
 			if (requestURI.startsWith("/WEB-INF")) {
-				response.sendError(403);
+				handleUrlNotFound(request, response);
 				return;
 			}
 
@@ -47,16 +62,18 @@ public class DispatcherServlet extends HttpServlet {
 				}
 			}
 
+			// 如果是WEB项目的资源
 			InputStream inputStream = getServletContext().getResourceAsStream(
 					requestURI);
-			if (inputStream == null) {
-				response.sendError(404);
+			if (inputStream != null) {
+				// 输出
+				OutputStream outputStream = response.getOutputStream();
+				IoUtil.copyStream(inputStream, outputStream);
+				inputStream.close();
 				return;
 			}
-			// 输出
-			OutputStream outputStream = response.getOutputStream();
-			IoUtil.copyStream(inputStream, outputStream);
-			inputStream.close();
+			// 处理URL未找到
+			handleUrlNotFound(request, response);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
