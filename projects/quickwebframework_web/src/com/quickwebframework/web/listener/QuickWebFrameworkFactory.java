@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -24,9 +25,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.BundleListener;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
@@ -75,7 +76,6 @@ public abstract class QuickWebFrameworkFactory {
 		return tmpLogger;
 	}
 
-	public final static String CONST_FRAMEWORK_CORE_BUNDLE_NAME = "com.quickwebframework.core";
 	// HttpServlet桥接对象类名
 	public final static String CONST_HTTP_SERVLET_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.HttpServletBridge";
 	// 日志桥接对象类名
@@ -95,6 +95,17 @@ public abstract class QuickWebFrameworkFactory {
 	private static Properties quickWebFrameworkProperties;
 
 	private static Framework framework;
+	private Map<String, Field> serviceFieldMap = new HashMap<String, Field>();
+	// 相应的Servlet
+	public static List<QwfServlet> qwfServletList = new ArrayList<QwfServlet>();
+	// HttpServlet桥接对象
+	private static HttpServlet httpServletBridgeObject;
+	// 日志桥接对象
+	private static Handler logBridgeObject;
+	// Servlet过滤器桥接对象
+	private static Filter servletFilterBridgeObject;
+	// Servlet监听器桥接对象
+	private static EventListener servletListenerBridgeObject;
 
 	/**
 	 * 得到Framework对象
@@ -115,15 +126,6 @@ public abstract class QuickWebFrameworkFactory {
 		return framework.getBundleContext();
 	}
 
-	// HttpServlet桥接对象
-	private static HttpServlet httpServletBridgeObject;
-	// 日志桥接对象
-	private static Handler logBridgeObject;
-	// Servlet过滤器桥接对象
-	private static Filter servletFilterBridgeObject;
-	// Servlet监听器桥接对象
-	private static EventListener servletListenerBridgeObject;
-
 	public static HttpServlet getHttpServletBridgeObject() {
 		return httpServletBridgeObject;
 	}
@@ -140,28 +142,24 @@ public abstract class QuickWebFrameworkFactory {
 		return servletListenerBridgeObject;
 	}
 
-	// 刷新框架各桥接对象
-	private static void refreshFrameworkBridgeObject() {
-		httpServletBridgeObject = (HttpServlet) getOsgiServiceObject(CONST_HTTP_SERVLET_BRIDGE_CLASS_NAME);
-		logBridgeObject = (Handler) getOsgiServiceObject(CONST_LOG_BRIDGE_CLASS_NAME);
-		servletFilterBridgeObject = (Filter) getOsgiServiceObject(CONST_SERVLET_FILTER_BRIDGE_CLASS_NAME);
-		servletListenerBridgeObject = (EventListener) getOsgiServiceObject(CONST_SERVLET_LISTENER_BRIDGE_CLASS_NAME);
+	private void setServiceObjectToStaticField(String serviceName, Field field) {
+		field.setAccessible(true);
+		try {
+			field.set(null, getOsgiServiceObject(serviceName));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
-		// 刷新各日志的处理器
-		if (logBridgeObject != null) {
-			synchronized (loggerMap) {
-				for (String tmpLoggerName : loggerMap.keySet()) {
-					Logger tmpLogger = loggerMap.get(tmpLoggerName);
-
-					// 先移除所有的处理器
-					Handler[] tmpLoggerHandlers = tmpLogger.getHandlers();
-					for (Handler tmpLoggerHandler : tmpLoggerHandlers) {
-						tmpLogger.removeHandler(tmpLoggerHandler);
-					}
-					// 添加框架中的日志处理器
-					tmpLogger.addHandler(logBridgeObject);
-				}
-			}
+	protected void addSimpleServiceStaticFieldLink(String serviceName,
+			String fieldName) {
+		try {
+			Field field = QuickWebFrameworkFactory.class
+					.getDeclaredField(fieldName);
+			serviceFieldMap.put(serviceName, field);
+			setServiceObjectToStaticField(serviceName, field);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 
@@ -174,9 +172,6 @@ public abstract class QuickWebFrameworkFactory {
 			return null;
 		return bundleContext.getService(serviceReference);
 	}
-
-	// 相应的Servlet
-	public static List<QwfServlet> qwfServletList = new ArrayList<QwfServlet>();
 
 	// 启动OSGi Freamwork
 	public void startOSGiFreamwork(ServletContext servletContext) {
@@ -364,19 +359,57 @@ public abstract class QuickWebFrameworkFactory {
 			// 设置WEB根目录到系统配置中
 			System.setProperty("web.root.dir", servletContext.getRealPath("/"));
 
-			// Bundle监听器
-			getBundleContext().addBundleListener(new BundleListener() {
-				public void bundleChanged(BundleEvent event) {
-					if (event.getType() == BundleEvent.STARTED) {
-						if (event.getBundle().getSymbolicName()
-								.equals(CONST_FRAMEWORK_CORE_BUNDLE_NAME)) {
-							refreshFrameworkBridgeObject();
+			getBundleContext().addServiceListener(new ServiceListener() {
+
+				@Override
+				public void serviceChanged(ServiceEvent event) {
+					String changedServiceName = event.getServiceReference()
+							.toString();
+					for (String serviceName : serviceFieldMap.keySet()) {
+						if (changedServiceName.contains(serviceName)) {
+							Field field = serviceFieldMap.get(serviceName);
+							setServiceObjectToStaticField(serviceName, field);
+						}
+					}
+					// 日志特殊处理
+					if (changedServiceName
+							.contains(CONST_SERVLET_FILTER_BRIDGE_CLASS_NAME)) {
+						// 刷新各日志的处理器
+						if (logBridgeObject != null) {
+							synchronized (loggerMap) {
+								for (String tmpLoggerName : loggerMap.keySet()) {
+									Logger tmpLogger = loggerMap
+											.get(tmpLoggerName);
+
+									// 先移除所有的处理器
+									Handler[] tmpLoggerHandlers = tmpLogger
+											.getHandlers();
+									for (Handler tmpLoggerHandler : tmpLoggerHandlers) {
+										tmpLogger
+												.removeHandler(tmpLoggerHandler);
+									}
+									// 添加框架中的日志处理器
+									tmpLogger.addHandler(logBridgeObject);
+								}
+							}
 						}
 					}
 				}
 			});
 
 			framework.start();
+
+			this.addSimpleServiceStaticFieldLink(
+					CONST_HTTP_SERVLET_BRIDGE_CLASS_NAME,
+					"httpServletBridgeObject");
+			this.addSimpleServiceStaticFieldLink(
+					CONST_SERVLET_FILTER_BRIDGE_CLASS_NAME, "logBridgeObject");
+			this.addSimpleServiceStaticFieldLink(
+					CONST_SERVLET_FILTER_BRIDGE_CLASS_NAME,
+					"servletFilterBridgeObject");
+			this.addSimpleServiceStaticFieldLink(
+					CONST_SERVLET_LISTENER_BRIDGE_CLASS_NAME,
+					"servletListenerBridgeObject");
 
 			// 启动OSGi框架所用时间
 			long startFrameworkUsedTime = System.currentTimeMillis()
