@@ -3,8 +3,6 @@ package com.quickwebframework.web.thread;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
@@ -57,14 +55,6 @@ public class BundleAutoManageThread extends Thread {
 				// 如果没有文件
 				if (files == null || files.length == 0)
 					continue;
-
-				List<File> fileList = new ArrayList<File>();
-				for (File file : files) {
-					if (file.canRead()) {
-						fileList.add(file);
-					}
-				}
-				files = fileList.toArray(new File[0]);
 
 				try {
 					BundleUtil.installOrUpdateBundle(bundleContext, files);

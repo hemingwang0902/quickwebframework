@@ -172,6 +172,8 @@ public class BundleUtil {
 					bundleInputStreams);
 
 			return bundles;
+		} catch (IOException ex) {
+			throw ex;
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		} finally {
