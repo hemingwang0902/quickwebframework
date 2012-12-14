@@ -13,6 +13,12 @@ import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 
 public class PluginViewDispatcherServlet extends QwfServlet {
 
+	private static PluginViewDispatcherServlet instance;
+
+	public static PluginViewDispatcherServlet getInstance() {
+		return instance;
+	}
+
 	private static final long serialVersionUID = -148988758320673145L;
 
 	public static final String MAPPING_PROPERTY_KEY = "quickwebframework.pluginViewServlet.mapping";
@@ -47,36 +53,31 @@ public class PluginViewDispatcherServlet extends QwfServlet {
 	public static QwfServlet initServlet(ServletContext servletContext,
 			Properties quickWebFrameworkProperties) {
 		// 添加插件视图Servlet
-		PluginViewDispatcherServlet pluginViewDispatcherServlet = new PluginViewDispatcherServlet();
+		instance = new PluginViewDispatcherServlet();
 		String pluginViewDispatcherServletMapping = quickWebFrameworkProperties
 				.getProperty(PluginViewDispatcherServlet.MAPPING_PROPERTY_KEY);
 		// 设置映射的URL
-		pluginViewDispatcherServlet
-				.setMapping(pluginViewDispatcherServletMapping);
+		instance.setMapping(pluginViewDispatcherServletMapping);
 		// 设置请求参数中的插件名称参数
-		pluginViewDispatcherServlet
-				.setBundleNameParameterName(quickWebFrameworkProperties
-						.getProperty(PluginViewDispatcherServlet.BUNDLE_NAME_PARAMETER_NAME_PROPERTY_KEY));
+		instance.setBundleNameParameterName(quickWebFrameworkProperties
+				.getProperty(PluginViewDispatcherServlet.BUNDLE_NAME_PARAMETER_NAME_PROPERTY_KEY));
 		// 设置请求参数中的方法名称参数
-		pluginViewDispatcherServlet
-				.setMethodNameParameterName(quickWebFrameworkProperties
-						.getProperty(PluginViewDispatcherServlet.METHOD_NAME_PARAMETER_NAME_PROPERTY_KEY));
+		instance.setMethodNameParameterName(quickWebFrameworkProperties
+				.getProperty(PluginViewDispatcherServlet.METHOD_NAME_PARAMETER_NAME_PROPERTY_KEY));
 
 		String urlTemplate = null;
 		// 如果映射的URL是类似于 */view/
-		if (pluginViewDispatcherServlet.mapping.startsWith("*")) {
+		if (instance.mapping.startsWith("*")) {
 			urlMappingStyle = 1;
-			String keyword = pluginViewDispatcherServlet.mapping.replace("*",
-					"").replace("/", "");
+			String keyword = instance.mapping.replace("*", "").replace("/", "");
 			urlTemplate = "/" + servletContext.getContextPath() + "/%s/"
 					+ keyword + "/%s";
 			urlTemplate = urlTemplate.replace("//", "/");
 		}
 		// 如果映射的URL是类似于 /view/*
-		else if (pluginViewDispatcherServlet.mapping.endsWith("*")) {
+		else if (instance.mapping.endsWith("*")) {
 			urlMappingStyle = 2;
-			String keyword = pluginViewDispatcherServlet.mapping.replace("*",
-					"").replace("/", "");
+			String keyword = instance.mapping.replace("*", "").replace("/", "");
 			urlTemplate = "/" + servletContext.getContextPath() + "/" + keyword
 					+ "/%s/%s";
 			urlTemplate = urlTemplate.replace("//", "/");
@@ -84,28 +85,24 @@ public class PluginViewDispatcherServlet extends QwfServlet {
 		// 否则应该是类似于/view，只需要直接取出参数
 		else {
 			urlMappingStyle = 3;
-			if (StringUtils
-					.isEmpty(pluginViewDispatcherServlet.bundleNameParameterName)) {
+			if (StringUtils.isEmpty(instance.bundleNameParameterName)) {
 				throw new RuntimeException(
 						"在QuickWebFramework的配置文件中未找到配置项:[quickwebframework.pluginViewServlet.bundleNameParameterName]");
 			}
-			if (StringUtils
-					.isEmpty(pluginViewDispatcherServlet.methodNameParameterName)) {
+			if (StringUtils.isEmpty(instance.methodNameParameterName)) {
 				throw new RuntimeException(
 						"在QuickWebFramework的配置文件中未找到配置项:[quickwebframework.pluginViewServlet.methodNameParameterName]");
 			}
-			urlTemplate = pluginViewDispatcherServlet.mapping + "?"
-					+ pluginViewDispatcherServlet.bundleNameParameterName
-					+ "=%s&"
-					+ pluginViewDispatcherServlet.methodNameParameterName
-					+ "=%s";
+			urlTemplate = instance.mapping + "?"
+					+ instance.bundleNameParameterName + "=%s&"
+					+ instance.methodNameParameterName + "=%s";
 		}
 		if (!urlTemplate.startsWith("/")) {
 			urlTemplate = "/" + urlTemplate;
 		}
 		servletContext.setAttribute(BUNDLE_METHOD_URL_TEMPLATE, urlTemplate);
 
-		return pluginViewDispatcherServlet;
+		return instance;
 	}
 
 	@Override
@@ -118,7 +115,7 @@ public class PluginViewDispatcherServlet extends QwfServlet {
 		if (urlMappingStyle == 1) {
 			String[] tmpArray = StringUtils.split(requestUrlWithoutContextPath,
 					"/");
-			if (tmpArray.length < 2) {
+			if (tmpArray.length <= 2) {
 				return false;
 			}
 			String keyword = mapping.replace("*", "").replace("/", "");
@@ -162,15 +159,19 @@ public class PluginViewDispatcherServlet extends QwfServlet {
 
 				// 得到bundleName和methodName
 
+				String requestUrlWithoutContextPath = requestURI
+						.substring(contextPath.length());
+				if (!this.isUrlMatch(requestUrlWithoutContextPath)) {
+				}
 				// 如果映射的URL是类似于 */view/
-				if (urlMappingStyle == 1) {
-					String otherString = requestURI.substring(contextPath
-							.length());
-					String[] tmpArray = StringUtils.split(otherString, "/");
+				else if (urlMappingStyle == 1) {
+					String[] tmpArray = StringUtils.split(
+							requestUrlWithoutContextPath, "/");
 					if (tmpArray.length >= 2) {
 						bundleName = tmpArray[0];
-						methodName = otherString.substring(bundleName.length()
-								+ mapping.length());
+						methodName = requestUrlWithoutContextPath
+								.substring(bundleName.length()
+										+ mapping.length());
 					}
 				}
 				// 否则如果是类似于/view/*
