@@ -117,7 +117,12 @@ public class HttpServletBridge extends HttpServlet {
 			return;
 		}
 
-		String bundleName = request.getAttribute(ARG_BUNDLE_NAME).toString();
+		Object bundleNameObject = request.getAttribute(ARG_BUNDLE_NAME);
+		if (bundleNameObject == null) {
+			processHttp(request, response, null, null);
+			return;
+		}
+		String bundleName = bundleNameObject.toString();
 		Object methodNameObject = request.getAttribute(ARG_METHOD_NAME);
 		Object resourcePathObject = request.getAttribute(ARG_RESOURCE_PATH);
 		// 如果是视图
