@@ -144,6 +144,7 @@ public class PluginViewDispatcherServlet extends QwfServlet {
 				response.setContentType("text/html;charset=utf-8");
 				StringBuilder sb = new StringBuilder();
 				sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
+				sb.append("<p>QuickWebFrameweb's core bundle not installed or started,please install core bundle and start it first!</p>");
 				sb.append("</body></html>");
 				response.getWriter().write(sb.toString());
 				return;
