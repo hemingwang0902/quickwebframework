@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: QuickWebFramework MVC Framework(Spring MVC)
 Bundle-SymbolicName: com.quickwebframework.mvc.spring
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.2.0.qualifier
 Bundle-Activator: com.quickwebframework.mvc.spring.Activator
 Bundle-Vendor: aaaSoft
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -18,9 +18,9 @@ Import-Package: javax.servlet,
  org.osgi.framework;version="1.3.0",
  org.w3c.dom,
  org.xml.sax
-Bundle-ClassPath: org.springframework.web_3.0.5.RELEASE.jar,
- org.springframework.web.servlet_3.0.5.RELEASE.jar,
- .
+Bundle-ClassPath: .,
+ spring-web-3.2.0.RELEASE.jar,
+ spring-webmvc-3.2.0.RELEASE.jar
 Require-Bundle: com.quickwebframework.core;bundle-version="1.0.0",
  com.quickwebframework.ioc.spring;bundle-version="1.0.0"
 Export-Package: com.quickwebframework.mvc.spring.util,

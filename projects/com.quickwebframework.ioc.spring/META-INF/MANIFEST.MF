@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: QuickWebFramework IoC Container(Spring IoC)
 Bundle-SymbolicName: com.quickwebframework.ioc.spring
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.2.0.qualifier
 Bundle-Activator: com.quickwebframework.ioc.spring.Activator
 Bundle-Vendor: aaaSoft
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -17,13 +17,12 @@ Import-Package: javax.xml.parsers,
  org.xml.sax
 Require-Bundle: com.quickwebframework.core;bundle-version="1.0.0"
 Bundle-ClassPath: org.aopalliance_1.0.0.v200905130917.jar,
- org.springframework.aop_3.0.5.RELEASE.jar,
- org.springframework.asm_3.0.5.RELEASE.jar,
- org.springframework.beans_3.0.5.RELEASE.jar,
- org.springframework.context_3.0.5.RELEASE.jar,
- org.springframework.core_3.0.5.RELEASE.jar,
- org.springframework.expression_3.0.5.RELEASE.jar,
- .
+ .,
+ spring-aop-3.2.0.RELEASE.jar,
+ spring-beans-3.2.0.RELEASE.jar,
+ spring-context-3.2.0.RELEASE.jar,
+ spring-core-3.2.0.RELEASE.jar,
+ spring-expression-3.2.0.RELEASE.jar
 Export-Package: com.quickwebframework.ioc.spring.util,
  org.aopalliance.aop,
  org.aopalliance.intercept,

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: QuickWebFramework ORM Bundle(Spring JDBC)
 Bundle-SymbolicName: com.quickwebframework.db.orm.spring.jdbc
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.2.0.qualifier
 Bundle-Activator: com.quickwebframework.db.orm.spring.jdbc.Activator
 Bundle-Vendor: aaaSoft
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -30,8 +30,8 @@ Export-Package: com.quickwebframework.db.orm.spring.jdbc,
  org.springframework.jdbc.support.nativejdbc,
  org.springframework.jdbc.support.rowset,
  org.springframework.jdbc.support.xml
-Bundle-ClassPath: org.springframework.jdbc_3.0.5.RELEASE.jar,
- org.springframework.transaction-3.1.1.RELEASE.jar,
- org.springframework.beans_3.0.5.RELEASE.jar,
- org.springframework.core_3.0.5.RELEASE.jar,
- .
+Bundle-ClassPath: .,
+ spring-beans-3.2.0.RELEASE.jar,
+ spring-core-3.2.0.RELEASE.jar,
+ spring-jdbc-3.2.0.RELEASE.jar,
+ spring-tx-3.2.0.RELEASE.jar
