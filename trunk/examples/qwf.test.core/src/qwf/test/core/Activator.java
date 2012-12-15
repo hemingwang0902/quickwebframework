@@ -14,6 +14,7 @@ import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 
 public class Activator implements BundleActivator {
 	private static BundleContext context;
+	private ApplicationContextListener applicationContextListener;
 
 	public static BundleContext getContext() {
 		return context;
@@ -32,35 +33,43 @@ public class Activator implements BundleActivator {
 		}
 	}
 
+	public Activator() {
+		applicationContextListener = new ApplicationContextListener() {
+
+			// 开始时
+			public void contextStarting(ApplicationContext applicationContext,
+					Bundle bundle) {
+				if (AnnotationConfigApplicationContext.class
+						.isInstance(applicationContext)) {
+					AnnotationConfigApplicationContext annotationConfigApplicationContext = (AnnotationConfigApplicationContext) applicationContext;
+					// 设置Bean名称生成器
+					annotationConfigApplicationContext
+							.setBeanNameGenerator(new MySpringBeanNameGenerator());
+				}
+			}
+
+			// 开始后
+			public void contextStarted(ApplicationContext applicationContext,
+					Bundle bundle) {
+			}
+
+		};
+	}
+
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
 
 		// 添加一个ApplicationContext监听器
 		BundleApplicationContextUtils
-				.addApplicationContextListener(new ApplicationContextListener() {
-
-					// 开始时
-					public void contextStarting(
-							ApplicationContext applicationContext, Bundle bundle) {
-						if (AnnotationConfigApplicationContext.class
-								.isInstance(applicationContext)) {
-							AnnotationConfigApplicationContext annotationConfigApplicationContext = (AnnotationConfigApplicationContext) applicationContext;
-							// 设置Bean名称生成器
-							annotationConfigApplicationContext
-									.setBeanNameGenerator(new MySpringBeanNameGenerator());
-						}
-					}
-
-					// 开始后
-					public void contextStarted(
-							ApplicationContext applicationContext, Bundle bundle) {
-					}
-
-				});
+				.addApplicationContextListener(applicationContextListener);
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
 		Activator.context = null;
+
+		// 移除一个ApplicationContext监听器
+		BundleApplicationContextUtils
+				.removeApplicationContextListener(applicationContextListener);
 	}
 
 }
