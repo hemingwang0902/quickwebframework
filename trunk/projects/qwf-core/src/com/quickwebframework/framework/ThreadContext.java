@@ -31,12 +31,12 @@ public class ThreadContext extends FrameworkContext {
 	private static BundleListener bundleListener;
 
 	/**
-	 * 得到线程列表
+	 * 得到所有线程
 	 * 
 	 * @return
 	 */
-	public static List<Thread> getThreadList() {
-		return threadList;
+	public static Thread[] getThreads() {
+		return threadList.toArray(new Thread[0]);
 	}
 
 	// ====== 变量部分结束

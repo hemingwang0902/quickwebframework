@@ -1,5 +1,6 @@
 package com.quickwebframework.framework;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -133,7 +134,7 @@ public class WebContext extends FrameworkContext {
 		WebContext.filterConfig = filterConfig;
 		if (filterConfig == null)
 			return;
-		for (Filter filter : getFilterList()) {
+		for (Filter filter : filterList) {
 			try {
 				filter.init(filterConfig);
 			} catch (ServletException e) {
@@ -143,12 +144,12 @@ public class WebContext extends FrameworkContext {
 	}
 
 	/**
-	 * 得到过滤器列表
+	 * 得到所有过滤器
 	 * 
 	 * @return
 	 */
-	public static List<Filter> getFilterList() {
-		return filterList;
+	public static Filter[] getFilters() {
+		return filterList.toArray(new Filter[0]);
 	}
 
 	// ===== 过滤器变量部分结束
@@ -459,12 +460,26 @@ public class WebContext extends FrameworkContext {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends EventListener> List<T> getListenerList(
+	private static <T extends EventListener> List<T> getListenerList(
 			Class<T> clazz) {
 		String listenerTypeName = getServletInterface(clazz).getName();
 		if (!typeNameListenerListMap.containsKey(listenerTypeName))
 			return null;
 		return (List<T>) typeNameListenerListMap.get(listenerTypeName);
+	}
+
+	/**
+	 * 得到所有监听器
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends EventListener> T[] getListeners(Class<T> clazz) {
+		List<T> list = getListenerList(clazz);
+		if (list == null)
+			return null;
+		return list.toArray((T[]) Array.newInstance(clazz, 0));
 	}
 
 	/**

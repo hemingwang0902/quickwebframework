@@ -1,6 +1,5 @@
 package qwf.test.core.controller;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +18,7 @@ public class ControllerInfoController {
 
 	@RequestMapping(value = "controller", method = RequestMethod.GET)
 	public String get_controller(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+			HttpServletResponse response) {
 		// 得到插件名称与方法名称列表的MAP
 		Map<String, List<HttpMethodInfo>> bundleNameHttpMethodInfoListMap = WebContext
 				.getMvcFrameworkService().getBundleHttpMethodInfoListMap();
