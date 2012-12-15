@@ -1,23 +1,12 @@
 <html>
 <head>
-<title>qwf.test.core index</title>
+<title>首页</title>
 </head>
 <body>
-	<#include "qwf.test.calculator:test">
-	<p>Hello,this is a test bundle for QuickWebFramework!</p>
-	<#list bundleNameHttpMethodInfoListMap?keys as bundleName>
-	<div>
-		<h1>${bundleName}</h1>
-		<#list bundleNameHttpMethodInfoListMap[bundleName] as httpMethodInfo>
-		<p>
-			&nbsp;&nbsp;<a href="${httpMethodInfo.mappingUrl}">${httpMethodInfo.mappingUrl}</a>
-			(${httpMethodInfo.httpMethod})
-		</p>
-		</#list>
-	</div>
-	</#list>
-	<form method="post">
-		<input type="submit" value="提交">
-	</form>
+	<p>
+		<b>首页</b>
+	</p>
+	<#include "qwf.test.core:navbar">
+	<p>这个QuickWebFramework的一个测试插件！</p>
 </body>
 </html>
