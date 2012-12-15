@@ -3,7 +3,7 @@
     <wb-module deploy-name="qwf.test.web">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <dependent-module archiveName="quickwebframework_web.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/quickwebframework_web/quickwebframework_web">
+        <dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/qwf_web/qwf_web">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="java-output-path" value="/qwf.test.web/build/classes"/>

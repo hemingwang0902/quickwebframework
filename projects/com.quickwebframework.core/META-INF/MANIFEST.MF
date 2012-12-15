@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: QuickWebFramework Core Bundle
-Bundle-SymbolicName: com.quickwebframework.core
+Bundle-SymbolicName: qwf-core
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.quickwebframework.core.Activator
 Bundle-Vendor: aaaSoft
