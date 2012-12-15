@@ -6,17 +6,17 @@ import javax.servlet.http.HttpSessionEvent;
 
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class TestListener implements javax.servlet.ServletRequestListener,
 		javax.servlet.ServletContextListener,
 		javax.servlet.http.HttpSessionListener {
 
 	public void requestDestroyed(ServletRequestEvent arg0) {
-		System.out.println("request销毁:" + arg0.getServletRequest());
+		// System.out.println("request销毁:" + arg0.getServletRequest());
 	}
 
 	public void requestInitialized(ServletRequestEvent arg0) {
-		System.out.println("request初始化:" + arg0.getServletRequest());
+		// System.out.println("request初始化:" + arg0.getServletRequest());
 	}
 
 	public void contextDestroyed(ServletContextEvent arg0) {
