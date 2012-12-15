@@ -25,6 +25,12 @@ import com.quickwebframework.web.fileupload.memory.MemoryFileItemFactory;
 import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 
 public class PluginManageServlet extends QwfServlet {
+	private static PluginManageServlet instance;
+
+	public static PluginManageServlet getInstance() {
+		return instance;
+	}
+
 	/**
 	 * 
 	 */
@@ -34,9 +40,15 @@ public class PluginManageServlet extends QwfServlet {
 	// 模板字符串
 	private String templateString;
 	// 映射的URL
-	private static String mapping;
+	private String mapping;
 
-	public PluginManageServlet() {
+	// 得到映射的URL
+	public String getMapping() {
+		return mapping;
+	}
+
+	public PluginManageServlet(String mapping) {
+		this.mapping = mapping;
 		try {
 			InputStream inputStream = this
 					.getClass()
@@ -56,15 +68,14 @@ public class PluginManageServlet extends QwfServlet {
 	// 初始化插件管理Servlet
 	public static QwfServlet initServlet(ServletContext servletContext,
 			Properties quickWebFrameworkProperties) {
-
-		mapping = quickWebFrameworkProperties
+		String mapping = quickWebFrameworkProperties
 				.getProperty(PluginManageServlet.MAPPING_PROPERTY_KEY);
 		if (mapping == null)
 			return null;
 
 		// 添加插件管理Servlet
-		PluginManageServlet pluginManageServlet = new PluginManageServlet();
-		return pluginManageServlet;
+		instance = new PluginManageServlet(mapping);
+		return instance;
 	}
 
 	@Override
