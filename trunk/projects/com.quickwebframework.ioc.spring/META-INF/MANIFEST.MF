@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: QuickWebFramework IoC Container(Spring IoC)
-Bundle-SymbolicName: com.quickwebframework.ioc.spring
+Bundle-SymbolicName: qwf-ioc-spring
 Bundle-Version: 3.2.0.qualifier
 Bundle-Activator: com.quickwebframework.ioc.spring.Activator
 Bundle-Vendor: aaaSoft
@@ -15,7 +15,7 @@ Import-Package: javax.xml.parsers,
  org.osgi.framework;version="1.3.0",
  org.w3c.dom,
  org.xml.sax
-Require-Bundle: com.quickwebframework.core;bundle-version="1.0.0"
+Require-Bundle: qwf-core;bundle-version="1.0.0"
 Bundle-ClassPath: org.aopalliance_1.0.0.v200905130917.jar,
  .,
  spring-aop-3.2.0.RELEASE.jar,

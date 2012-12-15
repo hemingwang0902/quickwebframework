@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>com.quickwebframework.db.orm.spring.jdbc</name>
+	<name>qwf-db-orm-springjdbc</name>
 	<comment></comment>
 	<projects>
 	</projects>
