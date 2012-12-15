@@ -144,7 +144,7 @@ public class HttpServletBridge extends HttpServlet {
 		if (WebContext.getRootUrlHandleServlet() == null) {
 			response.setContentType("text/html;charset=utf-8");
 			StringBuilder sb = new StringBuilder();
-			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use <a href=\"http://quickwebframework.com\">QuickWebFramework</a>!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
+			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use QuickWebFramework!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
 			if (WebContext.getMvcFrameworkService() != null) {
 				Map<String, List<HttpMethodInfo>> map = WebContext
 						.getMvcFrameworkService()
