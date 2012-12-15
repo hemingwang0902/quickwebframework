@@ -1,7 +1,5 @@
 package com.quickwebframework.bridge;
 
-import java.util.List;
-
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
@@ -28,22 +26,22 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 ServletContextListener
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		List<ServletContextListener> list = WebContext
-				.getListenerList(ServletContextListener.class);
-		if (list == null)
+		ServletContextListener[] listeners = WebContext
+				.getListeners(ServletContextListener.class);
+		if (listeners == null)
 			return;
-		for (ServletContextListener listener : list) {
+		for (ServletContextListener listener : listeners) {
 			listener.contextInitialized(arg0);
 		}
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		List<ServletContextListener> list = WebContext
-				.getListenerList(ServletContextListener.class);
-		if (list == null)
+		ServletContextListener[] listeners = WebContext
+				.getListeners(ServletContextListener.class);
+		if (listeners == null)
 			return;
-		for (ServletContextListener listener : list) {
+		for (ServletContextListener listener : listeners) {
 			listener.contextDestroyed(arg0);
 		}
 	}
@@ -53,33 +51,33 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 ServletContextAttributeListener
 	@Override
 	public void attributeAdded(ServletContextAttributeEvent arg0) {
-		List<ServletContextAttributeListener> list = WebContext
-				.getListenerList(ServletContextAttributeListener.class);
-		if (list == null)
+		ServletContextAttributeListener[] listeners = WebContext
+				.getListeners(ServletContextAttributeListener.class);
+		if (listeners == null)
 			return;
-		for (ServletContextAttributeListener listener : list) {
+		for (ServletContextAttributeListener listener : listeners) {
 			listener.attributeAdded(arg0);
 		}
 	}
 
 	@Override
 	public void attributeRemoved(ServletContextAttributeEvent arg0) {
-		List<ServletContextAttributeListener> list = WebContext
-				.getListenerList(ServletContextAttributeListener.class);
-		if (list == null)
+		ServletContextAttributeListener[] listeners = WebContext
+				.getListeners(ServletContextAttributeListener.class);
+		if (listeners == null)
 			return;
-		for (ServletContextAttributeListener listener : list) {
+		for (ServletContextAttributeListener listener : listeners) {
 			listener.attributeRemoved(arg0);
 		}
 	}
 
 	@Override
 	public void attributeReplaced(ServletContextAttributeEvent arg0) {
-		List<ServletContextAttributeListener> list = WebContext
-				.getListenerList(ServletContextAttributeListener.class);
-		if (list == null)
+		ServletContextAttributeListener[] listeners = WebContext
+				.getListeners(ServletContextAttributeListener.class);
+		if (listeners == null)
 			return;
-		for (ServletContextAttributeListener listener : list) {
+		for (ServletContextAttributeListener listener : listeners) {
 			listener.attributeReplaced(arg0);
 		}
 	}
@@ -89,22 +87,22 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 ServletRequestListener
 	@Override
 	public void requestDestroyed(ServletRequestEvent arg0) {
-		List<ServletRequestListener> list = WebContext
-				.getListenerList(ServletRequestListener.class);
-		if (list == null)
+		ServletRequestListener[] listeners = WebContext
+				.getListeners(ServletRequestListener.class);
+		if (listeners == null)
 			return;
-		for (ServletRequestListener listener : list) {
+		for (ServletRequestListener listener : listeners) {
 			listener.requestDestroyed(arg0);
 		}
 	}
 
 	@Override
 	public void requestInitialized(ServletRequestEvent arg0) {
-		List<ServletRequestListener> list = WebContext
-				.getListenerList(ServletRequestListener.class);
-		if (list == null)
+		ServletRequestListener[] listeners = WebContext
+				.getListeners(ServletRequestListener.class);
+		if (listeners == null)
 			return;
-		for (ServletRequestListener listener : list) {
+		for (ServletRequestListener listener : listeners) {
 			listener.requestInitialized(arg0);
 		}
 	}
@@ -114,33 +112,33 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 ServletRequestAttributeListener
 	@Override
 	public void attributeAdded(ServletRequestAttributeEvent arg0) {
-		List<ServletRequestAttributeListener> list = WebContext
-				.getListenerList(ServletRequestAttributeListener.class);
-		if (list == null)
+		ServletRequestAttributeListener[] listeners = WebContext
+				.getListeners(ServletRequestAttributeListener.class);
+		if (listeners == null)
 			return;
-		for (ServletRequestAttributeListener listener : list) {
+		for (ServletRequestAttributeListener listener : listeners) {
 			listener.attributeAdded(arg0);
 		}
 	}
 
 	@Override
 	public void attributeRemoved(ServletRequestAttributeEvent arg0) {
-		List<ServletRequestAttributeListener> list = WebContext
-				.getListenerList(ServletRequestAttributeListener.class);
-		if (list == null)
+		ServletRequestAttributeListener[] listeners = WebContext
+				.getListeners(ServletRequestAttributeListener.class);
+		if (listeners == null)
 			return;
-		for (ServletRequestAttributeListener listener : list) {
+		for (ServletRequestAttributeListener listener : listeners) {
 			listener.attributeRemoved(arg0);
 		}
 	}
 
 	@Override
 	public void attributeReplaced(ServletRequestAttributeEvent arg0) {
-		List<ServletRequestAttributeListener> list = WebContext
-				.getListenerList(ServletRequestAttributeListener.class);
-		if (list == null)
+		ServletRequestAttributeListener[] listeners = WebContext
+				.getListeners(ServletRequestAttributeListener.class);
+		if (listeners == null)
 			return;
-		for (ServletRequestAttributeListener listener : list) {
+		for (ServletRequestAttributeListener listener : listeners) {
 			listener.attributeReplaced(arg0);
 		}
 	}
@@ -150,22 +148,22 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 HttpSessionActivationListener
 	@Override
 	public void sessionDidActivate(HttpSessionEvent arg0) {
-		List<HttpSessionActivationListener> list = WebContext
-				.getListenerList(HttpSessionActivationListener.class);
-		if (list == null)
+		HttpSessionActivationListener[] listeners = WebContext
+				.getListeners(HttpSessionActivationListener.class);
+		if (listeners == null)
 			return;
-		for (HttpSessionActivationListener listener : list) {
+		for (HttpSessionActivationListener listener : listeners) {
 			listener.sessionDidActivate(arg0);
 		}
 	}
 
 	@Override
 	public void sessionWillPassivate(HttpSessionEvent arg0) {
-		List<HttpSessionActivationListener> list = WebContext
-				.getListenerList(HttpSessionActivationListener.class);
-		if (list == null)
+		HttpSessionActivationListener[] listeners = WebContext
+				.getListeners(HttpSessionActivationListener.class);
+		if (listeners == null)
 			return;
-		for (HttpSessionActivationListener listener : list) {
+		for (HttpSessionActivationListener listener : listeners) {
 			listener.sessionWillPassivate(arg0);
 		}
 	}
@@ -175,33 +173,33 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 HttpSessionAttributeListener
 	@Override
 	public void attributeAdded(HttpSessionBindingEvent arg0) {
-		List<HttpSessionAttributeListener> list = WebContext
-				.getListenerList(HttpSessionAttributeListener.class);
-		if (list == null)
+		HttpSessionAttributeListener[] listeners = WebContext
+				.getListeners(HttpSessionAttributeListener.class);
+		if (listeners == null)
 			return;
-		for (HttpSessionAttributeListener listener : list) {
+		for (HttpSessionAttributeListener listener : listeners) {
 			listener.attributeAdded(arg0);
 		}
 	}
 
 	@Override
 	public void attributeRemoved(HttpSessionBindingEvent arg0) {
-		List<HttpSessionAttributeListener> list = WebContext
-				.getListenerList(HttpSessionAttributeListener.class);
-		if (list == null)
+		HttpSessionAttributeListener[] listeners = WebContext
+				.getListeners(HttpSessionAttributeListener.class);
+		if (listeners == null)
 			return;
-		for (HttpSessionAttributeListener listener : list) {
+		for (HttpSessionAttributeListener listener : listeners) {
 			listener.attributeRemoved(arg0);
 		}
 	}
 
 	@Override
 	public void attributeReplaced(HttpSessionBindingEvent arg0) {
-		List<HttpSessionAttributeListener> list = WebContext
-				.getListenerList(HttpSessionAttributeListener.class);
-		if (list == null)
+		HttpSessionAttributeListener[] listeners = WebContext
+				.getListeners(HttpSessionAttributeListener.class);
+		if (listeners == null)
 			return;
-		for (HttpSessionAttributeListener listener : list) {
+		for (HttpSessionAttributeListener listener : listeners) {
 			listener.attributeReplaced(arg0);
 		}
 	}
@@ -211,22 +209,22 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 HttpSessionBindingListener
 	@Override
 	public void valueBound(HttpSessionBindingEvent arg0) {
-		List<HttpSessionBindingListener> list = WebContext
-				.getListenerList(HttpSessionBindingListener.class);
-		if (list == null)
+		HttpSessionBindingListener[] listeners = WebContext
+				.getListeners(HttpSessionBindingListener.class);
+		if (listeners == null)
 			return;
-		for (HttpSessionBindingListener listener : list) {
+		for (HttpSessionBindingListener listener : listeners) {
 			listener.valueBound(arg0);
 		}
 	}
 
 	@Override
 	public void valueUnbound(HttpSessionBindingEvent arg0) {
-		List<HttpSessionBindingListener> list = WebContext
-				.getListenerList(HttpSessionBindingListener.class);
-		if (list == null)
+		HttpSessionBindingListener[] listeners = WebContext
+				.getListeners(HttpSessionBindingListener.class);
+		if (listeners == null)
 			return;
-		for (HttpSessionBindingListener listener : list) {
+		for (HttpSessionBindingListener listener : listeners) {
 			listener.valueUnbound(arg0);
 		}
 	}
@@ -236,22 +234,22 @@ public class ServletListenerBridge implements ServletContextListener,
 	// 开始 HttpSessionListener
 	@Override
 	public void sessionCreated(HttpSessionEvent arg0) {
-		List<HttpSessionListener> list = WebContext
-				.getListenerList(HttpSessionListener.class);
-		if (list == null)
+		HttpSessionListener[] listeners = WebContext
+				.getListeners(HttpSessionListener.class);
+		if (listeners == null)
 			return;
-		for (HttpSessionListener listener : list) {
+		for (HttpSessionListener listener : listeners) {
 			listener.sessionCreated(arg0);
 		}
 	}
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent arg0) {
-		List<HttpSessionListener> list = WebContext
-				.getListenerList(HttpSessionListener.class);
-		if (list == null)
+		HttpSessionListener[] listeners = WebContext
+				.getListeners(HttpSessionListener.class);
+		if (listeners == null)
 			return;
-		for (HttpSessionListener listener : list) {
+		for (HttpSessionListener listener : listeners) {
 			listener.sessionDestroyed(arg0);
 		}
 	}

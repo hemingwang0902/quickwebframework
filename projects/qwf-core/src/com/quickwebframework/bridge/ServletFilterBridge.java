@@ -58,8 +58,8 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
-		ArrayFilterChain arrayFilterChain = new ArrayFilterChain(WebContext
-				.getFilterList().toArray(new Filter[0]));
+		ArrayFilterChain arrayFilterChain = new ArrayFilterChain(
+				WebContext.getFilters());
 		arrayFilterChain.doFilter(request, response);
 		if (arrayFilterChain.isContinueFilterChain())
 			filterChain.doFilter(request, response);
