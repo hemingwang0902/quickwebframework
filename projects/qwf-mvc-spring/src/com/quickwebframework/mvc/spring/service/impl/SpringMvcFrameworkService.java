@@ -128,9 +128,10 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 							// 添加到HTTP方法信息列表中
 							HttpMethodInfo httpMethodInfo = new HttpMethodInfo();
 							httpMethodInfo.setHttpMethod(requestMethod.name());
-							httpMethodInfo.setMappingUrl(WebContext
-									.getBundleMethodUrl(
-											bundleName, methodName));
+							httpMethodInfo
+									.setMappingUrl(WebContext
+											.getBundleMethodUrl(bundleName,
+													methodName));
 							pluginControllerInfo.getHttpMethodInfoList().add(
 									httpMethodInfo);
 						}
@@ -185,6 +186,11 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 			bundleApplicationContextMap.remove(bundle);
 		log.debug("插件[" + bundleName + "]注册在Spring MVC的Web App已经移除！");
 		return true;
+	}
+
+	@Override
+	public boolean containsBundle(Bundle bundle) {
+		return bundleApplicationContextMap.containsKey(bundle);
 	}
 
 	@Override

@@ -32,6 +32,14 @@ public interface MvcFrameworkService {
 	public boolean removeBundle(Bundle bundle);
 
 	/**
+	 * MVC框架中是否已包含指定的Bundle
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public boolean containsBundle(Bundle bundle);
+	
+	/**
 	 * 处理HTTP请求
 	 * 
 	 * @param request

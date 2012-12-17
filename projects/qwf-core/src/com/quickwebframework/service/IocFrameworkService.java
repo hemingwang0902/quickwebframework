@@ -36,7 +36,7 @@ public interface IocFrameworkService {
 	public Object getBundleApplicationContext(Bundle bundle);
 
 	/**
-	 * IoC窗口中是否已包含指定的Bundle
+	 * IoC框架中是否已包含指定的Bundle
 	 * 
 	 * @param bundle
 	 * @return
