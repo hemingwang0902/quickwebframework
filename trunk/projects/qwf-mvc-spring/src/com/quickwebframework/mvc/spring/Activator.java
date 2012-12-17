@@ -28,10 +28,11 @@ public class Activator implements BundleActivator {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
 				int bundleEventType = arg0.getType();
-				if (BundleEvent.STARTING == bundleEventType) {
+				if (BundleEvent.STARTED == bundleEventType) {
 					Bundle startingBundle = arg0.getBundle();
-					// 添加到MVC框架中
-					mvcFrameworkService.addBundle(startingBundle);
+					// 如果还没有添加到MVC框架中，则添加到MVC框架中
+					if (!mvcFrameworkService.containsBundle(startingBundle))
+						mvcFrameworkService.addBundle(startingBundle);
 				}
 			}
 		};
