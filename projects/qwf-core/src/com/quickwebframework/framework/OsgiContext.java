@@ -10,6 +10,7 @@ import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.SynchronousBundleListener;
+import org.osgi.framework.launch.Framework;
 
 import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.Log;
@@ -33,6 +34,8 @@ public class OsgiContext extends FrameworkContext {
 	private BundleListener bundleListener;
 	// 服务监听器
 	private ServiceListener serviceListener;
+	// OSGi的Framework
+	private static Framework framework;
 
 	// ======变量开始结束
 
@@ -89,6 +92,9 @@ public class OsgiContext extends FrameworkContext {
 		bundleContext.addBundleListener(bundleListener);
 		// 添加OSGi服务监听器
 		bundleContext.addServiceListener(serviceListener);
+
+		this.addSimpleServiceStaticFieldLink(Framework.class.getName(),
+				"framework");
 	}
 
 	@Override
@@ -108,5 +114,10 @@ public class OsgiContext extends FrameworkContext {
 			return bundleNameBundleMap.get(bundleName);
 		}
 		return null;
+	}
+
+	// 得到核心的Bundle上下文
+	public static BundleContext getFrameworkBundleContext() {
+		return framework.getBundleContext();
 	}
 }
