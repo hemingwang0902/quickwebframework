@@ -96,7 +96,8 @@ public class BundleUtil {
 			}
 		}
 		if (bundleOneClassName == null) {
-			throw new RuntimeException("Bundle中没有一个Java类！");
+			throw new RuntimeException(String.format("Bundle[%s]中没有一个Java类！",
+					bundle.getSymbolicName()));
 		}
 		Class<?> bundleOneClass = null;
 		try {
