@@ -115,7 +115,7 @@ public abstract class QuickWebFrameworkFactory {
 	}
 
 	/**
-	 * 得到BundleContext对象
+	 * 得到框架的BundleContext对象
 	 * 
 	 * @param servletContext
 	 * @return
@@ -335,6 +335,9 @@ public abstract class QuickWebFrameworkFactory {
 			// 将ServletContext注册为服务
 			getBundleContext().registerService(ServletContext.class.getName(),
 					servletContext, null);
+			// 将Framework注册为服务
+			getBundleContext().registerService(Framework.class.getName(),
+					framework, null);
 
 			// 设置插件要用到的配置文件
 			Enumeration<?> quickWebFrameworkPropertieNameEnumeration = quickWebFrameworkProperties
