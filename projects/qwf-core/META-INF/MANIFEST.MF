@@ -23,4 +23,5 @@ Export-Package: com.quickwebframework.entity,
  com.quickwebframework.stereotype,
  com.quickwebframework.util,
  org.apache.commons.logging,
+ org.apache.log4j,
  org.slf4j
