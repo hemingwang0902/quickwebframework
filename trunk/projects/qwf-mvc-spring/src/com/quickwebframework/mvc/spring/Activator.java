@@ -30,6 +30,10 @@ public class Activator implements BundleActivator {
 				int bundleEventType = arg0.getType();
 				if (BundleEvent.STARTED == bundleEventType) {
 					Bundle startingBundle = arg0.getBundle();
+					// 如果是系统Bundle
+					if (startingBundle.getBundleId() == 0)
+						return;
+
 					// 如果还没有添加到MVC框架中，则添加到MVC框架中
 					if (!mvcFrameworkService.containsBundle(startingBundle))
 						mvcFrameworkService.addBundle(startingBundle);
