@@ -1,4 +1,4 @@
-package org.slf4j.impl;
+package com.quickwebframework.log.impl.slf4j;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -7,16 +7,30 @@ import com.quickwebframework.entity.Log;
 
 public class LoggerImpl implements Logger {
 	private String loggerName;
-	private Log log;
+	private Log qwfLog;
 
-	public LoggerImpl(String loggerName, Log log) {
+	public LoggerImpl(String loggerName, Log qwfLog) {
 		this.loggerName = loggerName;
-		this.log = log;
+		this.qwfLog = qwfLog;
 	}
 
 	@Override
 	public String getName() {
 		return loggerName;
+	}
+
+	private String getFinalString(String format, Object... arguments) {
+		if (arguments == null || arguments.length == 0)
+			return format;
+		String spString = "{}";
+		StringBuilder sb = new StringBuilder(format);
+		for (int i = 0; i < arguments.length; i++) {
+			Object currentObj = arguments[arguments.length - i - 1];
+			int currentIndex = format.lastIndexOf(spString);
+			sb.delete(currentIndex, currentIndex + spString.length());
+			sb.insert(currentIndex, currentObj);
+		}
+		return sb.toString();
 	}
 
 	@Override
@@ -26,354 +40,297 @@ public class LoggerImpl implements Logger {
 
 	@Override
 	public void trace(String msg) {
-		log.trace(msg);
+		qwfLog.trace(msg);
 	}
 
 	@Override
 	public void trace(String format, Object arg) {
-		
+		trace(format, new Object[] { arg });
 	}
 
 	@Override
 	public void trace(String format, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
+		trace(format, new Object[] { arg1, arg2 });
 	}
 
 	@Override
 	public void trace(String format, Object... arguments) {
-		// TODO Auto-generated method stub
-
+		qwfLog.trace(getFinalString(format, arguments));
 	}
 
 	@Override
 	public void trace(String msg, Throwable t) {
-		// TODO Auto-generated method stub
-
+		qwfLog.trace(msg, t);
 	}
 
 	@Override
 	public boolean isTraceEnabled(Marker marker) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void trace(Marker marker, String msg) {
-		// TODO Auto-generated method stub
-
+		trace(msg);
 	}
 
 	@Override
 	public void trace(Marker marker, String format, Object arg) {
-		// TODO Auto-generated method stub
-
+		trace(format, arg);
 	}
 
 	@Override
 	public void trace(Marker marker, String format, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
+		trace(format, arg1, arg2);
 	}
 
 	@Override
 	public void trace(Marker marker, String format, Object... argArray) {
-		// TODO Auto-generated method stub
-
+		trace(format, argArray);
 	}
 
 	@Override
 	public void trace(Marker marker, String msg, Throwable t) {
-		// TODO Auto-generated method stub
-
+		trace(msg, t);
 	}
 
 	@Override
 	public boolean isDebugEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void debug(String msg) {
-		// TODO Auto-generated method stub
-
+		qwfLog.debug(msg);
 	}
 
 	@Override
 	public void debug(String format, Object arg) {
-		// TODO Auto-generated method stub
-
+		debug(format, new Object[] { arg });
 	}
 
 	@Override
 	public void debug(String format, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
+		debug(format, new Object[] { arg1, arg2 });
 	}
 
 	@Override
 	public void debug(String format, Object... arguments) {
-		// TODO Auto-generated method stub
-
+		debug(getFinalString(format, arguments));
 	}
 
 	@Override
 	public void debug(String msg, Throwable t) {
-		// TODO Auto-generated method stub
-
+		qwfLog.debug(msg, t);
 	}
 
 	@Override
 	public boolean isDebugEnabled(Marker marker) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void debug(Marker marker, String msg) {
-		// TODO Auto-generated method stub
-
+		debug(msg);
 	}
 
 	@Override
 	public void debug(Marker marker, String format, Object arg) {
-		// TODO Auto-generated method stub
-
+		debug(format, arg);
 	}
 
 	@Override
 	public void debug(Marker marker, String format, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
+		debug(format, arg1, arg2);
 	}
 
 	@Override
 	public void debug(Marker marker, String format, Object... arguments) {
-		// TODO Auto-generated method stub
-
+		debug(format, arguments);
 	}
 
 	@Override
 	public void debug(Marker marker, String msg, Throwable t) {
-		// TODO Auto-generated method stub
-
+		debug(msg, t);
 	}
 
 	@Override
 	public boolean isInfoEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void info(String msg) {
-		// TODO Auto-generated method stub
-
+		qwfLog.info(msg);
 	}
 
 	@Override
 	public void info(String format, Object arg) {
-		// TODO Auto-generated method stub
-
+		info(format, new Object[] { arg });
 	}
 
 	@Override
 	public void info(String format, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
+		info(format, new Object[] { arg1, arg2 });
 	}
 
 	@Override
 	public void info(String format, Object... arguments) {
-		// TODO Auto-generated method stub
-
+		qwfLog.info(getFinalString(format, arguments));
 	}
 
 	@Override
 	public void info(String msg, Throwable t) {
-		// TODO Auto-generated method stub
-
+		qwfLog.info(msg, t);
 	}
 
 	@Override
 	public boolean isInfoEnabled(Marker marker) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void info(Marker marker, String msg) {
-		// TODO Auto-generated method stub
-
+		info(msg);
 	}
 
 	@Override
 	public void info(Marker marker, String format, Object arg) {
-		// TODO Auto-generated method stub
-
+		info(format, arg);
 	}
 
 	@Override
 	public void info(Marker marker, String format, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
+		info(format, arg1, arg2);
 	}
 
 	@Override
 	public void info(Marker marker, String format, Object... arguments) {
-		// TODO Auto-generated method stub
-
+		info(format, arguments);
 	}
 
 	@Override
 	public void info(Marker marker, String msg, Throwable t) {
-		// TODO Auto-generated method stub
-
+		qwfLog.info(msg, t);
 	}
 
 	@Override
 	public boolean isWarnEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void warn(String msg) {
-		// TODO Auto-generated method stub
-
+		qwfLog.warn(msg);
 	}
 
 	@Override
 	public void warn(String format, Object arg) {
-		// TODO Auto-generated method stub
-
+		warn(format, new Object[] { arg });
 	}
 
 	@Override
 	public void warn(String format, Object... arguments) {
-		// TODO Auto-generated method stub
-
+		qwfLog.warn(getFinalString(format, arguments));
 	}
 
 	@Override
 	public void warn(String format, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
+		warn(format, new Object[] { arg1, arg2 });
 	}
 
 	@Override
 	public void warn(String msg, Throwable t) {
-		// TODO Auto-generated method stub
-
+		qwfLog.warn(msg, t);
 	}
 
 	@Override
 	public boolean isWarnEnabled(Marker marker) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void warn(Marker marker, String msg) {
-		// TODO Auto-generated method stub
-
+		warn(msg);
 	}
 
 	@Override
 	public void warn(Marker marker, String format, Object arg) {
-		// TODO Auto-generated method stub
-
+		warn(format, arg);
 	}
 
 	@Override
 	public void warn(Marker marker, String format, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
+		warn(format, arg1, arg2);
 	}
 
 	@Override
 	public void warn(Marker marker, String format, Object... arguments) {
-		// TODO Auto-generated method stub
-
+		warn(format, arguments);
 	}
 
 	@Override
 	public void warn(Marker marker, String msg, Throwable t) {
-		// TODO Auto-generated method stub
-
+		warn(msg, t);
 	}
 
 	@Override
 	public boolean isErrorEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void error(String msg) {
-		// TODO Auto-generated method stub
-
+		qwfLog.error(msg);
 	}
 
 	@Override
 	public void error(String format, Object arg) {
-		// TODO Auto-generated method stub
-
+		error(format, new Object[] { arg });
 	}
 
 	@Override
 	public void error(String format, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
+		error(format, new Object[] { arg1, arg2 });
 	}
 
 	@Override
 	public void error(String format, Object... arguments) {
-		// TODO Auto-generated method stub
-
+		qwfLog.error(getFinalString(format, arguments));
 	}
 
 	@Override
 	public void error(String msg, Throwable t) {
-		// TODO Auto-generated method stub
-
+		qwfLog.error(msg, t);
 	}
 
 	@Override
 	public boolean isErrorEnabled(Marker marker) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void error(Marker marker, String msg) {
-		// TODO Auto-generated method stub
-
+		error(msg);
 	}
 
 	@Override
 	public void error(Marker marker, String format, Object arg) {
-		// TODO Auto-generated method stub
-
+		error(format, arg);
 	}
 
 	@Override
 	public void error(Marker marker, String format, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
+		error(format, arg1, arg2);
 	}
 
 	@Override
 	public void error(Marker marker, String format, Object... arguments) {
-		// TODO Auto-generated method stub
-
+		error(format, arguments);
 	}
 
 	@Override
 	public void error(Marker marker, String msg, Throwable t) {
-		// TODO Auto-generated method stub
-
+		error(msg, t);
 	}
 
 }

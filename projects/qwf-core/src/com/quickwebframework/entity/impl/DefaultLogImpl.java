@@ -8,7 +8,7 @@ import org.osgi.framework.ServiceReference;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.service.LogService;
 
-public class DefaultLogImpl implements Log, org.apache.commons.logging.Log {
+public class DefaultLogImpl implements Log {
 
 	private BundleContext bundleContext;
 
@@ -122,35 +122,5 @@ public class DefaultLogImpl implements Log, org.apache.commons.logging.Log {
 	@Override
 	public void warn(Object message, Throwable exception) {
 		currentLog.warn(message, exception);
-	}
-
-	@Override
-	public boolean isDebugEnabled() {
-		return true;
-	}
-
-	@Override
-	public boolean isErrorEnabled() {
-		return true;
-	}
-
-	@Override
-	public boolean isFatalEnabled() {
-		return true;
-	}
-
-	@Override
-	public boolean isInfoEnabled() {
-		return true;
-	}
-
-	@Override
-	public boolean isTraceEnabled() {
-		return true;
-	}
-
-	@Override
-	public boolean isWarnEnabled() {
-		return true;
 	}
 }
