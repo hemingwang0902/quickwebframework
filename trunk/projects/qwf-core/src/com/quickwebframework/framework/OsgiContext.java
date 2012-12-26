@@ -13,8 +13,8 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.launch.Framework;
 
 import com.quickwebframework.core.Activator;
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class OsgiContext extends FrameworkContext {
 

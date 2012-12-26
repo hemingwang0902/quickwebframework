@@ -2,6 +2,7 @@ package com.quickwebframework.service;
 
 import com.quickwebframework.entity.Log;
 
+@SuppressWarnings("deprecation")
 /**
  * 日志服务
  * 

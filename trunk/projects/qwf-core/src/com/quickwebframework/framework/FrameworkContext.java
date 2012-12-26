@@ -11,7 +11,7 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 
 import com.quickwebframework.core.Activator;
-import com.quickwebframework.entity.LogFactory;
+import org.apache.commons.logging.LogFactory;
 import com.quickwebframework.util.BundleContextUtil;
 
 public abstract class FrameworkContext {

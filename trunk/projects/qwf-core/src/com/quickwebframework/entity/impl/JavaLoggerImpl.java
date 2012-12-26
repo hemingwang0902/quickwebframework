@@ -6,6 +6,7 @@ import java.util.logging.LogRecord;
 
 import com.quickwebframework.entity.Log;
 
+@SuppressWarnings("deprecation")
 public class JavaLoggerImpl implements Log {
 
 	/**

@@ -20,7 +20,7 @@ package org.apache.log4j;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.quickwebframework.framework.LogContext;
+import org.apache.commons.logging.LogFactory;
 
 public class BakLogManager {
 
@@ -35,7 +35,7 @@ public class BakLogManager {
 			logMap = new HashMap<String, BakLogger>();
 		if (logMap.containsKey(name))
 			return logMap.get(name);
-		BakLogger logger = new BakLogger(name, LogContext.getLog(name));
+		BakLogger logger = new BakLogger(name, LogFactory.getLog(name));
 		logMap.put(name, logger);
 		return logger;
 	}

@@ -13,12 +13,12 @@ import com.quickorm.config.Database;
 import com.quickorm.core.QuickormTemplate;
 import com.quickorm.core.impl.QuickormTemplateImpl;
 import com.quickwebframework.db.orm.quickorm.service.DatabaseService;
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class DatabaseServiceImpl implements DatabaseService {
 
-	public static Log log = LogFactory.getLog(DatabaseServiceImpl.class);
+	private static Log log = LogFactory.getLog(DatabaseServiceImpl.class);
 
 	private Properties prop;
 	private BundleContext bundleContext;

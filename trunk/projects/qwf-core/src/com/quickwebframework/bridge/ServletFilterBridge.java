@@ -9,8 +9,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.stereotype.FilterSetting;
 

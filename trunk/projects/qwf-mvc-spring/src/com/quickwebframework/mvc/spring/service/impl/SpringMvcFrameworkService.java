@@ -22,8 +22,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
 import com.quickwebframework.entity.HttpMethodInfo;
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
 import com.quickwebframework.framework.IocContext;
 import com.quickwebframework.framework.ThreadContext;

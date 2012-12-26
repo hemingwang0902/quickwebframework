@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.quickwebframework.framework.LogContext;
 
+@SuppressWarnings("deprecation")
 public abstract class LogFactory {
 	private static Map<String, Log> logMap;
 

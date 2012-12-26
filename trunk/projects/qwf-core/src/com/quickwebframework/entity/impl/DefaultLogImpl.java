@@ -8,6 +8,7 @@ import org.osgi.framework.ServiceReference;
 import com.quickwebframework.entity.Log;
 import com.quickwebframework.service.LogService;
 
+@SuppressWarnings("deprecation")
 public class DefaultLogImpl implements Log {
 
 	private BundleContext bundleContext;

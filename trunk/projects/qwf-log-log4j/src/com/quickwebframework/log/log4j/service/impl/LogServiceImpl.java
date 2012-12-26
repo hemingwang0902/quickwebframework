@@ -7,6 +7,7 @@ import com.quickwebframework.entity.Log;
 import com.quickwebframework.log.log4j.entity.impl.LogImpl;
 import com.quickwebframework.service.LogService;
 
+@SuppressWarnings("deprecation")
 public class LogServiceImpl implements LogService {
 	Map<String, Log> logMap;
 
