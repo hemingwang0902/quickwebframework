@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
-import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.UrlResource;
 

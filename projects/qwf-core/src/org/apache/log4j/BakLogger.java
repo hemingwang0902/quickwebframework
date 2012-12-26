@@ -17,16 +17,16 @@
 
 package org.apache.log4j;
 
-import com.quickwebframework.entity.Log;
+import org.apache.commons.logging.Log;
 
 public class BakLogger {
 
 	private String name;
-	private Log qwfLog;
+	private Log commonsLog;
 
-	protected BakLogger(String name, Log qwfLog) {
+	protected BakLogger(String name, Log commonsLog) {
 		this.name = name;
-		this.qwfLog = qwfLog;
+		this.commonsLog = commonsLog;
 	}
 
 	static public BakLogger getLogger(String name) {
@@ -58,50 +58,50 @@ public class BakLogger {
 	}
 
 	public void trace(Object message) {
-		qwfLog.trace(message);
+		commonsLog.trace(message);
 	}
 
 	public void trace(Object message, Throwable t) {
-		qwfLog.trace(message, t);
+		commonsLog.trace(message, t);
 	}
 
 	public void debug(Object message) {
-		qwfLog.debug(message);
+		commonsLog.debug(message);
 	}
 
 	public void debug(Object message, Throwable t) {
-		qwfLog.debug(message, t);
+		commonsLog.debug(message, t);
 	}
 
 	public void error(Object message) {
-		qwfLog.error(message);
+		commonsLog.error(message);
 	}
 
 	public void error(Object message, Throwable t) {
-		qwfLog.error(message, t);
+		commonsLog.error(message, t);
 	}
 
 	public void fatal(Object message) {
-		qwfLog.fatal(message);
+		commonsLog.fatal(message);
 	}
 
 	public void fatal(Object message, Throwable t) {
-		qwfLog.fatal(message, t);
+		commonsLog.fatal(message, t);
 	}
 
 	public void info(Object message) {
-		qwfLog.info(message);
+		commonsLog.info(message);
 	}
 
 	public void info(Object message, Throwable t) {
-		qwfLog.info(message, t);
+		commonsLog.info(message, t);
 	}
 
 	public void warn(Object message) {
-		qwfLog.warn(message);
+		commonsLog.warn(message);
 	}
 
 	public void warn(Object message, Throwable t) {
-		qwfLog.warn(message, t);
+		commonsLog.warn(message, t);
 	}
 }

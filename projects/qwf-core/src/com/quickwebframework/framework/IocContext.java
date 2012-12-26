@@ -8,8 +8,8 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 
 import com.quickwebframework.core.Activator;
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import com.quickwebframework.service.IocFrameworkService;
 import com.quickwebframework.util.BundleContextUtil;
 

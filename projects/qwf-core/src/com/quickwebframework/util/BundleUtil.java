@@ -22,8 +22,8 @@ import org.osgi.framework.Version;
 import org.osgi.framework.wiring.FrameworkWiring;
 
 import com.quickwebframework.entity.BundleInfo;
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * 插件辅助类

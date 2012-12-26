@@ -3,8 +3,8 @@ package org.slf4j;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.framework.LogContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class LoggerFactory {
 
@@ -17,7 +17,7 @@ public class LoggerFactory {
 			return logMap.get(name);
 
 		final String loggerName = name;
-		final Log qwfLog = LogContext.getLog(name);
+		final Log qwfLog = LogFactory.getLog(name);
 
 		Logger newLogger = new Logger() {
 			@Override

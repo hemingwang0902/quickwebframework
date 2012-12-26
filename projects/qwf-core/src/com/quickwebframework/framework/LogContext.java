@@ -15,6 +15,7 @@ import com.quickwebframework.entity.impl.DefaultLogImpl;
 import com.quickwebframework.entity.impl.JavaLoggerImpl;
 import com.quickwebframework.util.BundleContextUtil;
 
+@SuppressWarnings("deprecation")
 public class LogContext extends FrameworkContext {
 	private static LogContext instance;
 

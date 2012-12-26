@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import com.quickwebframework.entity.Log;
 
+@SuppressWarnings("deprecation")
 public class LogImpl implements Log {
 
 	private Logger logger;

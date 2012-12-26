@@ -9,8 +9,8 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.quickwebframework.db.orm.spring.jdbc.service.DatabaseService;
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class DatabaseServiceImpl implements DatabaseService {
 	public static Log log = LogFactory.getLog(DatabaseServiceImpl.class);
