@@ -40,8 +40,9 @@ public class BundleScanner {
 			try {
 				BundleGenericXmlApplicationContext bundleGenericXmlApplicationContext = (BundleGenericXmlApplicationContext) applicationContext;
 				bundleGenericXmlApplicationContext
-						.setNamespaceHandlerResolver(new DefaultNamespaceHandlerResolver(
-								this.getClass().getClassLoader()));
+						.setNamespaceHandlerResolver(new BundleNamespaceHandlerResolver(
+								this.getClass().getClassLoader(),
+								bundleClassLoader));
 				bundleGenericXmlApplicationContext
 						.setClassLoader(bundleClassLoader);
 				bundleGenericXmlApplicationContext.load(new UrlResource(

@@ -4,7 +4,7 @@ package com.quickwebframework.entity;
  * 日志对象接口
  * 
  * @author aaa
- * 
+ * @deprecated 请使用Apache Commons的Log类，即：org.apache.commons.logging.Log
  */
 public interface Log {
 	public void debug(Object message);
