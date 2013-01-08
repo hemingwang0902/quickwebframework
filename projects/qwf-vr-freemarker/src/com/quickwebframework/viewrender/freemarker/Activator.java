@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.Properties;
 
 import org.osgi.framework.BundleActivator;
@@ -18,9 +20,15 @@ import com.quickwebframework.viewrender.freemarker.service.impl.ViewRenderServic
 
 public class Activator implements BundleActivator {
 
+	private static BundleContext context;
 	private ServiceRegistration<?> viewRenderServiceRegistration;
 
+	static BundleContext getContext() {
+		return context;
+	}
+
 	public void start(BundleContext context) throws Exception {
+		Activator.context = context;
 
 		// 得到freemarker配置文件路径
 		String freemarkerPropertyFilePath = WebContext
@@ -52,11 +60,14 @@ public class Activator implements BundleActivator {
 		// 注册视图渲染服务
 		ViewRenderService viewRenderService = new ViewRenderServiceImpl(
 				freemarkerProp);
+		Dictionary<String, String> dict = new Hashtable<String, String>();
+		dict.put("bundle", context.getBundle().getSymbolicName());
 		viewRenderServiceRegistration = context.registerService(
-				ViewRenderService.class.getName(), viewRenderService, null);
+				ViewRenderService.class.getName(), viewRenderService, dict);
 	}
 
 	public void stop(BundleContext context) throws Exception {
+		Activator.context = null;
 		// 取消注册视图渲染服务
 		viewRenderServiceRegistration.unregister();
 	}
