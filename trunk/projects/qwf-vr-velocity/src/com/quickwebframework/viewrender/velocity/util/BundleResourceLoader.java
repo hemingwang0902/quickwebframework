@@ -59,6 +59,10 @@ public class BundleResourceLoader extends ResourceLoader {
 	@Override
 	public InputStream getResourceStream(String name)
 			throws ResourceNotFoundException {
+		if ("VM_global_library.vm".equals(name)) {
+			return null;
+		}
+
 		String[] tmpArray = name.split(pluginNameAndPathSplitString);
 		if (tmpArray.length < 2) {
 			throw new VelocityException("视图名称[" + name + "]不符合规则：“[插件名]"

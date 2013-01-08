@@ -19,13 +19,11 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 	private VelocityEngine engine;
 
 	public ViewRenderServiceImpl(Properties velocityProp) {
-
-		engine = new VelocityEngine();
+		engine = new VelocityEngine(velocityProp);
 		engine.setProperty(Velocity.RESOURCE_LOADER, "class");
 		engine.setProperty("class.resource.loader.class",
 				BundleResourceLoader.class.getName());
 		engine.init();
-
 	}
 
 	@Override
