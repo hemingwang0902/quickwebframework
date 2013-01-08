@@ -1,7 +1,7 @@
 package com.quickwebframework.viewrender.velocity.service.impl;
 
-import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,11 +14,11 @@ import org.apache.velocity.app.VelocityEngine;
 import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.viewrender.velocity.util.BundleResourceLoader;
 
-public class ViewRenderServiceImpl implements ViewRenderService {
+public class ViewRenderServiceImpl extends ViewRenderService {
 
 	private VelocityEngine engine;
 
-	public ViewRenderServiceImpl() {
+	public ViewRenderServiceImpl(Properties velocityProp) {
 
 		engine = new VelocityEngine();
 		engine.setProperty(Velocity.RESOURCE_LOADER, "class");

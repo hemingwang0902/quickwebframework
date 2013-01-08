@@ -1,22 +1,23 @@
 package com.quickwebframework.viewrender.freemarker.service.impl;
 
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.quickwebframework.service.ViewRenderService;
-import com.quickwebframework.viewrender.freemarker.util.FreemarkerViewRender;
 import com.quickwebframework.viewrender.freemarker.util.PluginTemplateLoader;
 
 import freemarker.template.Configuration;
 
-public class ViewRenderServiceImpl implements ViewRenderService {
-	private FreemarkerViewRender viewRender;
+public class ViewRenderServiceImpl extends ViewRenderService {
+	private Configuration configuration;
 
-	public ViewRenderServiceImpl(Properties freeMarkerProp,
-			Properties viewRenderProp) {
-		Configuration configuration = new Configuration();
+	public ViewRenderServiceImpl(Properties freeMarkerProp) {
+		configuration = new Configuration();
 		// 配置Freemarker
 		try {
 			configuration.setSettings(freeMarkerProp);
@@ -25,38 +26,35 @@ public class ViewRenderServiceImpl implements ViewRenderService {
 		}
 
 		// 配置ViewRender
-		PluginTemplateLoader pluginTemplateLoader = new PluginTemplateLoader();
-
-		// 分隔符
-		if (viewRenderProp
-				.containsKey("com.quickwebframework.viewrender.pluginNameAndPathSplitString")) {
-			pluginTemplateLoader
-					.setPluginNameAndPathSplitString(viewRenderProp
-							.getProperty("com.quickwebframework.viewrender.pluginNameAndPathSplitString"));
-		}
-		// 前缀
-		if (viewRenderProp
-				.containsKey("com.quickwebframework.viewrender.viewNamePrefix")) {
-			pluginTemplateLoader
-					.setViewNamePrefix(viewRenderProp
-							.getProperty("com.quickwebframework.viewrender.viewNamePrefix"));
-		}
-		// 后缀
-		if (viewRenderProp
-				.containsKey("com.quickwebframework.viewrender.viewNameSuffix")) {
-			pluginTemplateLoader
-					.setViewNameSuffix(viewRenderProp
-							.getProperty("com.quickwebframework.viewrender.viewNameSuffix"));
-		}
-		FreemarkerViewRender freemarkerViewRender = new FreemarkerViewRender(
-				configuration, pluginTemplateLoader);
-		viewRender = freemarkerViewRender;
+		PluginTemplateLoader pluginTemplateLoader = new PluginTemplateLoader(
+				this);
+		configuration.setTemplateLoader(pluginTemplateLoader);
 	}
 
 	@Override
 	public void renderView(String bundleName, String viewName,
 			HttpServletRequest request, HttpServletResponse response) {
-		viewRender.renderView(bundleName, viewName, request, response);
+
+		// 如果ViewName中未包括分隔符，即未包含插件名称，则添加当前插件名称为前缀
+		if (!viewName.contains(getPluginNameAndPathSplitString())) {
+			viewName = bundleName + getPluginNameAndPathSplitString()
+					+ viewName;
+		}
+		// 准备数据
+		Map<String, Object> root = new HashMap<String, Object>();
+		Enumeration<?> attributeNameEnumeration = request.getAttributeNames();
+		while (attributeNameEnumeration.hasMoreElements()) {
+			String key = attributeNameEnumeration.nextElement().toString();
+			root.put(key, request.getAttribute(key));
+		}
+		try {
+			response.setCharacterEncoding(configuration.getDefaultEncoding());
+			response.setContentType("text/html");
+			configuration.getTemplate(viewName).process(root,
+					response.getWriter());
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 }

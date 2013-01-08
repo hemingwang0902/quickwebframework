@@ -10,7 +10,6 @@ import java.util.Properties;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.framework.WebContext;
@@ -23,41 +22,16 @@ public class Activator implements BundleActivator {
 
 	public void start(BundleContext context) throws Exception {
 
-		String freemarkerPropertyFilePath = null;
-		String viewrenderPropertyFilePath = null;
-
 		// 得到freemarker配置文件路径
-		ServiceReference<?>[] serviceReferences = context
-				.getServiceReferences(
-						String.class.getName(),
-						"(quickwebframework.config=com.quickwebframework.viewrender.freemarker.properties)");
-		if (serviceReferences != null && serviceReferences.length > 0) {
-			freemarkerPropertyFilePath = (String) context
-					.getService(serviceReferences[0]);
-		}
+		String freemarkerPropertyFilePath = WebContext
+				.getQwfConfig("com.quickwebframework.viewrender.freemarker.properties");
 		if (freemarkerPropertyFilePath == null
 				|| freemarkerPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.viewrender.freemarker.properties'！");
 		}
-		freemarkerPropertyFilePath = WebContext.getServletContext()
+		freemarkerPropertyFilePath = WebContext
 				.getRealPath(freemarkerPropertyFilePath);
-
-		// 得到viewrender配置文件路径
-		serviceReferences = context
-				.getServiceReferences(String.class.getName(),
-						"(quickwebframework.config=com.quickwebframework.viewrender.properties)");
-		if (serviceReferences != null && serviceReferences.length > 0) {
-			viewrenderPropertyFilePath = (String) context
-					.getService(serviceReferences[0]);
-		}
-		if (viewrenderPropertyFilePath == null
-				|| viewrenderPropertyFilePath.isEmpty()) {
-			throw new RuntimeException(
-					"Can't found property 'quickwebframework.config.com.quickwebframework.viewrender.properties'！");
-		}
-		viewrenderPropertyFilePath = WebContext.getServletContext()
-				.getRealPath(viewrenderPropertyFilePath);
 
 		// 读取freemarker配置文件
 		File freemarkerPropertyFile = new File(freemarkerPropertyFilePath);
@@ -75,25 +49,9 @@ public class Activator implements BundleActivator {
 		reader.close();
 		inputStream.close();
 
-		// 读取viewrender配置文件
-		File viewrenderPropertyFile = new File(viewrenderPropertyFilePath);
-		if (!viewrenderPropertyFile.exists()
-				|| !viewrenderPropertyFile.isFile()) {
-			String message = String.format("Config file [%s] not exist!",
-					viewrenderPropertyFilePath);
-			throw new IOException(message);
-		}
-
-		inputStream = new FileInputStream(viewrenderPropertyFile);
-		reader = new InputStreamReader(inputStream, "utf-8");
-		Properties viewrenderProp = new Properties();
-		viewrenderProp.load(reader);
-		reader.close();
-		inputStream.close();
-
 		// 注册视图渲染服务
 		ViewRenderService viewRenderService = new ViewRenderServiceImpl(
-				freemarkerProp, viewrenderProp);
+				freemarkerProp);
 		viewRenderServiceRegistration = context.registerService(
 				ViewRenderService.class.getName(), viewRenderService, null);
 	}
