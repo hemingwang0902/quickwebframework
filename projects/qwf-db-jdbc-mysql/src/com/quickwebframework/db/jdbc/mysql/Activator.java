@@ -2,7 +2,6 @@ package com.quickwebframework.db.jdbc.mysql;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.db.jdbc.mysql.service.impl.DatabaseServiceImpl;
 import com.quickwebframework.framework.WebContext;
@@ -24,16 +23,8 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext context) throws Exception {
 		Activator.context = context;
 
-		String jdbcPropertyFilePath = null;
-
-		ServiceReference<?>[] serviceReferences = context
-				.getServiceReferences(String.class.getName(),
-						"(quickwebframework.config=com.quickwebframework.db.jdbc.properties)");
-
-		if (serviceReferences != null && serviceReferences.length > 0) {
-			jdbcPropertyFilePath = (String) context
-					.getService(serviceReferences[0]);
-		}
+		String jdbcPropertyFilePath = WebContext
+				.getQwfConfig("com.quickwebframework.db.jdbc.properties");
 
 		if (jdbcPropertyFilePath == null || jdbcPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
