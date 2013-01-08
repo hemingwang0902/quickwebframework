@@ -17,6 +17,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 
@@ -104,6 +106,41 @@ public class WebContext extends FrameworkContext {
 	public static void setHandlerExceptionResolver(
 			HandlerExceptionResolver handlerExceptionResolver) {
 		WebContext.handlerExceptionResolver = handlerExceptionResolver;
+	}
+
+	/**
+	 * 得到实际路径
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static String getRealPath(String path) {
+		if (servletContext == null)
+			return null;
+		return servletContext.getRealPath(path);
+	}
+
+	/**
+	 * 得到quickwebframework.properties文件中的quickwebframework.config开头的配置
+	 * 
+	 * @param configKey
+	 * @return
+	 */
+	public static String getQwfConfig(String configKey) {
+		BundleContext context = Activator.getContext();
+
+		ServiceReference<?>[] serviceReferences;
+		try {
+			serviceReferences = context.getServiceReferences(
+					String.class.getName(),
+					String.format("(quickwebframework.config=%s)", configKey));
+		} catch (InvalidSyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		if (serviceReferences != null && serviceReferences.length > 0) {
+			return (String) context.getService(serviceReferences[0]);
+		}
+		return null;
 	}
 
 	// ===== WEB相关变量部分结束

@@ -8,48 +8,32 @@ import java.net.URL;
 import org.osgi.framework.Bundle;
 
 import com.quickwebframework.framework.OsgiContext;
+import com.quickwebframework.service.ViewRenderService;
 
 import freemarker.cache.TemplateLoader;
 
 public class PluginTemplateLoader implements TemplateLoader {
 
-	// 插件名称与路径分隔符
-	private String pluginNameAndPathSplitString = ":";
+	private ViewRenderService viewRenderService;
 
-	public String getPluginNameAndPathSplitString() {
-		return pluginNameAndPathSplitString;
-	}
-
-	public void setPluginNameAndPathSplitString(
-			String pluginNameAndPathSplitString) {
-		this.pluginNameAndPathSplitString = pluginNameAndPathSplitString;
-	}
-
-	// 视图名称前缀
-	private String viewNamePrefix = "";
-
-	public void setViewNamePrefix(String viewNamePrefix) {
-		this.viewNamePrefix = viewNamePrefix;
-	}
-
-	// 视图名称后缀
-	private String viewNameSuffix = ".ftl";
-
-	public void setViewNameSuffix(String viewNameSuffix) {
-		this.viewNameSuffix = viewNameSuffix;
+	public PluginTemplateLoader(ViewRenderService viewRenderService) {
+		this.viewRenderService = viewRenderService;
 	}
 
 	@Override
 	public Object findTemplateSource(String name) throws IOException {
-		String[] tmpArray = name.split(pluginNameAndPathSplitString);
+		String[] tmpArray = name.split(viewRenderService
+				.getPluginNameAndPathSplitString());
 		if (tmpArray.length < 2) {
 			throw new IOException("视图名称[" + name + "]不符合规则：“[插件名]"
-					+ pluginNameAndPathSplitString + "[路径]”");
+					+ viewRenderService.getPluginNameAndPathSplitString()
+					+ "[路径]”");
 		}
 		String pluginName = tmpArray[0];
 		String path = tmpArray[1];
 		// 对视图名称进行处理(添加前后缀)
-		path = viewNamePrefix + path + viewNameSuffix;
+		path = viewRenderService.getViewNamePrefix() + path
+				+ viewRenderService.getViewNameSuffix();
 
 		Bundle bundle = OsgiContext.getBundleByName(pluginName);
 
@@ -60,7 +44,7 @@ public class PluginTemplateLoader implements TemplateLoader {
 		}
 
 		return new PluginTemplateSource(bundle, path, bundle.getLastModified(),
-				pluginNameAndPathSplitString);
+				viewRenderService.getPluginNameAndPathSplitString());
 	}
 
 	@Override
