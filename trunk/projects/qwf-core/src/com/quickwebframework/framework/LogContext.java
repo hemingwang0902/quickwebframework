@@ -13,7 +13,6 @@ import com.quickwebframework.entity.Log;
 import com.quickwebframework.entity.LogFactory;
 import com.quickwebframework.entity.impl.DefaultLogImpl;
 import com.quickwebframework.entity.impl.JavaLoggerImpl;
-import com.quickwebframework.util.BundleContextUtil;
 
 @SuppressWarnings("deprecation")
 public class LogContext extends FrameworkContext {
@@ -42,11 +41,10 @@ public class LogContext extends FrameworkContext {
 		BundleContext bundleContext = Activator.getContext();
 		// 设置默认的Java日志记录器配置
 		try {
-			Object obj = BundleContextUtil
-					.getServiceObject(bundleContext, String.class.getName(),
-							"(quickwebframework.config=com.quickwebframework.core.javalogger.level)");
-			if (obj != null) {
-				String javaLoggerLevelStr = (String) obj;
+
+			String javaLoggerLevelStr = WebContext
+					.getQwfConfig("com.quickwebframework.core.javalogger.level");
+			if (javaLoggerLevelStr != null) {
 				JavaLoggerImpl.javaLoggerLevel = Level
 						.parse(javaLoggerLevelStr);
 			}

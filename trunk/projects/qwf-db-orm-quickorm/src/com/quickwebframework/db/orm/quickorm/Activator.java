@@ -10,7 +10,6 @@ import java.util.Properties;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.db.orm.quickorm.service.DatabaseService;
@@ -29,17 +28,8 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext context) throws Exception {
 		Activator.context = context;
 
-		String quickormPropertyFilePath = null;
-
-		ServiceReference<?>[] serviceReferences = context
-				.getServiceReferences(String.class.getName(),
-						"(quickwebframework.config=com.quickwebframework.db.quickorm.properties)");
-
-		if (serviceReferences != null && serviceReferences.length > 0) {
-			quickormPropertyFilePath = (String) context
-					.getService(serviceReferences[0]);
-		}
-
+		String quickormPropertyFilePath = WebContext
+				.getQwfConfig("com.quickwebframework.db.quickorm.properties");
 		if (quickormPropertyFilePath == null
 				|| quickormPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(

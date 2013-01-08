@@ -3,7 +3,6 @@ package com.quickwebframework.log.log4j;
 import org.apache.log4j.PropertyConfigurator;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.framework.WebContext;
@@ -15,16 +14,8 @@ public class Activator implements BundleActivator {
 	private ServiceRegistration<?> logServiceRegistration;
 
 	public void start(BundleContext context) throws Exception {
-		String log4jConfigFilePath = null;
-
-		ServiceReference<?>[] serviceReferences = context
-				.getServiceReferences(String.class.getName(),
-						"(quickwebframework.config=com.quickwebframework.log.log4j.properties)");
-		if (serviceReferences != null && serviceReferences.length > 0) {
-			log4jConfigFilePath = (String) context
-					.getService(serviceReferences[0]);
-		}
-
+		String log4jConfigFilePath = WebContext
+				.getQwfConfig("com.quickwebframework.log.log4j.properties");
 		if (log4jConfigFilePath == null || log4jConfigFilePath.isEmpty()) {
 			throw new RuntimeException(
 					"Can't found property 'quickwebframework.config.com.quickwebframework.log.log4j.properties'！");
