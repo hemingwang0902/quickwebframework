@@ -8,24 +8,24 @@
 	<p>
 		<b>线程信息</b>
 	</p>
-#parse("qwf.test.core:navbar")
+	<#include "qwf.test.core:navbar">
 	<table>
 		<tbody>
-#foreach($thread in $allStackTraces.keySet())
+			<#list allStackTraces?keys as thread>
+			<!-- 分隔 -->
 			<tr>
 				<td><b>线程[${thread}]</b></td>
 			</tr>
-	#set($stackTraceList = $allStackTraces.get($thread))
-	#if($stackTraceList)
+			<#if allStackTraces[thread]??>
 			<tr>
-				<td>
-		#foreach($stackTrace in $stackTraceList)
+				<td><#list allStackTraces[thread] as stackTrace> <!-- 分隔 -->
 					<p style="margin-left: 20px; margin-top: 0px; margin-bottom: 0px">${stackTrace}</p>
-		#end
+					<!-- 分隔 --></#list>
 				</td>
 			</tr>
-	#end
-#end
+			</#if>
+			<!-- 分隔 -->
+			</#list>
 		</tbody>
 	</table>
 </body>

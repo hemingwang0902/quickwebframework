@@ -8,17 +8,17 @@
 	<p>
 		<b>过滤器信息</b>
 	</p>
-#parse("qwf.test.core:navbar")
+	<#include "qwf.test.core:navbar">
 	<table>
 		<tbody>
 			<tr>
 				<td><b>过滤器列表</b></td>
 			</tr>
-#foreach($filter in $filters)
+			<#list filters as filter>
 			<tr>
 				<td><p style="margin-left: 20px">${filter}</p></td>
 			</tr>
-#end
+			</#list>
 		</tbody>
 	</table>
 </body>

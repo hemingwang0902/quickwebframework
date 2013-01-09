@@ -8,25 +8,22 @@
 	<p>
 		<b>控制器信息</b>
 	</p>
-	<#include "qwf.test.core:navbar">
+#parse("qwf.test.core:navbar")
 	<table>
 		<tbody>
-			
-			<#list bundleNameHttpMethodInfoListMap?keys as bundleName>
-			
-			<#if bundleNameHttpMethodInfoListMap[bundleName]?size gt 0>
-			<tr>
-				<td><b>插件[${bundleName}]</b></td>
-			</tr>
-			<#list bundleNameHttpMethodInfoListMap[bundleName] as httpMethodInfo>
-			<tr>
-				<td><a style="margin-left: 20px"
-					href="${httpMethodInfo.mappingUrl}">${httpMethodInfo.mappingUrl}</a>(${httpMethodInfo.httpMethod})</td>
-			</tr>
-			</#list>
-			</#if>
-			
-			</#list>			
+#foreach($bundleName in $bundleNameHttpMethodInfoListMap.keySet())
+	#if($bundleNameHttpMethodInfoListMap.get(${bundleName}).size() > 0)
+		<tr>
+			<td><b>插件[${bundleName}]</b></td>
+		</tr>
+		#foreach($httpMethodInfo in $bundleNameHttpMethodInfoListMap.get(${bundleName}))
+		<tr>
+			<td><a style="margin-left: 20px"
+				href="${httpMethodInfo.mappingUrl}">${httpMethodInfo.mappingUrl}</a>(${httpMethodInfo.httpMethod})</td>
+		</tr>
+		#end
+	#end
+#end
 		</tbody>
 	</table>
 </body>

@@ -8,7 +8,7 @@
 	<p>
 		<b>首页</b>
 	</p>
-#parse("qwf.test.core:navbar")
+	<#include "qwf.test.core:navbar">
 	<p>这个QuickWebFramework的一个测试插件！</p>
 </body>
 </html>

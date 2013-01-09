@@ -46,6 +46,9 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 		}
 		// 输出
 		try {
+			//设置编码
+			response.setCharacterEncoding(template.getEncoding());
+			response.setContentType("text/html");
 			template.merge(context, response.getWriter());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
