@@ -8,7 +8,6 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Properties;
 
-import org.apache.velocity.texen.util.PropertiesUtil;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;

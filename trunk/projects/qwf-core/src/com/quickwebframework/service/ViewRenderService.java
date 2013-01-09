@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Enumeration;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.quickwebframework.entity.MvcModelAndView;
 import com.quickwebframework.framework.WebContext;
 
 /**
@@ -124,15 +127,35 @@ public abstract class ViewRenderService {
 	/**
 	 * 渲染视图
 	 * 
-	 * @param bundleName
-	 *            插件名称
-	 * @param viewName
-	 *            视图名称
 	 * @param request
 	 *            请求对象
 	 * @param response
 	 *            响应对象
+	 * @param mav
+	 *            模型与视图
 	 */
-	public abstract void renderView(String bundleName, String viewName,
-			HttpServletRequest request, HttpServletResponse response);
+	public final void renderView(HttpServletRequest request,
+			HttpServletResponse response, MvcModelAndView mav) {
+		// 视图名称
+		String viewName = mav.getViewName();
+		// 如果ViewName中未包括分隔符，即未包含插件名称，则添加当前插件名称为前缀
+		if (!viewName.contains(getPluginNameAndPathSplitString())) {
+			String bundleName = mav.getBundle().getSymbolicName();
+			viewName = bundleName + getPluginNameAndPathSplitString()
+					+ viewName;
+		}
+		// 准备数据模型
+		Enumeration<String> attributeNameEnumeration = request
+				.getAttributeNames();
+		while (attributeNameEnumeration.hasMoreElements()) {
+			String attributeName = attributeNameEnumeration.nextElement();
+			mav.getModel().put(attributeName,
+					request.getAttribute(attributeName));
+		}
+		renderView(request, response, viewName, mav.getModel());
+	}
+
+	public abstract void renderView(HttpServletRequest request,
+			HttpServletResponse response, String viewName,
+			Map<String, Object> model);
 }

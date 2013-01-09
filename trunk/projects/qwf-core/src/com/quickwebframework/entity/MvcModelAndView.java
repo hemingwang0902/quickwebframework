@@ -18,9 +18,9 @@ public class MvcModelAndView {
 	}
 
 	// 数据
-	private Map<?, ?> model;
+	private Map<String, Object> model;
 
-	public Map<?, ?> getModel() {
+	public Map<String, Object> getModel() {
 		return model;
 	}
 
@@ -35,7 +35,7 @@ public class MvcModelAndView {
 		this.bundle = bundle;
 	}
 
-	public void setModel(Map<?, ?> model) {
+	public void setModel(Map<String, Object> model) {
 		this.model = model;
 	}
 
@@ -47,15 +47,16 @@ public class MvcModelAndView {
 		init(viewName, null, null);
 	}
 
-	public MvcModelAndView(String viewName, Map<?, ?> model) {
+	public MvcModelAndView(String viewName, Map<String, Object> model) {
 		init(viewName, model, null);
 	}
 
-	public MvcModelAndView(String viewName, Map<?, ?> model, Bundle bundle) {
+	public MvcModelAndView(String viewName, Map<String, Object> model,
+			Bundle bundle) {
 		init(viewName, model, bundle);
 	}
 
-	private void init(String viewName, Map<?, ?> model, Bundle bundle) {
+	private void init(String viewName, Map<String, Object> model, Bundle bundle) {
 		this.viewName = viewName;
 		this.model = model;
 		this.bundle = bundle;
