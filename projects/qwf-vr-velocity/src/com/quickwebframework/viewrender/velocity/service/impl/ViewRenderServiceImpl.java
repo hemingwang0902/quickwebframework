@@ -24,6 +24,9 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 		engine.setProperty(Velocity.RESOURCE_LOADER, "class");
 		engine.setProperty("class.resource.loader.class",
 				BundleResourceLoader.class.getName());
+	}
+
+	public void init() {
 		engine.init();
 	}
 
