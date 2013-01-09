@@ -16,35 +16,17 @@ import org.apache.velocity.runtime.resource.loader.ResourceLoader;
 import org.osgi.framework.Bundle;
 
 import com.quickwebframework.framework.OsgiContext;
+import com.quickwebframework.service.ViewRenderService;
+import com.quickwebframework.viewrender.velocity.Activator;
 
 public class BundleResourceLoader extends ResourceLoader {
-
-	// 插件名称与路径分隔符
-	private String pluginNameAndPathSplitString = ":";
-	// 视图名称前缀
-	private String viewNamePrefix = "";
-	// 视图名称后缀
-	private String viewNameSuffix = ".vm";
 	// 用来缓存已经找到的视图名称与插件
 	private Map<String, Bundle> templateBundles = Collections
 			.synchronizedMap(new HashMap<String, Bundle>());
 
-	public String getPluginNameAndPathSplitString() {
-		return pluginNameAndPathSplitString;
-	}
-
-	public void setPluginNameAndPathSplitString(
-			String pluginNameAndPathSplitString) {
-		this.pluginNameAndPathSplitString = pluginNameAndPathSplitString;
-	}
-
-	public void setViewNamePrefix(String viewNamePrefix) {
-		this.viewNamePrefix = viewNamePrefix;
-	}
-
-	public void setViewNameSuffix(String viewNameSuffix) {
-		this.viewNameSuffix = viewNameSuffix;
-	}
+	private String pluginNameAndPathSplitString;
+	private String viewNameSuffix;
+	private String viewNamePrefix;
 
 	@Override
 	public long getLastModified(Resource resource) {
@@ -99,7 +81,11 @@ public class BundleResourceLoader extends ResourceLoader {
 
 	@Override
 	public void init(ExtendedProperties arg0) {
-
+		ViewRenderService viewRenderService = Activator.getViewRenderService();
+		this.pluginNameAndPathSplitString = viewRenderService
+				.getPluginNameAndPathSplitString();
+		this.viewNamePrefix = viewRenderService.getViewNamePrefix();
+		this.viewNameSuffix = viewRenderService.getViewNameSuffix();
 	}
 
 	@Override

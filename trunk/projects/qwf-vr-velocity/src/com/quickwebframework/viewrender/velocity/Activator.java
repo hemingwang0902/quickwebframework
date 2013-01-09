@@ -19,10 +19,15 @@ import com.quickwebframework.viewrender.velocity.service.impl.ViewRenderServiceI
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;
+	private static ViewRenderServiceImpl viewRenderService;
 	private ServiceRegistration<?> viewRenderServiceRegistration;
 
 	static BundleContext getContext() {
 		return context;
+	}
+
+	public static ViewRenderService getViewRenderService() {
+		return viewRenderService;
 	}
 
 	public void start(BundleContext bundleContext) throws Exception {
@@ -42,8 +47,8 @@ public class Activator implements BundleActivator {
 			inputStream.close();
 		}
 		// 注册视图渲染服务
-		ViewRenderService viewRenderService = new ViewRenderServiceImpl(
-				velocityProp);
+		viewRenderService = new ViewRenderServiceImpl(velocityProp);
+		viewRenderService.init();
 		Dictionary<String, String> dict = new Hashtable<String, String>();
 		dict.put("bundle", bundleContext.getBundle().getSymbolicName());
 		viewRenderServiceRegistration = context.registerService(
