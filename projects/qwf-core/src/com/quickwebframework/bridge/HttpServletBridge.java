@@ -43,11 +43,8 @@ public class HttpServletBridge extends HttpServlet {
 		try {
 			if (WebContext.getViewRenderService() != null) {
 				// 渲染视图
-				WebContext
-
-				.getViewRenderService().renderView(
-						mav.getBundle().getSymbolicName(), mav.getViewName(),
-						request, response);
+				WebContext.getViewRenderService().renderView(request, response,
+						mav);
 			} else {
 				response.sendError(500,
 						"[com.quickwebframework.core.DispatcherServlet] cannot found ViewRender!");

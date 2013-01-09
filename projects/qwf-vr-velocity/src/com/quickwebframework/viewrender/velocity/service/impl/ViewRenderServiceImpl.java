@@ -1,6 +1,7 @@
 package com.quickwebframework.viewrender.velocity.service.impl;
 
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,8 +28,9 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 	}
 
 	@Override
-	public void renderView(String bundleName, String viewName,
-			HttpServletRequest request, HttpServletResponse response) {
+	public void renderView(HttpServletRequest request,
+			HttpServletResponse response, String viewName,
+			Map<String, Object> model) {
 		// 得到模板
 		Template template = engine.getTemplate(viewName);
 		// 准备数据
