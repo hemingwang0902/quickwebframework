@@ -8,22 +8,24 @@
 	<p>
 		<b>监听器信息</b>
 	</p>
-#parse("qwf.test.core:navbar")
+	<#include "qwf.test.core:navbar">
 	<table>
 		<tbody>
-#foreach($className in $listenersMap.keySet())
-	#set($listenerList = $listenersMap.get($className))
-	#if($listenerList && $listenerList.size() > 0)
+			<#list listenersMap?keys as className>
+			<!-- 分隔 -->
+			<#if listenersMap[className]??>
 			<tr>
 				<td><b>[${className}]类型</b></td>
 			</tr>
-		#foreach($listener in $listenerList)
+			<#list listenersMap[className] as listener>
 			<tr>
 				<td><p style="margin-left: 20px">${listener}</p></td>
 			</tr>
-		#end
-	#end	
-#end
+			</#list>
+			<!-- 分隔 -->
+			</#if>
+			<!-- 分隔 -->
+			</#list>
 		</tbody>
 	</table>
 </body>
