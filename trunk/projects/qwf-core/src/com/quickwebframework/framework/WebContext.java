@@ -2,6 +2,8 @@ package com.quickwebframework.framework;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +11,8 @@ import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
+import javax.servlet.Servlet;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -69,6 +73,8 @@ public class WebContext extends FrameworkContext {
 	private static HandlerExceptionResolver handlerExceptionResolver;
 	// HttpServlet桥接对象
 	private ServiceRegistration<?> httpServletBridgeServiceRegistration;
+	// 路径与Servlet映射Map
+	private static Map<String, Servlet> pathServletMap;
 
 	public static MvcFrameworkService getMvcFrameworkService() {
 		return mvcFrameworkService;
@@ -206,6 +212,7 @@ public class WebContext extends FrameworkContext {
 		listenerList = new ArrayList<EventListener>();
 		typeNameListenerListMap = new HashMap<String, List<EventListener>>();
 		bundleListenerListMap = new HashMap<Bundle, List<EventListener>>();
+		pathServletMap = new HashMap<String, Servlet>();
 		bundleListener = new SynchronousBundleListener() {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
@@ -676,5 +683,98 @@ public class WebContext extends FrameworkContext {
 		}
 		// 加入到全部监听器对象列表中
 		listenerList.add(listener);
+	}
+
+	/**
+	 * 根据别名(路径)找到Servlet
+	 * 
+	 * @param alias
+	 * @return
+	 */
+	public static Servlet getServletByPath(String alias) {
+		return pathServletMap.get(alias);
+	}
+
+	/**
+	 * 获取所有Servlet所注册的路径数组
+	 * 
+	 * @return
+	 */
+	public static String[] getAllServletPaths() {
+		return pathServletMap.keySet().toArray(new String[0]);
+	}
+
+	/**
+	 * 注册Servlet
+	 * 
+	 * @param path
+	 * @param servlet
+	 * @param initparams
+	 * @throws javax.servlet.ServletException
+	 */
+	public static void registerServlet(String path, Servlet servlet,
+			Dictionary<String, Object> initparams)
+			throws javax.servlet.ServletException {
+		if (pathServletMap.containsKey(path)) {
+			throw new RuntimeException(String.format(
+					"路径[%s]已经被映射到了Servlet[%s]", path, pathServletMap.get(path)));
+		}
+		final Servlet servletMirror = servlet;
+		final Dictionary<String, Object> initparamsMirror = initparams;
+		// 初始化Servlet
+		servlet.init(new ServletConfig() {
+
+			@Override
+			public String getInitParameter(String arg0) {
+				if (initparamsMirror == null)
+					return null;
+				Object obj = initparamsMirror.get(arg0);
+				if (obj == null)
+					return null;
+				return obj.toString();
+			}
+
+			@Override
+			public Enumeration<String> getInitParameterNames() {
+				if (initparamsMirror == null)
+					return null;
+				return initparamsMirror.keys();
+			}
+
+			@Override
+			public ServletContext getServletContext() {
+				return WebContext.getServletContext();
+			}
+
+			@Override
+			public String getServletName() {
+				return servletMirror.toString();
+			}
+		});
+		pathServletMap.put(path, servlet);
+		log.debug(String.format("已注册路径[%s]到Servlet[%s].", path, servlet));
+	}
+
+	/**
+	 * 注册资源
+	 * 
+	 * @param alias
+	 * @param name
+	 */
+	public static void registerResources(String alias, String name) {
+		throw new RuntimeException("此方法还未实现！");
+	}
+
+	/**
+	 * 取消注册Servlet或资源
+	 * 
+	 * @param path
+	 */
+	public static void unregister(String path) {
+		if (!pathServletMap.containsKey(path))
+			return;
+		Servlet servlet = pathServletMap.get(path);
+		pathServletMap.remove(path);
+		log.debug(String.format("已取消注册路径为[%s]的Servlet[%s].", path, servlet));
 	}
 }

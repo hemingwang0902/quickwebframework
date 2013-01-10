@@ -9,6 +9,9 @@ import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import qwf.test.core.servlet.TestServlet;
+
+import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.ioc.spring.util.ApplicationContextListener;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 
@@ -62,10 +65,15 @@ public class Activator implements BundleActivator {
 		// 添加一个ApplicationContext监听器
 		BundleApplicationContextUtils
 				.addApplicationContextListener(applicationContextListener);
+		// 注册Servlet
+		WebContext.registerServlet("/test", new TestServlet(), null);
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
 		Activator.context = null;
+
+		// 取消注册Servlet
+		WebContext.unregister("/test");
 
 		// 移除一个ApplicationContext监听器
 		BundleApplicationContextUtils
