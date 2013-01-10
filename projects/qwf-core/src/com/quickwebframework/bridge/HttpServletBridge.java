@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -63,7 +64,8 @@ public class HttpServletBridge extends HttpServlet {
 			WebContext.getUrlNotFoundHandleServlet().service(request, response);
 	}
 
-	private void processHttp(HttpServletRequest request,
+	// 将这个连接推给MVC框架去处理
+	private void postToMvcFramework(HttpServletRequest request,
 			HttpServletResponse response, String bundleName, String methodName) {
 		try {
 			// 如果插件名称为null或空字符串
@@ -113,10 +115,17 @@ public class HttpServletBridge extends HttpServlet {
 			serviceRootUrl(request, response);
 			return;
 		}
+		// 如果此路径有映射的Servlet，则交由此Servlet去处理
+		Servlet pathServlet = WebContext
+				.getServletByPath(requestURIWithoutContextPath);
+		if (pathServlet != null) {
+			pathServlet.service(request, response);
+			return;
+		}
 
 		Object bundleNameObject = request.getAttribute(ARG_BUNDLE_NAME);
 		if (bundleNameObject == null) {
-			processHttp(request, response, null, null);
+			postToMvcFramework(request, response, null, null);
 			return;
 		}
 		String bundleName = bundleNameObject.toString();
@@ -125,7 +134,7 @@ public class HttpServletBridge extends HttpServlet {
 		// 如果是视图
 		if (methodNameObject != null) {
 			String methodName = methodNameObject.toString();
-			processHttp(request, response, bundleName, methodName);
+			postToMvcFramework(request, response, bundleName, methodName);
 		}
 		// 如果是资源
 		else if (resourcePathObject != null) {
@@ -142,11 +151,23 @@ public class HttpServletBridge extends HttpServlet {
 			response.setContentType("text/html;charset=utf-8");
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use QuickWebFramework!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
+			String[] allServletPaths = WebContext.getAllServletPaths();
+			if (allServletPaths != null && allServletPaths.length > 0) {
+				sb.append("<table>");
+				sb.append("<tr><td><b>==Java Servlet部分==</b></td></tr>");
+				for (String servletPath : allServletPaths) {
+					sb.append("<tr><td><a style=\"margin-left:20px\" href=\""
+							+ servletPath + "\">" + servletPath
+							+ "</a></td></tr>");
+				}
+				sb.append("</table>");
+			}
 			if (WebContext.getMvcFrameworkService() != null) {
 				Map<String, List<HttpMethodInfo>> map = WebContext
 						.getMvcFrameworkService()
 						.getBundleHttpMethodInfoListMap();
 				sb.append("<table>");
+				sb.append("<tr><td><b>==MVC部分==</b></td></tr>");
 				for (String bundleName : map.keySet()) {
 					List<HttpMethodInfo> httpMethodInfoList = map
 							.get(bundleName);
