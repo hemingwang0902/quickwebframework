@@ -1,0 +1,14 @@
+#labels 插件的依赖树形结构介绍
+此页面包含插件的依赖树形结构介绍
+
+= 前言 =
+
+QuickWebFramework包含各种插件，在实际使用中应根据需要用到的插件选择安装，而不是全部安装。
+
+
+= 详细 =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
