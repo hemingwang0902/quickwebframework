@@ -36,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import com.quickwebframework.service.MvcFrameworkService;
 import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.stereotype.FilterSetting;
+import com.quickwebframework.util.pattern.WildcardPattern;
 
 public class WebContext extends FrameworkContext {
 	private static WebContext instance;
@@ -75,6 +76,8 @@ public class WebContext extends FrameworkContext {
 	private ServiceRegistration<?> httpServletBridgeServiceRegistration;
 	// 路径与Servlet映射Map
 	private static Map<String, Servlet> pathServletMap;
+	// 路径与通配符模板对象映射Map
+	private static Map<String, WildcardPattern> pathWildcardPatternMap;
 
 	public static MvcFrameworkService getMvcFrameworkService() {
 		return mvcFrameworkService;
@@ -213,6 +216,7 @@ public class WebContext extends FrameworkContext {
 		typeNameListenerListMap = new HashMap<String, List<EventListener>>();
 		bundleListenerListMap = new HashMap<Bundle, List<EventListener>>();
 		pathServletMap = new HashMap<String, Servlet>();
+		pathWildcardPatternMap = new HashMap<String, WildcardPattern>();
 		bundleListener = new SynchronousBundleListener() {
 			@Override
 			public void bundleChanged(BundleEvent arg0) {
@@ -692,7 +696,23 @@ public class WebContext extends FrameworkContext {
 	 * @return
 	 */
 	public static Servlet getServletByPath(String alias) {
-		return pathServletMap.get(alias);
+		for (String path : pathServletMap.keySet()) {
+			if (path.startsWith("*.") || path.endsWith("*")) {
+				WildcardPattern pattern = pathWildcardPatternMap.get(path);
+				if (pattern == null) {
+					pattern = new WildcardPattern(path);
+					pathWildcardPatternMap.put(path, pattern);
+				}
+				if (pattern.implies(alias)) {
+					return pathServletMap.get(path);
+				}
+			} else {
+				if (path.equals(alias)) {
+					return pathServletMap.get(alias);
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
