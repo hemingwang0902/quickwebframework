@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import com.quickwebframework.entity.MvcModelAndView;
 import com.quickwebframework.framework.OsgiContext;
 import com.quickwebframework.framework.WebContext;
+import com.quickwebframework.service.MvcFrameworkService;
+import com.quickwebframework.service.ViewRenderService;
 
 public class HttpServletBridge extends HttpServlet {
 	/**
@@ -42,13 +44,14 @@ public class HttpServletBridge extends HttpServlet {
 	public void renderView(MvcModelAndView mav, HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			if (WebContext.getViewRenderService() != null) {
+			ViewRenderService viewRenderService = WebContext
+					.getViewRenderService();
+			if (viewRenderService != null) {
 				// 渲染视图
-				WebContext.getViewRenderService().renderView(request, response,
-						mav);
+				viewRenderService.renderView(request, response, mav);
 			} else {
-				response.sendError(500,
-						"[com.quickwebframework.core.DispatcherServlet] cannot found ViewRender!");
+				response.sendError(500, String.format("[%s]未找到视图渲染器服务!", this
+						.getClass().getName()));
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -67,16 +70,19 @@ public class HttpServletBridge extends HttpServlet {
 	// 将这个连接推给MVC框架去处理
 	private void postToMvcFramework(HttpServletRequest request,
 			HttpServletResponse response, String bundleName, String methodName) {
+		MvcFrameworkService mvcFrameworkService = WebContext
+				.getMvcFrameworkService();
 		try {
 			// 如果插件名称为null或空字符串
-			if (bundleName == null || bundleName.isEmpty()) {
+			if (bundleName == null || bundleName.isEmpty()
+					|| mvcFrameworkService == null) {
 				handleUrlNotFound(request, response);
 				return;
 			}
 
 			try {
-				MvcModelAndView mav = WebContext.getMvcFrameworkService()
-						.handle(request, response, bundleName, methodName);
+				MvcModelAndView mav = mvcFrameworkService.handle(request,
+						response, bundleName, methodName);
 				if (mav == null) {
 					return;
 				}
@@ -123,6 +129,7 @@ public class HttpServletBridge extends HttpServlet {
 			return;
 		}
 
+		// 否则交给MVC框架去处理
 		Object bundleNameObject = request.getAttribute(ARG_BUNDLE_NAME);
 		if (bundleNameObject == null) {
 			postToMvcFramework(request, response, null, null);

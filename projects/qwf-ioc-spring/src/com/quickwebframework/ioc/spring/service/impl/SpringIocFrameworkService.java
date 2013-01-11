@@ -1,5 +1,6 @@
 package com.quickwebframework.ioc.spring.service.impl;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,5 +99,13 @@ public class SpringIocFrameworkService implements IocFrameworkService {
 	public <T> Map<String, T> getBeansOfType(Bundle bundle, Class<T> clazz) {
 		return BundleApplicationContextUtils
 				.getBundleApplicationContext(bundle).getBeansOfType(clazz);
+	}
+
+	@Override
+	public Map<String, Object> getBeansWithAnnotation(Bundle bundle,
+			Class<? extends Annotation> annotationClazz) {
+		return BundleApplicationContextUtils
+				.getBundleApplicationContext(bundle).getBeansWithAnnotation(
+						annotationClazz);
 	}
 }

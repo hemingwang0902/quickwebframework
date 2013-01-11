@@ -1,5 +1,6 @@
 package com.quickwebframework.service;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
@@ -102,4 +103,14 @@ public interface IocFrameworkService {
 	 * @return
 	 */
 	public <T> Map<String, T> getBeansOfType(Bundle bundle, Class<T> clazz);
+
+	/**
+	 * 得到指定注解类型的所有bean的Map
+	 * 
+	 * @param bundle
+	 * @param annotationClazz
+	 * @return
+	 */
+	public Map<String, Object> getBeansWithAnnotation(Bundle bundle,
+			Class<? extends Annotation> annotationClazz);
 }

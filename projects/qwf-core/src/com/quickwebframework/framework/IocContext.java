@@ -1,5 +1,6 @@
 package com.quickwebframework.framework;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
@@ -200,5 +201,19 @@ public class IocContext extends FrameworkContext {
 			Class<T> clazz) {
 		checkIocFrameworkExist();
 		return iocFrameworkService.getBeansOfType(bundle, clazz);
+	}
+
+	/**
+	 * 得到指定注解类型的所有bean的Map
+	 * 
+	 * @param bundle
+	 * @param annotationClazz
+	 * @return
+	 */
+	public static Map<String, Object> getBeansWithAnnotation(Bundle bundle,
+			Class<? extends Annotation> annotationClazz) {
+		checkIocFrameworkExist();
+		return iocFrameworkService.getBeansWithAnnotation(bundle,
+				annotationClazz);
 	}
 }
