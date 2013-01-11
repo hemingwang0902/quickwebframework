@@ -25,3 +25,6 @@ Export-Package: com.quickwebframework.entity,
  org.apache.commons.logging,
  org.apache.log4j,
  org.slf4j
+Bundle-ClassPath: jsp-api.jar,
+ jasper.jar,
+ .

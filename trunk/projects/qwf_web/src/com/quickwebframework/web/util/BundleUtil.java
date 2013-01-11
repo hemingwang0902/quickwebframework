@@ -233,7 +233,11 @@ public class BundleUtil {
 				bundle.stop();
 			}
 		}
-
+		// 休息0.001秒钟
+		try {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
+		}
 		Bundle[] installedBundles = new Bundle[bundleInfoList.size()];
 
 		// 按照顺序安装，注意:此处只是安装并不启动插件
