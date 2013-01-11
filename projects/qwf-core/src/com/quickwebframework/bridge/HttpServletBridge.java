@@ -73,9 +73,14 @@ public class HttpServletBridge extends HttpServlet {
 		MvcFrameworkService mvcFrameworkService = WebContext
 				.getMvcFrameworkService();
 		try {
+			// 如果没找到MVC框架服务
+			if (mvcFrameworkService == null) {
+				response.sendError(500, String.format("[%s]未找到MVC框架服务!", this
+						.getClass().getName()));
+				return;
+			}
 			// 如果插件名称为null或空字符串
-			if (bundleName == null || bundleName.isEmpty()
-					|| mvcFrameworkService == null) {
+			if (bundleName == null || bundleName.isEmpty()) {
 				handleUrlNotFound(request, response);
 				return;
 			}
@@ -116,7 +121,7 @@ public class HttpServletBridge extends HttpServlet {
 		if (requestURIWithoutContextPath.isEmpty())
 			requestURIWithoutContextPath = "/";
 
-		// 如果是根路径
+		// 如果是根路径，则交给serviceRootUrl方法去处理
 		if ("/".equals(requestURIWithoutContextPath)) {
 			serviceRootUrl(request, response);
 			return;
@@ -129,19 +134,26 @@ public class HttpServletBridge extends HttpServlet {
 			return;
 		}
 
-		// 否则交给MVC框架去处理
 		Object bundleNameObject = request.getAttribute(ARG_BUNDLE_NAME);
+		// 如果没有找到插件名称
 		if (bundleNameObject == null) {
-			postToMvcFramework(request, response, null, null);
+			handleUrlNotFound(request, response);
 			return;
 		}
 		String bundleName = bundleNameObject.toString();
+
 		Object methodNameObject = request.getAttribute(ARG_METHOD_NAME);
 		Object resourcePathObject = request.getAttribute(ARG_RESOURCE_PATH);
 		// 如果是视图
 		if (methodNameObject != null) {
 			String methodName = methodNameObject.toString();
-			postToMvcFramework(request, response, bundleName, methodName);
+			// 如果是jsp后缀
+			if (methodName.endsWith(".jsp")) {
+
+			} else {
+				// 否则交给MVC框架去处理
+				postToMvcFramework(request, response, bundleName, methodName);
+			}
 		}
 		// 如果是资源
 		else if (resourcePathObject != null) {
