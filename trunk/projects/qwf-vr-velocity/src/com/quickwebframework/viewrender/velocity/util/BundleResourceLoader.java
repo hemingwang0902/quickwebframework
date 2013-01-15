@@ -16,7 +16,7 @@ import org.apache.velocity.runtime.resource.loader.ResourceLoader;
 import org.osgi.framework.Bundle;
 
 import com.quickwebframework.framework.OsgiContext;
-import com.quickwebframework.service.ViewRenderService;
+import com.quickwebframework.viewrender.ViewRenderService;
 import com.quickwebframework.viewrender.velocity.Activator;
 
 public class BundleResourceLoader extends ResourceLoader {

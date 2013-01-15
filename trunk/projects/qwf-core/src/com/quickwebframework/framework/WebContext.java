@@ -26,15 +26,12 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 
-import com.quickwebframework.bridge.HttpServletBridge;
 import com.quickwebframework.bridge.ServletFilterBridge;
 import com.quickwebframework.bridge.ServletListenerBridge;
 import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.HandlerExceptionResolver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import com.quickwebframework.service.MvcFrameworkService;
-import com.quickwebframework.service.ViewRenderService;
 import com.quickwebframework.stereotype.FilterSetting;
 import com.quickwebframework.util.pattern.WildcardPattern;
 
@@ -52,51 +49,24 @@ public class WebContext extends FrameworkContext {
 	// QuickwebFramework的过滤器配置状态
 	// ===== 常量开始
 	public static final String QUICKWEBFRAMEWORK_STATE_FILTERCONFIG = "com.quickwebframework.state.FILTERCONFIG";
-	public static final String BUNDLE_METHOD_URL_TEMPLATE = "com.quickwebframework.util.BUNDLE_METHOD_URL_TEMPLATE";
 	// ===== 常量结束
 
 	// ===== WEB相关变量部分开始
 	private static BundleListener bundleListener;
 
-	// 插件方法URL模板
-	public static String bundleMethodUrlTemplate;
-	// MVC框架服务
-	private static MvcFrameworkService mvcFrameworkService;
-	// 视图渲染服务
-	private static ViewRenderService viewRenderService;
 	// WEB项目的ServletContext
 	private static ServletContext servletContext;
-	// 根URL处理Servlet
-	private static HttpServlet rootUrlHandleServlet;
 	// URL未找到处理Servlet
 	private static HttpServlet urlNotFoundHandleServlet;
 	// 得到处理器异常解决器
 	private static HandlerExceptionResolver handlerExceptionResolver;
-	// HttpServlet桥接对象
-	private ServiceRegistration<?> httpServletBridgeServiceRegistration;
 	// 路径与Servlet映射Map
 	private static Map<String, Servlet> pathServletMap;
 	// 路径与通配符模板对象映射Map
 	private static Map<String, WildcardPattern> pathWildcardPatternMap;
 
-	public static MvcFrameworkService getMvcFrameworkService() {
-		return mvcFrameworkService;
-	}
-
 	public static ServletContext getServletContext() {
 		return servletContext;
-	}
-
-	public static ViewRenderService getViewRenderService() {
-		return viewRenderService;
-	}
-
-	public static HttpServlet getRootUrlHandleServlet() {
-		return rootUrlHandleServlet;
-	}
-
-	public static void setRootUrlHandleServlet(HttpServlet rootUrlHandleServlet) {
-		WebContext.rootUrlHandleServlet = rootUrlHandleServlet;
 	}
 
 	public static HttpServlet getUrlNotFoundHandleServlet() {
@@ -228,21 +198,17 @@ public class WebContext extends FrameworkContext {
 					return;
 				Bundle coreBundle = bundleContext.getBundle();
 				if (bundleEventType == BundleEvent.STOPPING) {
-					// 移除插件的控制器
-					if (mvcFrameworkService == null)
-						return;
-					mvcFrameworkService.removeBundle(bundle);
 					// 移除插件的过滤器
 					if (bundle.equals(coreBundle)) {
-						removeAllFilter();
+						WebContext.removeAllFilter();
 					} else {
-						removeBundleAllFilter(bundle);
+						WebContext.removeBundleAllFilter(bundle);
 					}
 					// 移除插件的监听器
 					if (bundle.equals(coreBundle)) {
-						removeAllListener();
+						WebContext.removeAllListener();
 					} else {
-						removeBundleAllListener(bundle);
+						WebContext.removeBundleAllListener(bundle);
 					}
 				}
 			}
@@ -253,19 +219,8 @@ public class WebContext extends FrameworkContext {
 	protected void init() {
 		super.addSimpleServiceStaticFieldLink(ServletContext.class.getName(),
 				"servletContext");
-		super.addSimpleServiceStaticFieldLink(
-				ViewRenderService.class.getName(), "viewRenderService");
-		super.addSimpleServiceStaticFieldLink(
-				MvcFrameworkService.class.getName(), "mvcFrameworkService");
 
 		final BundleContext bundleContext = Activator.getContext();
-
-		// 设置插件方法URL模板
-		ServletContext servletContext = getServletContext();
-		Object tmpObj = servletContext.getAttribute(BUNDLE_METHOD_URL_TEMPLATE);
-		if (tmpObj != null) {
-			bundleMethodUrlTemplate = tmpObj.toString();
-		}
 
 		// 添加插件监听器
 		bundleContext.addBundleListener(bundleListener);
@@ -276,10 +231,6 @@ public class WebContext extends FrameworkContext {
 		if (filterConfigObject != null)
 			setFilterConfig((FilterConfig) filterConfigObject);
 
-		// 注册HttpServlet桥接对象
-		httpServletBridgeServiceRegistration = bundleContext.registerService(
-				HttpServletBridge.class.getName(), new HttpServletBridge(),
-				null);
 		// 注册过滤器桥接对象
 		servletFilterBridgeServiceRegistration = bundleContext.registerService(
 				ServletFilterBridge.class.getName(), new ServletFilterBridge(),
@@ -293,7 +244,6 @@ public class WebContext extends FrameworkContext {
 	@Override
 	protected void destory() {
 		Activator.getContext().removeBundleListener(bundleListener);
-		httpServletBridgeServiceRegistration.unregister();
 		servletFilterBridgeServiceRegistration.unregister();
 		servletListenerBridgeServiceRegistration.unregister();
 
@@ -310,25 +260,7 @@ public class WebContext extends FrameworkContext {
 	 * @return
 	 */
 	public static String getBundleMethodUrl(String bundleName, String methodName) {
-		if (bundleMethodUrlTemplate == null
-				|| bundleMethodUrlTemplate.isEmpty())
-			return "Missing bundleMethodUrlTemplate";
-		return String.format(bundleMethodUrlTemplate, bundleName, methodName);
-	}
-
-	/**
-	 * 注册WEB应用
-	 * 
-	 * @param bundleContext
-	 */
-	public static void addBundle(Bundle bundle) {
-		if (mvcFrameworkService == null) {
-			String message = String.format("将插件[%s]添加到MVC框架时，未发现有注册的MVC框架服务！",
-					bundle.getSymbolicName());
-			throw new RuntimeException(message);
-		}
-		// 注册服务
-		mvcFrameworkService.addBundle(bundle);
+		throw new RuntimeException("此方法应分解到MVC,JSP等插件中。。。");
 	}
 
 	/**

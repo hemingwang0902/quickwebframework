@@ -29,11 +29,11 @@ public class Activator implements BundleActivator {
 		Activator.context = context;
 
 		String quickormPropertyFilePath = WebContext
-				.getQwfConfig("com.quickwebframework.db.quickorm.properties");
+				.getQwfConfig("qwf-db-orm-quickorm.properties");
 		if (quickormPropertyFilePath == null
 				|| quickormPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
-					"Can't found property 'quickwebframework.config.com.quickwebframework.db.quickorm.properties'！");
+					"Can't found qwf config: 'qwf-db-orm-quickorm.properties'！");
 		}
 		quickormPropertyFilePath = WebContext.getServletContext().getRealPath(
 				quickormPropertyFilePath);

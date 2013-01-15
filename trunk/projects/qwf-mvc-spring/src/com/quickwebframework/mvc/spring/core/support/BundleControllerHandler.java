@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
-import com.quickwebframework.entity.HttpMethodInfo;
 import com.quickwebframework.framework.WebContext;
+import com.quickwebframework.mvc.HttpMethodInfo;
 import com.quickwebframework.mvc.spring.Activator;
 import com.quickwebframework.mvc.spring.core.BundleHandler;
 import com.quickwebframework.mvc.spring.core.PluginPathMatcher;

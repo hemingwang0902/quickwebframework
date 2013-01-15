@@ -13,7 +13,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.framework.WebContext;
-import com.quickwebframework.service.ViewRenderService;
+import com.quickwebframework.viewrender.ViewRenderService;
 import com.quickwebframework.viewrender.velocity.service.impl.ViewRenderServiceImpl;
 
 public class Activator implements BundleActivator {
@@ -33,7 +33,7 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
 		String velocityPropFilePath = WebContext
-				.getQwfConfig("com.quickwebframework.viewrender.velocity.properties");
+				.getQwfConfig("qwf-vr-velocity.properties");
 		// velocity的配置
 		Properties velocityProp = new Properties();
 		// 从文件加载velocity的配置

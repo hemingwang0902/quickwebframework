@@ -7,9 +7,9 @@ import java.util.Map;
 import org.osgi.framework.Bundle;
 import org.springframework.context.ApplicationContext;
 
+import com.quickwebframework.ioc.IocFrameworkService;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 import com.quickwebframework.ioc.spring.util.BundleScanner;
-import com.quickwebframework.service.IocFrameworkService;
 import com.quickwebframework.util.BundleUtil;
 
 public class SpringIocFrameworkService implements IocFrameworkService {

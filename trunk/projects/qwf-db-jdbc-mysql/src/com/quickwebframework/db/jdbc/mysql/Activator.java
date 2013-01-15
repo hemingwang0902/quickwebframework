@@ -24,11 +24,11 @@ public class Activator implements BundleActivator {
 		Activator.context = context;
 
 		String jdbcPropertyFilePath = WebContext
-				.getQwfConfig("com.quickwebframework.db.jdbc.properties");
+				.getQwfConfig("qwf-db-jdbc.properties");
 
 		if (jdbcPropertyFilePath == null || jdbcPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
-					"Can't found property 'quickwebframework.config.com.quickwebframework.db.jdbc.properties'！");
+					"Can't found qwf config: 'qwf-db-jdbc.properties'！");
 		}
 		jdbcPropertyFilePath = WebContext.getServletContext().getRealPath(
 				jdbcPropertyFilePath);

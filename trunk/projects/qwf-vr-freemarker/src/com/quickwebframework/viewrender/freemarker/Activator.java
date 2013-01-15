@@ -15,7 +15,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.framework.WebContext;
-import com.quickwebframework.service.ViewRenderService;
+import com.quickwebframework.viewrender.ViewRenderService;
 import com.quickwebframework.viewrender.freemarker.service.impl.ViewRenderServiceImpl;
 
 public class Activator implements BundleActivator {
@@ -32,11 +32,11 @@ public class Activator implements BundleActivator {
 
 		// 得到freemarker配置文件路径
 		String freemarkerPropertyFilePath = WebContext
-				.getQwfConfig("com.quickwebframework.viewrender.freemarker.properties");
+				.getQwfConfig("qwf-vr-freemarker.properties");
 		if (freemarkerPropertyFilePath == null
 				|| freemarkerPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
-					"Can't found property 'quickwebframework.config.com.quickwebframework.viewrender.freemarker.properties'！");
+					"Can't found qwf config 'qwf-vr-freemarker.properties'！");
 		}
 		freemarkerPropertyFilePath = WebContext
 				.getRealPath(freemarkerPropertyFilePath);

@@ -6,7 +6,7 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.quickwebframework.service.ViewRenderService;
+import com.quickwebframework.viewrender.ViewRenderService;
 import com.quickwebframework.viewrender.freemarker.util.PluginTemplateLoader;
 
 import freemarker.template.Configuration;

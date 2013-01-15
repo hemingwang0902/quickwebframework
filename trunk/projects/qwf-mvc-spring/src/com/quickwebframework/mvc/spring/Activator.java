@@ -8,12 +8,12 @@ import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 
+import com.quickwebframework.mvc.MvcFrameworkService;
 import com.quickwebframework.mvc.spring.core.support.BundleControllerHandler;
 import com.quickwebframework.mvc.spring.core.support.BundleFilterHandler;
 import com.quickwebframework.mvc.spring.core.support.BundleListenerHandler;
 import com.quickwebframework.mvc.spring.core.support.BundleThreadHandler;
 import com.quickwebframework.mvc.spring.service.impl.SpringMvcFrameworkService;
-import com.quickwebframework.service.MvcFrameworkService;
 
 public class Activator implements BundleActivator {
 

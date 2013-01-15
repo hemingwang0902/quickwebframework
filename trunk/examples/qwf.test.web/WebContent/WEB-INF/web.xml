@@ -10,15 +10,6 @@
 	<listener>
 		<listener-class>com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener</listener-class>
 	</listener>
-	<!-- QuickWebFramework分发Servlet -->
-	<servlet>
-		<servlet-name>dispatcherServlet</servlet-name>
-		<servlet-class>com.quickwebframework.web.servlet.DispatcherServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>dispatcherServlet</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
 	<!-- QuickWebFramework过滤器 -->
 	<filter>
 		<filter-name>commonFilter</filter-name>
@@ -26,7 +17,7 @@
 	</filter>
 	<filter-mapping>
 		<filter-name>commonFilter</filter-name>
-		<servlet-name>dispatcherServlet</servlet-name>
+		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<session-config>

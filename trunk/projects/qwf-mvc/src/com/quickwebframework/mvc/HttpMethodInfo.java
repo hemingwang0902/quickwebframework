@@ -1,4 +1,4 @@
-package com.quickwebframework.entity;
+package com.quickwebframework.mvc;
 
 /**
  * 提供HTTP方法信息类

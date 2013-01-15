@@ -1,4 +1,4 @@
-package com.quickwebframework.entity;
+package com.quickwebframework.mvc;
 
 import java.util.Map;
 

@@ -35,7 +35,7 @@ public class PluginManageServlet extends QwfServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = -370194350835819493L;
-	public static final String MAPPING_PROPERTY_KEY = "quickwebframework.pluginManageServlet.mapping";
+	public static final String MAPPING_PROPERTY_KEY = "qwf.pluginManage.mapping";
 
 	// 模板字符串
 	private String templateString;

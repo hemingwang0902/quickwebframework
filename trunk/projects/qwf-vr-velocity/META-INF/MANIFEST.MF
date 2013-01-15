@@ -13,4 +13,5 @@ Bundle-ClassPath: commons-lang-2.4.jar,
  commons-collections-3.2.1.jar,
  velocity-1.7.jar,
  .
-Require-Bundle: qwf-core;bundle-version="1.0.0"
+Require-Bundle: qwf-core;bundle-version="1.0.0",
+ qwf-vr;bundle-version="1.0.0"

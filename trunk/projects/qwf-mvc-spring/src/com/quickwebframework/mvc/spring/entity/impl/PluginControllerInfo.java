@@ -8,7 +8,7 @@ import java.util.Map;
 import org.osgi.framework.Bundle;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
-import com.quickwebframework.entity.HttpMethodInfo;
+import com.quickwebframework.mvc.HttpMethodInfo;
 
 public class PluginControllerInfo {
 

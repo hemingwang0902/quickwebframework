@@ -1,4 +1,4 @@
-package com.quickwebframework.service;
+package com.quickwebframework.db;
 
 import javax.sql.DataSource;
 
