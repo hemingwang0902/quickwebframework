@@ -14,9 +14,9 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+import com.quickwebframework.db.DatabaseService;
 import com.quickwebframework.db.jdbc.mysql.Activator;
 import com.quickwebframework.db.jdbc.mysql.util.JdbcPropertiesInitializer;
-import com.quickwebframework.service.DatabaseService;
 
 public class DatabaseServiceImpl implements DatabaseService {
 

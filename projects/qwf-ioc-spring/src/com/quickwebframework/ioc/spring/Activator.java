@@ -8,8 +8,8 @@ import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 
+import com.quickwebframework.ioc.IocFrameworkService;
 import com.quickwebframework.ioc.spring.service.impl.SpringIocFrameworkService;
-import com.quickwebframework.service.IocFrameworkService;
 
 public class Activator implements BundleActivator {
 

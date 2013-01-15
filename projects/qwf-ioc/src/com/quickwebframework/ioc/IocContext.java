@@ -1,4 +1,4 @@
-package com.quickwebframework.framework;
+package com.quickwebframework.ioc;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -8,10 +8,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 
-import com.quickwebframework.core.Activator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import com.quickwebframework.service.IocFrameworkService;
+
+import com.quickwebframework.framework.FrameworkContext;
+import com.quickwebframework.ioc.impl.Activator;
 import com.quickwebframework.util.BundleContextUtil;
 
 public class IocContext extends FrameworkContext {

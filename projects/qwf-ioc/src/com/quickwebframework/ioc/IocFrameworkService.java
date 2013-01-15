@@ -1,4 +1,4 @@
-package com.quickwebframework.service;
+package com.quickwebframework.ioc;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;

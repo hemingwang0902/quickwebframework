@@ -1,11 +1,10 @@
-package com.quickwebframework.service;
+package com.quickwebframework.viewrender;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.quickwebframework.entity.MvcModelAndView;
 import com.quickwebframework.framework.WebContext;
 
 /**
@@ -30,7 +28,7 @@ public abstract class ViewRenderService {
 			.getName());
 
 	// 视图渲染器配置键
-	public final static String CONFIG_QWF_VIEW_RENDER_PROP = "com.quickwebframework.viewrender.properties";
+	public final static String CONFIG_QWF_VIEW_RENDER_PROP = "qwf-core.viewrender.properties";
 	// 插件名称与路径分隔字符串配置键
 	public final static String CONFIG_PLUGIN_NAME_AND_PATH_SPLIT_STRING = "com.quickwebframework.viewrender.pluginNameAndPathSplitString";
 	// 视图名称统一前缀配置键
@@ -122,37 +120,6 @@ public abstract class ViewRenderService {
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-	}
-
-	/**
-	 * 渲染视图
-	 * 
-	 * @param request
-	 *            请求对象
-	 * @param response
-	 *            响应对象
-	 * @param mav
-	 *            模型与视图
-	 */
-	public final void renderView(HttpServletRequest request,
-			HttpServletResponse response, MvcModelAndView mav) {
-		// 视图名称
-		String viewName = mav.getViewName();
-		// 如果ViewName中未包括分隔符，即未包含插件名称，则添加当前插件名称为前缀
-		if (!viewName.contains(getPluginNameAndPathSplitString())) {
-			String bundleName = mav.getBundle().getSymbolicName();
-			viewName = bundleName + getPluginNameAndPathSplitString()
-					+ viewName;
-		}
-		// 准备数据模型
-		Enumeration<String> attributeNameEnumeration = request
-				.getAttributeNames();
-		while (attributeNameEnumeration.hasMoreElements()) {
-			String attributeName = attributeNameEnumeration.nextElement();
-			mav.getModel().put(attributeName,
-					request.getAttribute(attributeName));
-		}
-		renderView(request, response, viewName, mav.getModel());
 	}
 
 	public abstract void renderView(HttpServletRequest request,

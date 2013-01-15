@@ -15,10 +15,10 @@ public class Activator implements BundleActivator {
 
 	public void start(BundleContext context) throws Exception {
 		String log4jConfigFilePath = WebContext
-				.getQwfConfig("com.quickwebframework.log.log4j.properties");
+				.getQwfConfig("qwf-log-log4j.properties");
 		if (log4jConfigFilePath == null || log4jConfigFilePath.isEmpty()) {
 			throw new RuntimeException(
-					"Can't found property 'quickwebframework.config.com.quickwebframework.log.log4j.properties'！");
+					"Can't found qwf config 'qwf-log-log4j.properties'！");
 		}
 		log4jConfigFilePath = WebContext.getServletContext().getRealPath(
 				log4jConfigFilePath);

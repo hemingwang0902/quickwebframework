@@ -1,4 +1,4 @@
-package com.quickwebframework.service;
+package com.quickwebframework.mvc;
 
 import java.util.List;
 import java.util.Map;
@@ -7,9 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
-
-import com.quickwebframework.entity.HttpMethodInfo;
-import com.quickwebframework.entity.MvcModelAndView;
 
 public interface MvcFrameworkService {
 
@@ -38,7 +35,7 @@ public interface MvcFrameworkService {
 	 * @return
 	 */
 	public boolean containsBundle(Bundle bundle);
-	
+
 	/**
 	 * 处理HTTP请求
 	 * 

@@ -37,7 +37,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 				if (arg0.getServiceReference()
 						.toString()
 						.contains(
-								com.quickwebframework.service.DatabaseService.class
+								com.quickwebframework.db.DatabaseService.class
 										.getName())) {
 					refreshDataSource();
 				}
@@ -52,8 +52,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 		ServiceReference<?>[] serviceReferences = null;
 		try {
 			serviceReferences = bundleContext.getServiceReferences(
-					com.quickwebframework.service.DatabaseService.class
-							.getName(), null);
+					com.quickwebframework.db.DatabaseService.class.getName(),
+					null);
 		} catch (Exception e) {
 			return;
 		}
@@ -63,7 +63,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 		log.debug("准备刷新com.quickwebframework.db.orm.quickorm.service.impl.DatabaseServiceImpl中的数据源");
 		for (ServiceReference<?> serviceReference : serviceReferences) {
-			com.quickwebframework.service.DatabaseService databaseService = (com.quickwebframework.service.DatabaseService) bundleContext
+			com.quickwebframework.db.DatabaseService databaseService = (com.quickwebframework.db.DatabaseService) bundleContext
 					.getService(serviceReference);
 			tmpDataSource = databaseService.getDataSource();
 			if ("org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy"

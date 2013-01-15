@@ -1,9 +1,7 @@
 package com.quickwebframework.framework;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
@@ -16,7 +14,6 @@ import com.quickwebframework.util.BundleContextUtil;
 
 public abstract class FrameworkContext {
 
-	private static List<FrameworkContext> contextList;
 	private ServiceListener serviceListener;
 	private Map<String, Field> serviceFieldMap;
 
@@ -48,29 +45,12 @@ public abstract class FrameworkContext {
 			}
 		};
 		bundleContext.addServiceListener(serviceListener);
-
-		if (contextList == null)
-			contextList = new ArrayList<FrameworkContext>();
-
-		synchronized (contextList) {
-			contextList.add(this);
-		}
 	}
 
 	@Override
 	public void finalize() {
 		BundleContext bundleContext = Activator.getContext();
 		bundleContext.removeServiceListener(serviceListener);
-		synchronized (contextList) {
-			contextList.remove(this);
-		}
-	}
-
-	// 得到所有的Context对象
-	protected static FrameworkContext[] getContexts() {
-		if (contextList == null)
-			return new FrameworkContext[0];
-		return contextList.toArray(new FrameworkContext[0]);
 	}
 
 	private void setServiceObjectToStaticField(String serviceName, Field field) {

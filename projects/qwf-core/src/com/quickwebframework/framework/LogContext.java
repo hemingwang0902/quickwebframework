@@ -43,7 +43,7 @@ public class LogContext extends FrameworkContext {
 		try {
 
 			String javaLoggerLevelStr = WebContext
-					.getQwfConfig("com.quickwebframework.core.javalogger.level");
+					.getQwfConfig("qwf-core.javalogger.level");
 			if (javaLoggerLevelStr != null) {
 				JavaLoggerImpl.javaLoggerLevel = Level
 						.parse(javaLoggerLevelStr);

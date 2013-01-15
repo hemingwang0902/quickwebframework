@@ -8,7 +8,7 @@ import java.net.URL;
 import org.osgi.framework.Bundle;
 
 import com.quickwebframework.framework.OsgiContext;
-import com.quickwebframework.service.ViewRenderService;
+import com.quickwebframework.viewrender.ViewRenderService;
 
 import freemarker.cache.TemplateLoader;
 

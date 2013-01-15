@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: qwf-mvc
+Bundle-SymbolicName: qwf-mvc
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.quickwebframework.mvc.impl.Activator
+Import-Package: javax.servlet,
+ javax.servlet.http,
+ org.osgi.framework;version="1.3.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: qwf-core;bundle-version="1.0.0",
+ qwf-vr;bundle-version="1.0.0"
+Export-Package: com.quickwebframework.mvc

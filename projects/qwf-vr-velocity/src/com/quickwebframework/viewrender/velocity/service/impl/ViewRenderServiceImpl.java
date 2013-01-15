@@ -12,7 +12,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 
-import com.quickwebframework.service.ViewRenderService;
+import com.quickwebframework.viewrender.ViewRenderService;
 import com.quickwebframework.viewrender.velocity.util.BundleResourceLoader;
 
 public class ViewRenderServiceImpl extends ViewRenderService {
@@ -46,7 +46,7 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 		}
 		// 输出
 		try {
-			//设置编码
+			// 设置编码
 			response.setCharacterEncoding(template.getEncoding());
 			response.setContentType("text/html");
 			template.merge(context, response.getWriter());

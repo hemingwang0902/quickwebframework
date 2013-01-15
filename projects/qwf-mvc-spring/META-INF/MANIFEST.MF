@@ -22,7 +22,9 @@ Bundle-ClassPath: .,
  spring-web-3.2.0.RELEASE.jar,
  spring-webmvc-3.2.0.RELEASE.jar
 Require-Bundle: qwf-core;bundle-version="1.0.0",
- qwf-ioc-spring;bundle-version="1.0.0"
+ qwf-ioc;bundle-version="1.0.0",
+ qwf-ioc-spring;bundle-version="1.0.0",
+ qwf-mvc;bundle-version="1.0.0"
 Export-Package: org.springframework.http,
  org.springframework.http.client,
  org.springframework.http.client.support,

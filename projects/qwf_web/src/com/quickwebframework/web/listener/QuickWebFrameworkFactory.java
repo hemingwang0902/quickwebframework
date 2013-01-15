@@ -33,8 +33,6 @@ import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 
 import com.quickwebframework.web.servlet.PluginManageServlet;
-import com.quickwebframework.web.servlet.PluginResourceDispatcherServlet;
-import com.quickwebframework.web.servlet.PluginViewDispatcherServlet;
 import com.quickwebframework.web.servlet.QwfServlet;
 import com.quickwebframework.web.thread.BundleAutoManageThread;
 
@@ -84,7 +82,7 @@ public abstract class QuickWebFrameworkFactory {
 	public final static String CONST_SERVLET_LISTENER_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.ServletListenerBridge";
 
 	// 插件配置
-	public final static String PLUGIN_CONFIG_PROPERTY_KEY = "quickwebframework.config";
+	public final static String PLUGIN_CONFIG_PROPERTY_KEY = "qwf.config";
 
 	// 配置文件路径参数名称
 	public final static String CONFIG_LOCATION_PARAMETER_NAME = "quickwebframeworkConfigLocation";
@@ -217,7 +215,7 @@ public abstract class QuickWebFrameworkFactory {
 
 		// 配置缓存保存路径
 		String osgiFrameworkStorage = quickWebFrameworkProperties
-				.getProperty("quickwebframework.osgiFrameworkStorage");
+				.getProperty("qwf.osgiFrameworkStorage");
 		osgiFrameworkStorage = servletContext.getRealPath(osgiFrameworkStorage);
 		if (osgiFrameworkStorage != null) {
 			osgiFrameworkConfigMap.put("org.osgi.framework.storage",
@@ -226,7 +224,7 @@ public abstract class QuickWebFrameworkFactory {
 
 		// 读取固定配置
 		String osgiFrameworkFactoryConfig = quickWebFrameworkProperties
-				.getProperty("quickwebframework.osgiFrameworkFactoryConfig");
+				.getProperty("qwf.osgiFrameworkFactoryConfig");
 		if (osgiFrameworkFactoryConfig != null) {
 			String[] configLines = osgiFrameworkFactoryConfig.split(";");
 			for (String configLine : configLines) {
@@ -241,7 +239,7 @@ public abstract class QuickWebFrameworkFactory {
 
 		// 加载OSGi框架类或OSGi框架工厂类
 		String osgiFrameworkClass = quickWebFrameworkProperties
-				.getProperty("quickwebframework.osgiFrameworkClass");
+				.getProperty("qwf.osgiFrameworkClass");
 		if (osgiFrameworkClass != null) {
 			Class<?> osgiFrameworkClazz;
 			try {
@@ -277,7 +275,7 @@ public abstract class QuickWebFrameworkFactory {
 			logger.info("正在启动OSGi框架，OSGi框架类: " + osgiFrameworkClass);
 		} else {
 			String osgiFrameworkFactoryClass = quickWebFrameworkProperties
-					.getProperty("quickwebframework.osgiFrameworkFactoryClass");
+					.getProperty("qwf.osgiFrameworkFactoryClass");
 			Class<?> osgiFrameworkFactoryClazz;
 			try {
 				osgiFrameworkFactoryClazz = Class
@@ -313,18 +311,6 @@ public abstract class QuickWebFrameworkFactory {
 			framework.init();
 
 			QwfServlet tmpServlet = null;
-			// 初始化插件视图Servlet
-			tmpServlet = PluginViewDispatcherServlet.initServlet(
-					servletContext, quickWebFrameworkProperties);
-			if (tmpServlet != null) {
-				qwfServletList.add(tmpServlet);
-			}
-			// 初始化插件资源Servlet
-			tmpServlet = PluginResourceDispatcherServlet.initServlet(
-					servletContext, quickWebFrameworkProperties);
-			if (tmpServlet != null) {
-				qwfServletList.add(tmpServlet);
-			}
 			// 初始化插件管理Servlet
 			tmpServlet = PluginManageServlet.initServlet(servletContext,
 					quickWebFrameworkProperties);

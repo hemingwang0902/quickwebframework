@@ -1,20 +1,27 @@
 package com.quickwebframework.framework;
 
-public class ContextManager {
-	public static void initAllContext() {
-		OsgiContext.getInstance();
-		LogContext.getInstance();
-		WebContext.getInstance();
-		IocContext.getInstance();
-		ThreadContext.getInstance();
+import java.util.ArrayList;
+import java.util.List;
 
-		for (FrameworkContext context : FrameworkContext.getContexts()) {
+public class ContextManager {
+
+	private static List<FrameworkContext> contextList;
+
+	public static void initAllContext() {
+		contextList = new ArrayList<FrameworkContext>();
+
+		contextList.add(OsgiContext.getInstance());
+		contextList.add(LogContext.getInstance());
+		contextList.add(WebContext.getInstance());
+		contextList.add(ThreadContext.getInstance());
+
+		for (FrameworkContext context : contextList) {
 			context.init();
 		}
 	}
 
 	public static void destoryAllContext() {
-		for (FrameworkContext context : FrameworkContext.getContexts()) {
+		for (FrameworkContext context : contextList) {
 			context.destory();
 		}
 	}
