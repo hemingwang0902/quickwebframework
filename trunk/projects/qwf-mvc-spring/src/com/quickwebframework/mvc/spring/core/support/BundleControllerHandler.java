@@ -80,10 +80,6 @@ public class BundleControllerHandler implements BundleHandler {
 							// 添加到HTTP方法信息列表中
 							HttpMethodInfo httpMethodInfo = new HttpMethodInfo();
 							httpMethodInfo.setHttpMethod(requestMethod.name());
-							httpMethodInfo
-									.setMappingUrl(WebContext
-											.getBundleMethodUrl(bundleName,
-													methodName));
 							pluginControllerInfo.getHttpMethodInfoList().add(
 									httpMethodInfo);
 						}

@@ -9,8 +9,6 @@ package com.quickwebframework.mvc;
 public class HttpMethodInfo {
 	// GET,POST
 	private String httpMethod;
-	// 映射的URL
-	private String mappingUrl;
 
 	public String getHttpMethod() {
 		return httpMethod;
@@ -18,13 +16,5 @@ public class HttpMethodInfo {
 
 	public void setHttpMethod(String httpMethod) {
 		this.httpMethod = httpMethod;
-	}
-
-	public String getMappingUrl() {
-		return mappingUrl;
-	}
-
-	public void setMappingUrl(String mappingUrl) {
-		this.mappingUrl = mappingUrl;
 	}
 }
