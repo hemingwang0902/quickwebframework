@@ -42,13 +42,13 @@ public class OsgiContext extends FrameworkContext {
 	}
 
 	@Override
-	protected void init() {
+	protected void init(int arg) {
 		this.addSimpleServiceStaticFieldLink(Framework.class.getName(),
 				"framework");
 	}
 
 	@Override
-	protected void destory() {
+	protected void destory(int arg) {
 		BundleContext bundleContext = getBundleContext();
 		log.debug(String.format("插件[%s]已停止", bundleContext.getBundle()
 				.getSymbolicName()));

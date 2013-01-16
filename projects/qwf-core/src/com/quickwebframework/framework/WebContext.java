@@ -108,7 +108,7 @@ public class WebContext extends FrameworkContext {
 	}
 
 	@Override
-	protected void init() {
+	protected void init(int arg) {
 		super.addSimpleServiceStaticFieldLink(ServletContext.class.getName(),
 				"servletContext");
 		ServletServletContext.getInstance().init();
@@ -117,7 +117,7 @@ public class WebContext extends FrameworkContext {
 	}
 
 	@Override
-	protected void destory() {
+	protected void destory(int arg) {
 		ServletListenerContext.getInstance().destory();
 		ServletFilterContext.getInstance().destory();
 		ServletServletContext.getInstance().destory();

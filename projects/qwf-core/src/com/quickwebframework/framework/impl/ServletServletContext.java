@@ -46,12 +46,12 @@ public class ServletServletContext extends FrameworkContext {
 	}
 
 	@Override
-	public void init() {
+	protected void init(int arg) {
 
 	}
 
 	@Override
-	public void destory() {
+	protected void destory(int arg) {
 
 	}
 

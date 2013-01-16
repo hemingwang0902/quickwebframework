@@ -50,11 +50,11 @@ public class ThreadContext extends FrameworkContext {
 	}
 
 	@Override
-	protected void init() {
+	protected void init(int arg) {
 	}
 
 	@Override
-	protected void destory() {
+	protected void destory(int arg) {
 	}
 
 	@Override

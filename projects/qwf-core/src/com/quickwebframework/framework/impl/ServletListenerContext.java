@@ -50,7 +50,7 @@ public class ServletListenerContext extends FrameworkContext {
 	}
 
 	@Override
-	public void init() {
+	protected void init(int arg) {
 		BundleContext bundleContext = Activator.getContext();
 		// 注册监听器桥接对象
 		servletListenerBridgeServiceRegistration = bundleContext
@@ -59,7 +59,7 @@ public class ServletListenerContext extends FrameworkContext {
 	}
 
 	@Override
-	public void destory() {
+	protected void destory(int arg) {
 		servletListenerBridgeServiceRegistration.unregister();
 	}
 

@@ -29,13 +29,13 @@ public class ViewRenderContext extends FrameworkContext {
 	}
 
 	@Override
-	public void init() {
+	protected void init(int arg0) {
 		super.addSimpleServiceStaticFieldLink(
 				ViewRenderService.class.getName(), "viewRenderService");
 	}
 
 	@Override
-	public void destory() {
+	protected void destory(int arg0) {
 	}
 
 	@Override

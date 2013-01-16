@@ -29,14 +29,14 @@ public abstract class FrameworkContext {
 	protected abstract BundleContext getBundleContext();
 
 	/**
-	 * 初始化方法
+	 * 初始化方法(参数只是为了重载，不起作用)
 	 */
-	protected abstract void init();
+	protected abstract void init(int arg);
 
 	/**
-	 * 销毁时方法
+	 * 销毁时方法(参数只是为了重载，不起作用)
 	 */
-	protected abstract void destory();
+	protected abstract void destory(int arg);
 
 	/**
 	 * 插件改变时执行方法
@@ -68,8 +68,6 @@ public abstract class FrameworkContext {
 				serviceChanged(event);
 			}
 		};
-		BundleContext bundleContext = this.getBundleContext();
-		bundleContext.addServiceListener(serviceListener);
 		bundleListener = new SynchronousBundleListener() {
 
 			@Override
@@ -77,14 +75,20 @@ public abstract class FrameworkContext {
 				bundleChanged(arg0);
 			}
 		};
-		bundleContext.addBundleListener(bundleListener);
 	}
 
-	@Override
-	public void finalize() {
+	public void init() {
+		BundleContext bundleContext = this.getBundleContext();
+		bundleContext.addServiceListener(serviceListener);
+		bundleContext.addBundleListener(bundleListener);
+		init(0);
+	}
+
+	public void destory() {
 		BundleContext bundleContext = this.getBundleContext();
 		bundleContext.removeServiceListener(serviceListener);
 		bundleContext.removeBundleListener(bundleListener);
+		destory(0);
 	}
 
 	private void setServiceObjectToStaticField(String serviceName, Field field) {
