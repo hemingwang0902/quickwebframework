@@ -65,16 +65,24 @@ public abstract class FrameworkContext {
 						setServiceObjectToStaticField(serviceName, field);
 					}
 				}
-				serviceChanged(event);
+				serviceChangedWarper(event);
 			}
 		};
 		bundleListener = new SynchronousBundleListener() {
 
 			@Override
-			public void bundleChanged(BundleEvent arg0) {
-				bundleChanged(arg0);
+			public void bundleChanged(BundleEvent event) {
+				bundleChangedWarper(event);
 			}
 		};
+	}
+
+	private void bundleChangedWarper(BundleEvent event) {
+		bundleChanged(event);
+	}
+
+	private void serviceChangedWarper(ServiceEvent event) {
+		serviceChanged(event);
 	}
 
 	public void init() {
