@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.bridge.LogBridge;
@@ -37,8 +39,13 @@ public class LogContext extends FrameworkContext {
 	}
 
 	@Override
+	protected BundleContext getBundleContext() {
+		return Activator.getContext();
+	}
+
+	@Override
 	protected void init() {
-		BundleContext bundleContext = Activator.getContext();
+		BundleContext bundleContext = getBundleContext();
 		// 设置默认的Java日志记录器配置
 		try {
 
@@ -81,5 +88,14 @@ public class LogContext extends FrameworkContext {
 			}
 		}
 		return log;
+	}
+
+	@Override
+	protected void bundleChanged(BundleEvent event) {
+	}
+
+	@Override
+	protected void serviceChanged(ServiceEvent event) {
+
 	}
 }

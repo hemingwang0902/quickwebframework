@@ -1,6 +1,11 @@
 package com.quickwebframework.viewrender;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.ServiceEvent;
+
 import com.quickwebframework.framework.FrameworkContext;
+import com.quickwebframework.viewrender.impl.Activator;
 
 public class ViewRenderContext extends FrameworkContext {
 	private static ViewRenderContext instance;
@@ -19,6 +24,11 @@ public class ViewRenderContext extends FrameworkContext {
 	}
 
 	@Override
+	protected BundleContext getBundleContext() {
+		return Activator.getContext();
+	}
+
+	@Override
 	public void init() {
 		super.addSimpleServiceStaticFieldLink(
 				ViewRenderService.class.getName(), "viewRenderService");
@@ -26,5 +36,17 @@ public class ViewRenderContext extends FrameworkContext {
 
 	@Override
 	public void destory() {
+	}
+
+	@Override
+	protected void bundleChanged(BundleEvent event) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void serviceChanged(ServiceEvent event) {
+		// TODO Auto-generated method stub
+
 	}
 }

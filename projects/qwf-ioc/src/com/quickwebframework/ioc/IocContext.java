@@ -6,7 +6,7 @@ import java.util.Map;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
+import org.osgi.framework.ServiceEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,41 +28,44 @@ public class IocContext extends FrameworkContext {
 	private static Log log = LogFactory.getLog(IocContext.class);
 
 	private static IocFrameworkService iocFrameworkService;
-	private BundleListener bundleListener;
 
 	// ======变量部分结束
 
 	public IocContext() {
-		bundleListener = new BundleListener() {
-			@Override
-			public void bundleChanged(BundleEvent arg0) {
-				Bundle bundle = arg0.getBundle();
-				int bundleEventType = arg0.getType();
-				// 如果是已经停止
-				if (bundleEventType == BundleEvent.STOPPED) {
-					if (iocFrameworkService == null)
-						return;
-					removeBundle(bundle);
-				}
-			}
-		};
+
+	}
+
+	@Override
+	protected BundleContext getBundleContext() {
+		return Activator.getContext();
 	}
 
 	@Override
 	protected void init() {
 		super.addSimpleServiceStaticFieldLink(
 				IocFrameworkService.class.getName(), "iocFrameworkService");
-
-		// 添加插件监听器
-		BundleContext bundleContext = Activator.getContext();
-		bundleContext.addBundleListener(bundleListener);
 	}
 
 	@Override
 	protected void destory() {
-		// 移除插件监听器
-		BundleContext bundleContext = Activator.getContext();
-		bundleContext.removeBundleListener(bundleListener);
+
+	}
+
+	@Override
+	protected void bundleChanged(BundleEvent event) {
+		Bundle bundle = event.getBundle();
+		int bundleEventType = event.getType();
+		// 如果是已经停止
+		if (bundleEventType == BundleEvent.STOPPED) {
+			if (iocFrameworkService == null)
+				return;
+			removeBundle(bundle);
+		}
+	}
+
+	@Override
+	protected void serviceChanged(ServiceEvent event) {
+
 	}
 
 	/**

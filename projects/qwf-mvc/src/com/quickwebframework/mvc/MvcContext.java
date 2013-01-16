@@ -3,8 +3,7 @@ package com.quickwebframework.mvc;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
-import org.osgi.framework.SynchronousBundleListener;
+import org.osgi.framework.ServiceEvent;
 
 import com.quickwebframework.framework.FrameworkContext;
 import com.quickwebframework.mvc.impl.Activator;
@@ -19,7 +18,6 @@ public class MvcContext extends FrameworkContext {
 		return instance;
 	}
 
-	private static BundleListener bundleListener;
 	// MVC框架服务
 	private static MvcFrameworkService mvcFrameworkService;
 
@@ -28,37 +26,39 @@ public class MvcContext extends FrameworkContext {
 	}
 
 	public MvcContext() {
-		bundleListener = new SynchronousBundleListener() {
-			@Override
-			public void bundleChanged(BundleEvent arg0) {
-				Bundle bundle = arg0.getBundle();
-				int bundleEventType = arg0.getType();
+	}
 
-				BundleContext bundleContext = Activator.getContext();
-				if (bundleContext == null)
-					return;
-				Bundle coreBundle = bundleContext.getBundle();
-				if (bundleEventType == BundleEvent.STOPPING) {
-					// 移除插件的控制器
-					if (mvcFrameworkService == null)
-						return;
-					mvcFrameworkService.removeBundle(bundle);
-				}
-			}
-		};
+	@Override
+	protected BundleContext getBundleContext() {
+		return Activator.getContext();
 	}
 
 	@Override
 	public void init() {
 		super.addSimpleServiceStaticFieldLink(
 				MvcFrameworkService.class.getName(), "mvcFrameworkService");
-		// 添加插件监听器
-		Activator.getContext().addBundleListener(bundleListener);
+	}
+
+	@Override
+	protected void bundleChanged(BundleEvent event) {
+		Bundle bundle = event.getBundle();
+		int bundleEventType = event.getType();
+		if (bundleEventType == BundleEvent.STOPPING) {
+			// 移除插件的控制器
+			if (mvcFrameworkService == null)
+				return;
+			mvcFrameworkService.removeBundle(bundle);
+		}
+	}
+
+	@Override
+	protected void serviceChanged(ServiceEvent event) {
+
 	}
 
 	@Override
 	public void destory() {
-		Activator.getContext().removeBundleListener(bundleListener);
+
 	}
 
 	/**
