@@ -18,6 +18,7 @@ import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.core.Activator;
 import com.quickwebframework.entity.HandlerExceptionResolver;
+import com.quickwebframework.framework.impl.PluginServletContext;
 import com.quickwebframework.framework.impl.ServletFilterContext;
 import com.quickwebframework.framework.impl.ServletListenerContext;
 import com.quickwebframework.framework.impl.ServletServletContext;
@@ -30,6 +31,10 @@ public class WebContext extends FrameworkContext {
 			instance = new WebContext();
 		return instance;
 	}
+
+	// 用于从HttpServletRequest对象中设置或获取对应的参数
+	public static final String CONST_PLUGIN_NAME = "com.quickwebframework.framework.WebContext.CONST_PLUGIN_NAME";
+	public static final String CONST_PATH_NAME = "com.quickwebframework.framework.WebContext.CONST_PATH_NAME";
 
 	//
 	// WEB项目的ServletContext
@@ -114,10 +119,12 @@ public class WebContext extends FrameworkContext {
 		ServletServletContext.getInstance().init();
 		ServletFilterContext.getInstance().init();
 		ServletListenerContext.getInstance().init();
+		PluginServletContext.getInstance().init();
 	}
 
 	@Override
 	protected void destory(int arg) {
+		PluginServletContext.getInstance().destory();
 		ServletListenerContext.getInstance().destory();
 		ServletFilterContext.getInstance().destory();
 		ServletServletContext.getInstance().destory();
@@ -253,5 +260,34 @@ public class WebContext extends FrameworkContext {
 	 */
 	public static Servlet getServletByPath(String path) {
 		return ServletServletContext.getServletByPath(path);
+	}
+
+	/**
+	 * 注册视图类型的Servlet
+	 * 
+	 * @param typeName
+	 * @param servlet
+	 */
+	public static void registerViewTypeServlet(String typeName, Servlet servlet) {
+		PluginServletContext.registerViewTypeServlet(typeName, servlet);
+	}
+
+	/**
+	 * 取消注册视图类型的Servlet
+	 * 
+	 * @param typeName
+	 */
+	public static void unregisterViewTypeServlet(String typeName) {
+		PluginServletContext.unregisterViewTypeServlet(typeName);
+	}
+
+	/**
+	 * 得到指定视图类型的Servlet
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	public static Servlet getViewTypeServlet(String typeName) {
+		return PluginServletContext.getViewTypeServlet(typeName);
 	}
 }

@@ -125,22 +125,26 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 		String[] splitResult = StringUtils.split(requestUriWithoutContextPath,
 				"/");
 		// 如果根据/切分出来的字符串段数小于3，则不合法，返回404错误
-		// 正确的插件的URL构成为： [插件名]/[类型名]/[方法名]
+		// 正确的插件的URL构成为： [插件名]/[视图类型名]/[路径]
 		if (splitResult.length < 3) {
 			response.sendError(404);
 			return;
 		}
 		String pluginName = splitResult[0];
-		String typeName = splitResult[1];
-		String methodName = StringUtils.join(splitResult, "/", 2,
+		String viewTypeName = splitResult[1];
+		String pathName = StringUtils.join(splitResult, "/", 2,
 				splitResult.length);
 
-		System.out.println("pluginName:" + pluginName);
-		System.out.println("typeName:" + typeName);
-		System.out.println("methodName:" + methodName);
+		// 设置插件名称与路径到request的属性中
+		request.setAttribute(WebContext.CONST_PLUGIN_NAME, pluginName);
+		request.setAttribute(WebContext.CONST_PATH_NAME, pathName);
 
 		// 根据typeName，找对应的类型的处理器
-		// TODO:
+		Servlet typeServlet = WebContext.getViewTypeServlet(viewTypeName);
+		if (typeServlet != null) {
+			typeServlet.service(arg0, arg1);
+			return;
+		}
 	}
 
 	// 过滤器初始化
