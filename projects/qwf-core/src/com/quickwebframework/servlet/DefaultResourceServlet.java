@@ -53,8 +53,18 @@ public class DefaultResourceServlet extends HttpServlet {
 		String pathName = request.getAttribute(WebContext.CONST_PATH_NAME)
 				.toString();
 
+		// 如果有统一前缀，则添加统一前缀
 		if (resourcePathPrefix != null) {
 			pathName = resourcePathPrefix + pathName;
+		}
+
+		// 安全检测
+
+		// 如果请求的资源路径没有后缀，则不允许访问
+		if (!pathName.contains(".")) {
+			// 返回400 Bad Request
+			response.sendError(400, "请求的资源[" + pathName + "]未包括后缀，不允许访问！");
+			return;
 		}
 
 		// 查找资源
