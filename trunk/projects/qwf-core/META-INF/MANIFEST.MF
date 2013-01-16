@@ -28,4 +28,5 @@ Export-Package: com.quickwebframework.entity,
 Bundle-ClassPath: jsp-api.jar,
  jasper.jar,
  commons-lang3-3.1.jar,
+ commons-io-2.4.jar,
  .
