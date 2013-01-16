@@ -110,6 +110,12 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 			requestUriWithoutContextPath = "/";
 		}
 
+		// 保护WEB-INF中的文件
+		if (requestUriWithoutContextPath.startsWith("/WEB-INF/")) {
+			response.sendError(400, "/WEB-INF目录拒绝访问！");
+			return;
+		}
+
 		// 如果此路径有映射的Servlet，则交由此Servlet去处理
 		Servlet pathServlet = WebContext
 				.getServletByPath(requestUriWithoutContextPath);
