@@ -112,7 +112,7 @@ public class WebContext extends FrameworkContext {
 		try {
 			serviceReferences = context.getServiceReferences(
 					String.class.getName(),
-					String.format("(quickwebframework.config=%s)", configKey));
+					String.format("(qwf.config=%s)", configKey));
 		} catch (InvalidSyntaxException e) {
 			throw new RuntimeException(e);
 		}

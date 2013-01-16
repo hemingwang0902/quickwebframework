@@ -11,16 +11,18 @@
 #parse("qwf.test.core:navbar")
 	<table>
 		<tbody>
-#foreach($bundleName in $bundleNameHttpMethodInfoListMap.keySet())
-	#if($bundleNameHttpMethodInfoListMap.get(${bundleName}).size() > 0)
+#if($bundleNameHttpMethodInfoListMap)
+	#foreach($bundleName in $bundleNameHttpMethodInfoListMap.keySet())
+		#if($bundleNameHttpMethodInfoListMap.get(${bundleName}).size() > 0)
 		<tr>
 			<td><b>插件[${bundleName}]</b></td>
 		</tr>
-		#foreach($httpMethodInfo in $bundleNameHttpMethodInfoListMap.get(${bundleName}))
+			#foreach($httpMethodInfo in $bundleNameHttpMethodInfoListMap.get(${bundleName}))
 		<tr>
 			<td><a style="margin-left: 20px"
 				href="${httpMethodInfo.mappingUrl}">${httpMethodInfo.mappingUrl}</a>(${httpMethodInfo.httpMethod})</td>
 		</tr>
+			#end
 		#end
 	#end
 #end

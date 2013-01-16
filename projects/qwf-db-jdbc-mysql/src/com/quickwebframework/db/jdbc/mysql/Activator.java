@@ -25,7 +25,6 @@ public class Activator implements BundleActivator {
 
 		String jdbcPropertyFilePath = WebContext
 				.getQwfConfig("qwf-db-jdbc.properties");
-
 		if (jdbcPropertyFilePath == null || jdbcPropertyFilePath.isEmpty()) {
 			throw new RuntimeException(
 					"Can't found qwf config: 'qwf-db-jdbc.properties'！");
