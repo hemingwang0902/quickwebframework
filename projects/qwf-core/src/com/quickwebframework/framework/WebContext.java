@@ -9,6 +9,7 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -22,6 +23,7 @@ import com.quickwebframework.framework.impl.PluginServletContext;
 import com.quickwebframework.framework.impl.ServletFilterContext;
 import com.quickwebframework.framework.impl.ServletListenerContext;
 import com.quickwebframework.framework.impl.ServletServletContext;
+import com.quickwebframework.servlet.DefaultResourceServlet;
 
 public class WebContext extends FrameworkContext {
 	private static WebContext instance;
@@ -120,6 +122,17 @@ public class WebContext extends FrameworkContext {
 		ServletFilterContext.getInstance().init();
 		ServletListenerContext.getInstance().init();
 		PluginServletContext.getInstance().init();
+
+		// 如果配置了默认的资源访问Servlet
+		if ("true".equals(WebContext
+				.getQwfConfig(DefaultResourceServlet.RESOURCE_SERVLET))) {
+			DefaultResourceServlet resourceServlet = new DefaultResourceServlet();
+			String resourceViewTypeName = resourceServlet.getViewTypeName();
+			if (!StringUtils.isEmpty(resourceViewTypeName)) {
+				WebContext.registerViewTypeServlet(resourceViewTypeName,
+						resourceServlet);
+			}
+		}
 	}
 
 	@Override

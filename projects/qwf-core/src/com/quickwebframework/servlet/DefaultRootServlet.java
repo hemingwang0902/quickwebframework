@@ -16,6 +16,10 @@ import com.quickwebframework.framework.WebContext;
  */
 public class DefaultRootServlet extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8318707530041789685L;
 	private static HttpServlet instance;
 
 	/**

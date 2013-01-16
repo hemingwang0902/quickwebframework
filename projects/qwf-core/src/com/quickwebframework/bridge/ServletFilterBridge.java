@@ -127,7 +127,8 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 		// 如果根据/切分出来的字符串段数小于3，则不合法，返回404错误
 		// 正确的插件的URL构成为： [插件名]/[视图类型名]/[路径]
 		if (splitResult.length < 3) {
-			response.sendError(404);
+			response.sendError(404, "URL " + requestUriWithoutContextPath
+					+ " not found!");
 			return;
 		}
 		String pluginName = splitResult[0];
@@ -145,6 +146,8 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 			typeServlet.service(arg0, arg1);
 			return;
 		}
+		response.sendError(404,
+				String.format("未找到映射到视图类型为[%s]的Servlet!", viewTypeName));
 	}
 
 	// 过滤器初始化
