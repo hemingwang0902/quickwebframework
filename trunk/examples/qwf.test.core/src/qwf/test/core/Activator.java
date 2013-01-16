@@ -73,7 +73,7 @@ public class Activator implements BundleActivator {
 		Activator.context = null;
 
 		// 取消注册Servlet
-		WebContext.unregister("/test");
+		WebContext.unregisterServlet("/test");
 
 		// 移除一个ApplicationContext监听器
 		BundleApplicationContextUtils

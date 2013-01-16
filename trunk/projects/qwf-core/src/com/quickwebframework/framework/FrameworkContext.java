@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
+import org.osgi.framework.SynchronousBundleListener;
 
 import com.quickwebframework.core.Activator;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +19,14 @@ public abstract class FrameworkContext {
 
 	private ServiceListener serviceListener;
 	private Map<String, Field> serviceFieldMap;
+	private BundleListener bundleListener;
+
+	/**
+	 * 得到插件上下文
+	 * 
+	 * @return
+	 */
+	protected abstract BundleContext getBundleContext();
 
 	/**
 	 * 初始化方法
@@ -27,10 +38,22 @@ public abstract class FrameworkContext {
 	 */
 	protected abstract void destory();
 
+	/**
+	 * 插件改变时执行方法
+	 * 
+	 * @param event
+	 */
+	protected abstract void bundleChanged(BundleEvent event);
+
+	/**
+	 * 服务改变时执行方法
+	 * 
+	 * @param event
+	 */
+	protected abstract void serviceChanged(ServiceEvent event);
+
 	public FrameworkContext() {
 		serviceFieldMap = new HashMap<String, Field>();
-
-		final BundleContext bundleContext = Activator.getContext();
 		serviceListener = new ServiceListener() {
 			@Override
 			public void serviceChanged(ServiceEvent event) {
@@ -42,15 +65,26 @@ public abstract class FrameworkContext {
 						setServiceObjectToStaticField(serviceName, field);
 					}
 				}
+				serviceChanged(event);
 			}
 		};
+		BundleContext bundleContext = this.getBundleContext();
 		bundleContext.addServiceListener(serviceListener);
+		bundleListener = new SynchronousBundleListener() {
+
+			@Override
+			public void bundleChanged(BundleEvent arg0) {
+				bundleChanged(arg0);
+			}
+		};
+		bundleContext.addBundleListener(bundleListener);
 	}
 
 	@Override
 	public void finalize() {
-		BundleContext bundleContext = Activator.getContext();
+		BundleContext bundleContext = this.getBundleContext();
 		bundleContext.removeServiceListener(serviceListener);
+		bundleContext.removeBundleListener(bundleListener);
 	}
 
 	private void setServiceObjectToStaticField(String serviceName, Field field) {

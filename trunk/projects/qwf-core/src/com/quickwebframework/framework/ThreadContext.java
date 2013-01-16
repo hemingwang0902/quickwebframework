@@ -8,14 +8,14 @@ import java.util.Map;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
+import org.osgi.framework.ServiceEvent;
 
 import com.quickwebframework.core.Activator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ThreadContext extends FrameworkContext {
-
+	private static Log log = LogFactory.getLog(ThreadContext.class);
 	private static ThreadContext instance;
 
 	protected static ThreadContext getInstance() {
@@ -24,11 +24,9 @@ public class ThreadContext extends FrameworkContext {
 		return instance;
 	}
 
-	private static Log log = LogFactory.getLog(ThreadContext.class);
 	// ====== 变量部分开始
 	private static List<Thread> threadList;
 	private static Map<Bundle, List<Thread>> bundleThreadListMap;
-	private static BundleListener bundleListener;
 
 	/**
 	 * 得到所有线程
@@ -44,37 +42,43 @@ public class ThreadContext extends FrameworkContext {
 	public ThreadContext() {
 		threadList = new ArrayList<Thread>();
 		bundleThreadListMap = new HashMap<Bundle, List<Thread>>();
-		bundleListener = new BundleListener() {
-			@Override
-			public void bundleChanged(BundleEvent arg0) {
-				int eventType = arg0.getType();
-				Bundle bundle = arg0.getBundle();
-				BundleContext bundleContext = Activator.getContext();
-				if (bundleContext == null)
-					return;
-				Bundle coreBundle = bundleContext.getBundle();
-				// 如果插件的状态是正在停止或已经停止
-				if (eventType == BundleEvent.STOPPED
-						|| eventType == BundleEvent.STOPPING) {
-					if (bundle.equals(coreBundle)) {
-						removeAllThread();
-					} else {
-						removeBundleAllThread(bundle);
-					}
-				}
-			}
-		};
+	}
+
+	@Override
+	protected BundleContext getBundleContext() {
+		return Activator.getContext();
 	}
 
 	@Override
 	protected void init() {
-		// 注册
-		Activator.getContext().addBundleListener(bundleListener);
 	}
 
 	@Override
 	protected void destory() {
-		Activator.getContext().removeBundleListener(bundleListener);
+	}
+
+	@Override
+	protected void bundleChanged(BundleEvent event) {
+		int eventType = event.getType();
+		Bundle bundle = event.getBundle();
+		BundleContext bundleContext = getBundleContext();
+		if (bundleContext == null)
+			return;
+		Bundle coreBundle = bundleContext.getBundle();
+		// 如果插件的状态是正在停止或已经停止
+		if (eventType == BundleEvent.STOPPED
+				|| eventType == BundleEvent.STOPPING) {
+			if (bundle.equals(coreBundle)) {
+				removeAllThread();
+			} else {
+				removeBundleAllThread(bundle);
+			}
+		}
+	}
+
+	@Override
+	protected void serviceChanged(ServiceEvent event) {
+
 	}
 
 	/**

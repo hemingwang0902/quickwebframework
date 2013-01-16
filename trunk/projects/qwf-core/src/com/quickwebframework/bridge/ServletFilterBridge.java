@@ -152,6 +152,6 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 	@Override
 	public void destroy() {
 		// 移除所有的过滤器
-		WebContext.removeAllListener();
+		WebContext.unregisterAllFilter();
 	}
 }

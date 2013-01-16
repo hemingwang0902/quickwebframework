@@ -25,7 +25,7 @@ public class BundleFilterHandler implements BundleHandler {
 		Map<String, Filter> filterMap = applicationContext
 				.getBeansOfType(Filter.class);
 		for (Filter filter : filterMap.values()) {
-			WebContext.addFilter(bundle, filter);
+			WebContext.registerFilter(bundle, filter);
 		}
 	}
 
@@ -36,7 +36,7 @@ public class BundleFilterHandler implements BundleHandler {
 		Map<String, Filter> filterMap = applicationContext
 				.getBeansOfType(Filter.class);
 		for (Filter filter : filterMap.values()) {
-			WebContext.removeFilter(bundle, filter);
+			WebContext.unregisterFilter(bundle, filter);
 		}
 	}
 }

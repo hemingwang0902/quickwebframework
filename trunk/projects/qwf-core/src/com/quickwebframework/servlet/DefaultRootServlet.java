@@ -1,8 +1,6 @@
 package com.quickwebframework.servlet;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -49,27 +47,21 @@ public class DefaultRootServlet extends HttpServlet {
 			sb.append("</table>");
 		}
 		/*
-		if (WebContext.getMvcFrameworkService() != null) {
-			Map<String, List<HttpMethodInfo>> map = WebContext
-					.getMvcFrameworkService().getBundleHttpMethodInfoListMap();
-			sb.append("<table>");
-			sb.append("<tr><td><b>==MVC部分==</b></td></tr>");
-			for (String bundleName : map.keySet()) {
-				List<HttpMethodInfo> httpMethodInfoList = map.get(bundleName);
-				if (httpMethodInfoList.isEmpty())
-					continue;
-				sb.append("<tr><td><b>" + bundleName + "</b></td></tr>");
-				for (HttpMethodInfo httpMethodInfo : httpMethodInfoList) {
-					String url = httpMethodInfo.getMappingUrl();
-					String httpMethod = httpMethodInfo.getHttpMethod();
-					sb.append("<tr><td><a style=\"margin-left:20px\" href=\""
-							+ url + "\">" + url + "</a>(" + httpMethod
-							+ ")</td></tr>");
-				}
-			}
-			sb.append("</table>");
-		}
-		*/
+		 * if (WebContext.getMvcFrameworkService() != null) { Map<String,
+		 * List<HttpMethodInfo>> map = WebContext
+		 * .getMvcFrameworkService().getBundleHttpMethodInfoListMap();
+		 * sb.append("<table>");
+		 * sb.append("<tr><td><b>==MVC部分==</b></td></tr>"); for (String
+		 * bundleName : map.keySet()) { List<HttpMethodInfo> httpMethodInfoList
+		 * = map.get(bundleName); if (httpMethodInfoList.isEmpty()) continue;
+		 * sb.append("<tr><td><b>" + bundleName + "</b></td></tr>"); for
+		 * (HttpMethodInfo httpMethodInfo : httpMethodInfoList) { String url =
+		 * httpMethodInfo.getMappingUrl(); String httpMethod =
+		 * httpMethodInfo.getHttpMethod();
+		 * sb.append("<tr><td><a style=\"margin-left:20px\" href=\"" + url +
+		 * "\">" + url + "</a>(" + httpMethod + ")</td></tr>"); } }
+		 * sb.append("</table>"); }
+		 */
 		sb.append("</body></html>");
 		response.getWriter().write(sb.toString());
 	}

@@ -18,7 +18,7 @@ public class BundleListenerHandler implements BundleHandler {
 		Map<String, EventListener> listenerMap = applicationContext
 				.getBeansOfType(EventListener.class);
 		for (EventListener listener : listenerMap.values()) {
-			WebContext.addListener(bundle, listener);
+			WebContext.registerListener(bundle, listener);
 		}
 	}
 
@@ -29,7 +29,7 @@ public class BundleListenerHandler implements BundleHandler {
 		Map<String, EventListener> listenerMap = applicationContext
 				.getBeansOfType(EventListener.class);
 		for (EventListener listener : listenerMap.values()) {
-			WebContext.removeListener(bundle, listener);
+			WebContext.unregisterListener(bundle, listener);
 		}
 	}
 
