@@ -96,7 +96,7 @@ public class ServletFilterContext extends FrameworkContext {
 	}
 
 	@Override
-	public void init() {
+	protected void init(int arg) {
 		BundleContext bundleContext = Activator.getContext();
 
 		// 启动时，从ServletContext中读取相关运行时状态
@@ -112,7 +112,7 @@ public class ServletFilterContext extends FrameworkContext {
 	}
 
 	@Override
-	public void destory() {
+	protected void destory(int arg) {
 		servletFilterBridgeServiceRegistration.unregister();
 		// 停止时，保存相关运行时状态到ServletContext中。
 		WebContext.getServletContext().setAttribute(

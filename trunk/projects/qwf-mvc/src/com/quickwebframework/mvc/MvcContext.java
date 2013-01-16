@@ -34,9 +34,14 @@ public class MvcContext extends FrameworkContext {
 	}
 
 	@Override
-	public void init() {
+	protected void init(int arg) {
 		super.addSimpleServiceStaticFieldLink(
 				MvcFrameworkService.class.getName(), "mvcFrameworkService");
+	}
+
+	@Override
+	protected void destory(int arg) {
+
 	}
 
 	@Override
@@ -53,11 +58,6 @@ public class MvcContext extends FrameworkContext {
 
 	@Override
 	protected void serviceChanged(ServiceEvent event) {
-
-	}
-
-	@Override
-	public void destory() {
 
 	}
 

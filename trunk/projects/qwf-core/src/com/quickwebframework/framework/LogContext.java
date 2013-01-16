@@ -44,7 +44,7 @@ public class LogContext extends FrameworkContext {
 	}
 
 	@Override
-	protected void init() {
+	protected void init(int arg) {
 		BundleContext bundleContext = getBundleContext();
 		// 设置默认的Java日志记录器配置
 		try {
@@ -66,7 +66,7 @@ public class LogContext extends FrameworkContext {
 	}
 
 	@Override
-	protected void destory() {
+	protected void destory(int arg) {
 		// 取消注册日志桥接对象
 		logBridgeServiceRegistration.unregister();
 	}
