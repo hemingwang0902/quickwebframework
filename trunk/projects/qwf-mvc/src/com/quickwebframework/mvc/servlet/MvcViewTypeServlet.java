@@ -10,24 +10,19 @@ import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.mvc.MvcContext;
 import com.quickwebframework.mvc.MvcFrameworkService;
 import com.quickwebframework.mvc.MvcModelAndView;
+import com.quickwebframework.servlet.ViewTypeServlet;
 import com.quickwebframework.viewrender.ViewRenderContext;
 import com.quickwebframework.viewrender.ViewRenderService;
 
-public class MvcDispatchServlet extends HttpServlet {
+public class MvcViewTypeServlet extends ViewTypeServlet {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 9011381588046624048L;
-	private static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-mvc.MvcDispatchServlet.viewTypeName";
+	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-mvc.MvcViewTypeServlet.viewTypeName";
 
-	private String viewTypeName;
-
-	public String getViewTypeName() {
-		return viewTypeName;
-	}
-
-	public MvcDispatchServlet() {
-		viewTypeName = WebContext.getQwfConfig(VIEW_TYPE_NAME_PROPERTY_KEY);
+	public MvcViewTypeServlet(String viewTypeName) {
+		super(viewTypeName);
 	}
 
 	/**
@@ -82,5 +77,10 @@ public class MvcDispatchServlet extends HttpServlet {
 			renderView(request, response, mav);
 			return;
 		}
+	}
+
+	@Override
+	public String[] getUrls() {
+		return null;
 	}
 }

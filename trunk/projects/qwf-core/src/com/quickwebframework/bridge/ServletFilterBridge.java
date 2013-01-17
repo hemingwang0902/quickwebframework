@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.quickwebframework.framework.WebContext;
-import com.quickwebframework.servlet.DefaultRootServlet;
+import com.quickwebframework.servlet.support.DefaultRootServlet;
 import com.quickwebframework.stereotype.FilterSetting;
 
 public class ServletFilterBridge implements javax.servlet.Filter {

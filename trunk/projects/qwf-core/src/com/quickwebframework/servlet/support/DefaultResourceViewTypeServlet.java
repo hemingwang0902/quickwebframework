@@ -1,4 +1,4 @@
-package com.quickwebframework.servlet;
+package com.quickwebframework.servlet.support;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,7 +7,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,30 +16,26 @@ import org.osgi.framework.Bundle;
 
 import com.quickwebframework.framework.OsgiContext;
 import com.quickwebframework.framework.WebContext;
+import com.quickwebframework.servlet.ViewTypeServlet;
 
-public class DefaultResourceServlet extends HttpServlet {
+public class DefaultResourceViewTypeServlet extends ViewTypeServlet {
 
 	private static final long serialVersionUID = -1402692734489050382L;
 
-	public static final String RESOURCE_SERVLET = "qwf-core.DefaultResourceServlet";
-	public static final String RESOURCE_PATH_PREFIX_PROPERTY_KEY = "qwf-core.DefaultResourceServlet.resourcePathPrefix";
-	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-core.DefaultResourceServlet.viewTypeName";
+	public static final String RESOURCE_SERVLET = "qwf-core.DefaultResourceViewTypeServlet";
+	public static final String RESOURCE_PATH_PREFIX_PROPERTY_KEY = "qwf-core.DefaultResourceViewTypeServlet.resourcePathPrefix";
+	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-core.DefaultResourceViewTypeServlet.viewTypeName";
 
 	private Map<String, String> mimeMap;
 	// 资源路径统一前缀
 	private String resourcePathPrefix;
-	// 视图类型名称
-	private String viewTypeName;
 
-	public String getViewTypeName() {
-		return viewTypeName;
-	}
+	public DefaultResourceViewTypeServlet(String viewTypeName) {
+		super(viewTypeName);
 
-	public DefaultResourceServlet() {
 		mimeMap = new HashMap<String, String>();
 		resourcePathPrefix = WebContext
 				.getQwfConfig(RESOURCE_PATH_PREFIX_PROPERTY_KEY);
-		viewTypeName = WebContext.getQwfConfig(VIEW_TYPE_NAME_PROPERTY_KEY);
 		intitDefaultMime();
 	}
 
@@ -285,5 +280,11 @@ public class DefaultResourceServlet extends HttpServlet {
 		mimeMap.put("xwd", "image/x-xwindowdump");
 		mimeMap.put("z", "application/x-compress");
 		mimeMap.put("zip", "application/zip");
+	}
+
+	@Override
+	public String[] getUrls() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -9,7 +9,6 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -23,7 +22,8 @@ import com.quickwebframework.framework.impl.PluginServletContext;
 import com.quickwebframework.framework.impl.ServletFilterContext;
 import com.quickwebframework.framework.impl.ServletListenerContext;
 import com.quickwebframework.framework.impl.ServletServletContext;
-import com.quickwebframework.servlet.DefaultResourceServlet;
+import com.quickwebframework.servlet.ViewTypeServlet;
+import com.quickwebframework.servlet.support.DefaultResourceViewTypeServlet;
 
 public class WebContext extends FrameworkContext {
 	private static WebContext instance;
@@ -125,13 +125,12 @@ public class WebContext extends FrameworkContext {
 
 		// 如果配置了默认的资源访问Servlet
 		if ("true".equals(WebContext
-				.getQwfConfig(DefaultResourceServlet.RESOURCE_SERVLET))) {
-			DefaultResourceServlet resourceServlet = new DefaultResourceServlet();
-			String resourceViewTypeName = resourceServlet.getViewTypeName();
-			if (!StringUtils.isEmpty(resourceViewTypeName)) {
-				WebContext.registerViewTypeServlet(resourceViewTypeName,
-						resourceServlet);
-			}
+				.getQwfConfig(DefaultResourceViewTypeServlet.RESOURCE_SERVLET))) {
+			String viewTypeName = WebContext
+					.getQwfConfig(DefaultResourceViewTypeServlet.VIEW_TYPE_NAME_PROPERTY_KEY);
+			DefaultResourceViewTypeServlet resourceServlet = new DefaultResourceViewTypeServlet(
+					viewTypeName);
+			WebContext.registerViewTypeServlet(resourceServlet);
 		}
 	}
 
@@ -281,8 +280,8 @@ public class WebContext extends FrameworkContext {
 	 * @param typeName
 	 * @param servlet
 	 */
-	public static void registerViewTypeServlet(String typeName, Servlet servlet) {
-		PluginServletContext.registerViewTypeServlet(typeName, servlet);
+	public static void registerViewTypeServlet(ViewTypeServlet servlet) {
+		PluginServletContext.registerViewTypeServlet(servlet);
 	}
 
 	/**
@@ -292,6 +291,15 @@ public class WebContext extends FrameworkContext {
 	 */
 	public static void unregisterViewTypeServlet(String typeName) {
 		PluginServletContext.unregisterViewTypeServlet(typeName);
+	}
+
+	/**
+	 * 取消注册视图类型的Servlet
+	 * 
+	 * @param servlet
+	 */
+	public static void unregisterViewTypeServlet(ViewTypeServlet servlet) {
+		unregisterViewTypeServlet(servlet.getViewTypeName());
 	}
 
 	/**
