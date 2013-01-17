@@ -21,7 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import com.quickwebframework.ioc.IocContext;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 import com.quickwebframework.mvc.spring.BundleHandler;
+import com.quickwebframework.mvc.spring.SpringMvcContext;
 import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
+import com.quickwebframework.mvc.spring.support.Activator;
 
 public class SpringMvcFrameworkService {
 
@@ -104,7 +106,7 @@ public class SpringMvcFrameworkService {
 			bundleHandler.unregisterBundle(bundle, applicationContext);
 		}
 		bundleApplicationContextMap.remove(bundle);
-		IocContext.unregisterBundle(bundle);
+		// IocContext.unregisterBundle(bundle);
 		return true;
 	}
 
@@ -112,12 +114,36 @@ public class SpringMvcFrameworkService {
 		return bundleApplicationContextMap.containsKey(bundle);
 	}
 
-	public Map<String, List<String>> getBundleHttpMethodListMap() {
-		Map<String, List<String>> rtnMap = new HashMap<String, List<String>>();
+	/**
+	 * 得到插件与URL的映射MAP
+	 * 
+	 * @return
+	 */
+	public Map<String, String[]> getBundleUrlsMap() {
+		String viewTypeName = Activator.getViewTypeServlet().getViewTypeName();
+
+		Map<String, String[]> rtnMap = new HashMap<String, String[]>();
 		for (String key : bundleNamePluginControllerInfoMap.keySet()) {
 			PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
 					.get(key);
-			rtnMap.put(key, pluginControllerInfo.getHttpMethodList());
+
+			List<String> tmpList = new ArrayList<String>();
+
+			for (String tmpStr : pluginControllerInfo.getMappingUrlHandlerMap()
+					.keySet()) {
+				int spIndex = tmpStr.indexOf("/");
+				String tmpUrl1 = tmpStr.substring(spIndex + 1);
+				int spIndex2 = tmpUrl1.indexOf("/");
+
+				String bundleName = tmpUrl1.substring(0, spIndex2);
+				String methodName = tmpUrl1.substring(spIndex2);
+
+				String url = "/" + bundleName + "/" + viewTypeName + methodName;
+				if (!tmpList.contains(tmpList)) {
+					tmpList.add(url);
+				}
+			}
+			rtnMap.put(key, tmpList.toArray(new String[tmpList.size()]));
 		}
 		return rtnMap;
 	}

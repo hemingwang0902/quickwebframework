@@ -308,7 +308,16 @@ public class WebContext extends FrameworkContext {
 	 * @param typeName
 	 * @return
 	 */
-	public static Servlet getViewTypeServlet(String typeName) {
+	public static ViewTypeServlet getViewTypeServlet(String typeName) {
 		return PluginServletContext.getViewTypeServlet(typeName);
+	}
+
+	/**
+	 * 得到所有的视图类型Servlet
+	 * 
+	 * @return
+	 */
+	public static ViewTypeServlet[] getViewTypeServlets() {
+		return PluginServletContext.getViewTypeServlets();
 	}
 }

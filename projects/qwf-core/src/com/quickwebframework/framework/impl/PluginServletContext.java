@@ -3,8 +3,6 @@ package com.quickwebframework.framework.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.Servlet;
-
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -84,12 +82,22 @@ public class PluginServletContext extends FrameworkContext {
 	}
 
 	/**
-	 * 得到指定视图类型的Servlet
+	 * 得到指定的视图类型Servlet
 	 * 
 	 * @param typeName
 	 * @return
 	 */
-	public static Servlet getViewTypeServlet(String typeName) {
+	public static ViewTypeServlet getViewTypeServlet(String typeName) {
 		return viewTypeNameServletMap.get(typeName);
+	}
+
+	/**
+	 * 得到所有的视图类型Servlet
+	 * 
+	 * @return
+	 */
+	public static ViewTypeServlet[] getViewTypeServlets() {
+		return viewTypeNameServletMap.values().toArray(
+				new ViewTypeServlet[viewTypeNameServletMap.size()]);
 	}
 }

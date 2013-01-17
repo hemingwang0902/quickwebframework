@@ -52,10 +52,6 @@ public class SpringMvcContext extends FrameworkContext {
 
 		// 添加到MVC框架中
 		for (Bundle bundle : this.getBundleContext().getBundles()) {
-			// 如果是系统Bundle，则不处理
-			if (bundle.getBundleId() == 0) {
-				continue;
-			}
 			// 如果状态是已激活
 			if (bundle.getState() == Bundle.ACTIVE) {
 				registerBundle(bundle);
@@ -96,6 +92,10 @@ public class SpringMvcContext extends FrameworkContext {
 	 * @param bundle
 	 */
 	public static void registerBundle(Bundle bundle) {
+		// 如果是系统Bundle，则不处理
+		if (bundle.getBundleId() == 0) {
+			return;
+		}
 		mvcFrameworkService.registerBundle(bundle);
 	}
 

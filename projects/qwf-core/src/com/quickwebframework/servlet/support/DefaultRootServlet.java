@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.quickwebframework.framework.WebContext;
+import com.quickwebframework.servlet.ViewTypeServlet;
 
 /**
  * 默认处理根路径的Servlet
@@ -37,6 +38,11 @@ public class DefaultRootServlet extends HttpServlet {
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
+		String contextPath = request.getContextPath();
+		if (contextPath == "/") {
+			contextPath = "";
+		}
+
 		response.setContentType("text/html;charset=utf-8");
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use QuickWebFramework!You can manage bundles in the <a href=\"qwf/index\">Bundle Manage Page</a>!");
@@ -46,26 +52,31 @@ public class DefaultRootServlet extends HttpServlet {
 			sb.append("<tr><td><b>==Java Servlet部分==</b></td></tr>");
 			for (String servletPath : allServletPaths) {
 				sb.append("<tr><td><a style=\"margin-left:20px\" href=\""
-						+ servletPath + "\">" + servletPath + "</a></td></tr>");
+						+ contextPath + servletPath + "\">" + contextPath
+						+ servletPath + "</a></td></tr>");
 			}
 			sb.append("</table>");
 		}
-		/*
-		 * if (WebContext.getMvcFrameworkService() != null) { Map<String,
-		 * List<HttpMethodInfo>> map = WebContext
-		 * .getMvcFrameworkService().getBundleHttpMethodInfoListMap();
-		 * sb.append("<table>");
-		 * sb.append("<tr><td><b>==MVC部分==</b></td></tr>"); for (String
-		 * bundleName : map.keySet()) { List<HttpMethodInfo> httpMethodInfoList
-		 * = map.get(bundleName); if (httpMethodInfoList.isEmpty()) continue;
-		 * sb.append("<tr><td><b>" + bundleName + "</b></td></tr>"); for
-		 * (HttpMethodInfo httpMethodInfo : httpMethodInfoList) { String url =
-		 * httpMethodInfo.getMappingUrl(); String httpMethod =
-		 * httpMethodInfo.getHttpMethod();
-		 * sb.append("<tr><td><a style=\"margin-left:20px\" href=\"" + url +
-		 * "\">" + url + "</a>(" + httpMethod + ")</td></tr>"); } }
-		 * sb.append("</table>"); }
-		 */
+
+		ViewTypeServlet[] viewTypeServlets = WebContext.getViewTypeServlets();
+		if (viewTypeServlets != null && viewTypeServlets.length > 0) {
+			for (ViewTypeServlet viewTypeServlet : viewTypeServlets) {
+				String[] urls = viewTypeServlet.getUrls();
+				if (urls == null) {
+					continue;
+				}
+				sb.append("<table>");
+				sb.append("<tr><td><b>==视图类型["
+						+ viewTypeServlet.getViewTypeName()
+						+ "]部分==</b></td></tr>");
+				for (String url : urls) {
+					sb.append("<tr><td><a style=\"margin-left:20px\" href=\""
+							+ contextPath + url + "\">" + contextPath + url
+							+ "</a></td></tr>");
+				}
+				sb.append("</table>");
+			}
+		}
 		sb.append("</body></html>");
 		response.getWriter().write(sb.toString());
 	}

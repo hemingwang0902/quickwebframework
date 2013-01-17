@@ -1,5 +1,7 @@
 package com.quickwebframework.bridge;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -18,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.servlet.support.DefaultRootServlet;
 import com.quickwebframework.stereotype.FilterSetting;
+import com.quickwebframework.util.WebResourceUtils;
 
 public class ServletFilterBridge implements javax.servlet.Filter {
 
@@ -128,8 +131,24 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 			DefaultRootServlet.getInstance().service(arg0, arg1);
 			return;
 		}
+
 		String[] splitResult = StringUtils.split(requestUriWithoutContextPath,
 				"/");
+		// 如果URL包含后缀名
+		if (splitResult[splitResult.length - 1].contains(".")) {
+			String fullFilePath = WebContext
+					.getRealPath(requestUriWithoutContextPath);
+			File tmpFile = new File(fullFilePath);
+			// 如果文件存在，则输出资源
+			if (tmpFile.exists()) {
+				WebResourceUtils.outputResource(response,
+						requestUriWithoutContextPath, new FileInputStream(
+								tmpFile));
+				return;
+			}
+		}
+		// 如果是映射到本地的文件资源
+
 		// 如果根据/切分出来的字符串段数小于3，则不合法，返回404错误
 		// 正确的插件的URL构成为： [插件名]/[视图类型名]/[路径]
 		if (splitResult.length < 3) {

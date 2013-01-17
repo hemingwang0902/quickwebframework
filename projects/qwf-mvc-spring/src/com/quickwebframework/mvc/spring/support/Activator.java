@@ -6,14 +6,19 @@ import org.osgi.framework.BundleContext;
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.mvc.spring.SpringMvcContext;
 import com.quickwebframework.mvc.spring.servlet.SpringMvcViewTypeServlet;
+import com.quickwebframework.servlet.ViewTypeServlet;
 
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;
-	private SpringMvcViewTypeServlet servlet;
+	private static ViewTypeServlet servlet;
 
 	public static BundleContext getContext() {
 		return context;
+	}
+
+	public static ViewTypeServlet getViewTypeServlet() {
+		return servlet;
 	}
 
 	public void start(final BundleContext bundleContext) throws Exception {
