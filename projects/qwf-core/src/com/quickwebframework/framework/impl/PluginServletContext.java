@@ -5,12 +5,14 @@ import java.util.Map;
 
 import javax.servlet.Servlet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceEvent;
 
 import com.quickwebframework.core.Activator;
 import com.quickwebframework.framework.FrameworkContext;
+import com.quickwebframework.servlet.ViewTypeServlet;
 
 public class PluginServletContext extends FrameworkContext {
 	private static PluginServletContext instance;
@@ -21,10 +23,10 @@ public class PluginServletContext extends FrameworkContext {
 		return instance;
 	}
 
-	private static Map<String, Servlet> typeNameServletMap;
+	private static Map<String, ViewTypeServlet> viewTypeNameServletMap;
 
 	public PluginServletContext() {
-		typeNameServletMap = new HashMap<String, Servlet>();
+		viewTypeNameServletMap = new HashMap<String, ViewTypeServlet>();
 	}
 
 	@Override
@@ -58,11 +60,18 @@ public class PluginServletContext extends FrameworkContext {
 	 * @param typeName
 	 * @param servlet
 	 */
-	public static void registerViewTypeServlet(String typeName, Servlet servlet) {
-		if (typeNameServletMap.containsKey(typeName)) {
-			throw new RuntimeException("视图类型为[%s]的Servlet已经被注册到了上下文中！");
+	public static void registerViewTypeServlet(ViewTypeServlet servlet) {
+		String viewTypeName = servlet.getViewTypeName();
+		if (StringUtils.isEmpty(viewTypeName)) {
+			throw new RuntimeException(String.format(
+					"视图类型Servlet[%s]的视图类型名称为null或空字符串！", servlet));
 		}
-		typeNameServletMap.put(typeName, servlet);
+		if (viewTypeNameServletMap.containsKey(viewTypeName)) {
+			throw new RuntimeException(String.format(
+					"视图类型Servlet[%s]注册时失败，原因：视图类型名称[%s]已经被注册到了上下文中！", servlet,
+					servlet.getViewTypeName()));
+		}
+		viewTypeNameServletMap.put(viewTypeName, servlet);
 	}
 
 	/**
@@ -71,7 +80,7 @@ public class PluginServletContext extends FrameworkContext {
 	 * @param typeName
 	 */
 	public static void unregisterViewTypeServlet(String typeName) {
-		typeNameServletMap.remove(typeName);
+		viewTypeNameServletMap.remove(typeName);
 	}
 
 	/**
@@ -81,6 +90,6 @@ public class PluginServletContext extends FrameworkContext {
 	 * @return
 	 */
 	public static Servlet getViewTypeServlet(String typeName) {
-		return typeNameServletMap.get(typeName);
+		return viewTypeNameServletMap.get(typeName);
 	}
 }

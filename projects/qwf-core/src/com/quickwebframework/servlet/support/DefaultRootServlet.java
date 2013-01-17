@@ -1,4 +1,4 @@
-package com.quickwebframework.servlet;
+package com.quickwebframework.servlet.support;
 
 import java.io.IOException;
 
