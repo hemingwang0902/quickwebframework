@@ -112,6 +112,10 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 		if (requestUriWithoutContextPath.isEmpty()) {
 			requestUriWithoutContextPath = "/";
 		}
+		while (requestUriWithoutContextPath.contains("//")) {
+			requestUriWithoutContextPath = requestUriWithoutContextPath
+					.replace("//", "/");
+		}
 
 		// 保护WEB-INF中的文件
 		if (requestUriWithoutContextPath.startsWith("/WEB-INF/")) {
@@ -134,6 +138,11 @@ public class ServletFilterBridge implements javax.servlet.Filter {
 
 		String[] splitResult = StringUtils.split(requestUriWithoutContextPath,
 				"/");
+		if (splitResult.length == 0) {
+			response.sendError(404, "URL not found:"
+					+ requestUriWithoutContextPath);
+			return;
+		}
 		// 如果URL包含后缀名
 		if (splitResult[splitResult.length - 1].contains(".")) {
 			String fullFilePath = WebContext
