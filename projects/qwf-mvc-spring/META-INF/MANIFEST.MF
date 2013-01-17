@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: QuickWebFramework MVC Framework(Spring MVC)
-Bundle-SymbolicName: qwf-mvc-spring
+Bundle-SymbolicName: qwf-view-springmvc
 Bundle-Version: 3.2.0.qualifier
 Bundle-Activator: com.quickwebframework.mvc.spring.support.Activator
 Bundle-Vendor: aaaSoft
