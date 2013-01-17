@@ -20,13 +20,10 @@ import org.apache.commons.logging.LogFactory;
 
 import com.quickwebframework.ioc.IocContext;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
-import com.quickwebframework.mvc.HttpMethodInfo;
-import com.quickwebframework.mvc.MvcFrameworkService;
-import com.quickwebframework.mvc.MvcModelAndView;
-import com.quickwebframework.mvc.spring.core.BundleHandler;
+import com.quickwebframework.mvc.spring.BundleHandler;
 import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
 
-public class SpringMvcFrameworkService implements MvcFrameworkService {
+public class SpringMvcFrameworkService {
 
 	private static Log log = LogFactory.getLog(SpringMvcFrameworkService.class);
 
@@ -67,7 +64,6 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		bundleNamePluginControllerInfoMap.remove(bundleName);
 	}
 
-	@Override
 	public boolean addBundle(Bundle bundle) {
 		// 如果IoC框架中还没有此Bundle,则添加到IoC框架中
 		if (!IocContext.containsBundle(bundle))
@@ -86,7 +82,6 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		return true;
 	}
 
-	@Override
 	public boolean removeBundle(Bundle bundle) {
 		if (!bundleApplicationContextMap.containsKey(bundle)) {
 			return false;
@@ -101,24 +96,21 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 		return true;
 	}
 
-	@Override
 	public boolean containsBundle(Bundle bundle) {
 		return bundleApplicationContextMap.containsKey(bundle);
 	}
 
-	@Override
-	public Map<String, List<HttpMethodInfo>> getBundleHttpMethodInfoListMap() {
-		Map<String, List<HttpMethodInfo>> rtnMap = new HashMap<String, List<HttpMethodInfo>>();
+	public Map<String, List<String>> getBundleHttpMethodListMap() {
+		Map<String, List<String>> rtnMap = new HashMap<String, List<String>>();
 		for (String key : bundleNamePluginControllerInfoMap.keySet()) {
 			PluginControllerInfo pluginControllerInfo = bundleNamePluginControllerInfoMap
 					.get(key);
-			rtnMap.put(key, pluginControllerInfo.getHttpMethodInfoList());
+			rtnMap.put(key, pluginControllerInfo.getHttpMethodList());
 		}
 		return rtnMap;
 	}
 
-	@Override
-	public MvcModelAndView handle(HttpServletRequest request,
+	public ModelAndView handle(HttpServletRequest request,
 			HttpServletResponse response, String bundleName, String methodName) {
 		// 如果插件名称为null或Map中不存在此插件名称
 		if (bundleName == null
@@ -182,9 +174,7 @@ public class SpringMvcFrameworkService implements MvcFrameworkService {
 			if (mav == null) {
 				return null;
 			}
-			MvcModelAndView mmav = new MvcModelAndView(mav.getViewName(),
-					mav.getModel(), pluginControllerInfo.getBundle());
-			return mmav;
+			return mav;
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

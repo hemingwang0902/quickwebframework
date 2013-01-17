@@ -1,4 +1,4 @@
-package com.quickwebframework.mvc.spring.core.support;
+package com.quickwebframework.mvc.spring.support;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
 import com.quickwebframework.framework.WebContext;
-import com.quickwebframework.mvc.HttpMethodInfo;
-import com.quickwebframework.mvc.spring.Activator;
-import com.quickwebframework.mvc.spring.core.BundleHandler;
-import com.quickwebframework.mvc.spring.core.PluginPathMatcher;
-import com.quickwebframework.mvc.spring.core.PluginUrlPathHelper;
+import com.quickwebframework.mvc.spring.BundleHandler;
+import com.quickwebframework.mvc.spring.PluginPathMatcher;
+import com.quickwebframework.mvc.spring.PluginUrlPathHelper;
+import com.quickwebframework.mvc.spring.SpringMvcContext;
 import com.quickwebframework.mvc.spring.entity.impl.PluginControllerInfo;
 
 public class BundleControllerHandler implements BundleHandler {
@@ -77,11 +76,9 @@ public class BundleControllerHandler implements BundleHandler {
 									.toUpperCase() + "_" + innerMappingUrl;
 							pluginControllerInfo.getMappingUrlHandlerMap().put(
 									tmpMappingUrl, handler);
-							// 添加到HTTP方法信息列表中
-							HttpMethodInfo httpMethodInfo = new HttpMethodInfo();
-							httpMethodInfo.setHttpMethod(requestMethod.name());
-							pluginControllerInfo.getHttpMethodInfoList().add(
-									httpMethodInfo);
+							// 添加到HTTP方法列表中
+							pluginControllerInfo.getHttpMethodList().add(
+									requestMethod.name());
 						}
 
 						if (sb.length() == 0)
@@ -109,8 +106,8 @@ public class BundleControllerHandler implements BundleHandler {
 				}
 			}
 		}
-		Activator.getSpringMvcFrameworkService().addBundleControllerInfo(
-				bundleName, pluginControllerInfo);
+		SpringMvcContext.getSpringMvcFrameworkService()
+				.addBundleControllerInfo(bundleName, pluginControllerInfo);
 		log.debug("插件[" + bundleName + "]已注册为Spring MVC的Web App.");
 	}
 
@@ -119,8 +116,8 @@ public class BundleControllerHandler implements BundleHandler {
 			ApplicationContext applicationContext) {
 		// Bundle的名称
 		String bundleName = bundle.getSymbolicName();
-		Activator.getSpringMvcFrameworkService().removeBundleControllerInfo(
-				bundleName);
+		SpringMvcContext.getSpringMvcFrameworkService()
+				.removeBundleControllerInfo(bundleName);
 		log.debug("插件[" + bundleName + "]注册在Spring MVC的Web App已经移除！");
 	}
 }
