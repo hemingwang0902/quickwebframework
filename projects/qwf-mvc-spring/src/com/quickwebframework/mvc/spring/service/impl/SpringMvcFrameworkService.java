@@ -64,10 +64,16 @@ public class SpringMvcFrameworkService {
 		bundleNamePluginControllerInfoMap.remove(bundleName);
 	}
 
-	public boolean addBundle(Bundle bundle) {
+	/**
+	 * 注册Bundle到Spring MVC框架中
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public boolean registerBundle(Bundle bundle) {
 		// 如果IoC框架中还没有此Bundle,则添加到IoC框架中
 		if (!IocContext.containsBundle(bundle))
-			IocContext.addBundle(bundle);
+			IocContext.registerBundle(bundle);
 		ApplicationContext applicationContext = BundleApplicationContextUtils
 				.getBundleApplicationContext(bundle);
 		if (applicationContext == null) {
@@ -82,7 +88,13 @@ public class SpringMvcFrameworkService {
 		return true;
 	}
 
-	public boolean removeBundle(Bundle bundle) {
+	/**
+	 * 取消注册Bundle到Spring MVC框架中
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public boolean unregisterBundle(Bundle bundle) {
 		if (!bundleApplicationContextMap.containsKey(bundle)) {
 			return false;
 		}
@@ -91,8 +103,8 @@ public class SpringMvcFrameworkService {
 		for (BundleHandler bundleHandler : bundleHandlerList) {
 			bundleHandler.unregisterBundle(bundle, applicationContext);
 		}
-
 		bundleApplicationContextMap.remove(bundle);
+		IocContext.unregisterBundle(bundle);
 		return true;
 	}
 

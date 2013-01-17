@@ -18,12 +18,12 @@ public class SpringIocFrameworkService implements IocFrameworkService {
 	public static Map<Bundle, ApplicationContext> bundleApplicationContextMap = new HashMap<Bundle, ApplicationContext>();
 
 	/**
-	 * 加入Bundle
+	 * 注册Bundle到Spring IoC上下文中
 	 * 
 	 * @param bundle
 	 */
 	@Override
-	public void addBundle(Bundle bundle) {
+	public void registerBundle(Bundle bundle) {
 		if (!bundleApplicationContextMap.containsKey(bundle)) {
 			ClassLoader bundleClassLoader = BundleUtil
 					.getBundleClassLoader(bundle);
@@ -36,15 +36,18 @@ public class SpringIocFrameworkService implements IocFrameworkService {
 	}
 
 	/**
-	 * 移除Bundle
+	 * 取消注册Bundle到Spring IoC上下文中
 	 * 
 	 * @param bundle
 	 */
 	@Override
-	public void removeBundle(Bundle bundle) {
+	public void unregisterBundle(Bundle bundle) {
 		bundleApplicationContextMap.remove(bundle);
 	}
 
+	/**
+	 * Spring MVC上下文中是否包含此Bundle
+	 */
 	@Override
 	public boolean containsBundle(Bundle bundle) {
 		return bundleApplicationContextMap.containsKey(bundle);

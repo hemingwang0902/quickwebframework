@@ -59,7 +59,7 @@ public class IocContext extends FrameworkContext {
 		if (bundleEventType == BundleEvent.STOPPED) {
 			if (iocFrameworkService == null)
 				return;
-			removeBundle(bundle);
+			unregisterBundle(bundle);
 		}
 	}
 
@@ -69,23 +69,23 @@ public class IocContext extends FrameworkContext {
 	}
 
 	/**
-	 * 添加一个Bundle到IoC框架中
+	 * 注册Bundle到IoC框架中
 	 * 
 	 * @param bundle
 	 */
-	public static void addBundle(Bundle bundle) {
+	public static void registerBundle(Bundle bundle) {
 		checkIocFrameworkExist();
-		iocFrameworkService.addBundle(bundle);
+		iocFrameworkService.registerBundle(bundle);
 	}
 
 	/**
-	 * 移除一个Bundle到IoC框架中
+	 * 取消注册Bundle到IoC框架中
 	 * 
 	 * @param bundle
 	 */
-	public static void removeBundle(Bundle bundle) {
+	public static void unregisterBundle(Bundle bundle) {
 		checkIocFrameworkExist();
-		iocFrameworkService.removeBundle(bundle);
+		iocFrameworkService.unregisterBundle(bundle);
 	}
 
 	/**
