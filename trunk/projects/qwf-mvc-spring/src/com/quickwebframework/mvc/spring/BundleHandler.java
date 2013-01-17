@@ -1,4 +1,4 @@
-package com.quickwebframework.mvc.spring.core;
+package com.quickwebframework.mvc.spring;
 
 import org.osgi.framework.Bundle;
 import org.springframework.context.ApplicationContext;
