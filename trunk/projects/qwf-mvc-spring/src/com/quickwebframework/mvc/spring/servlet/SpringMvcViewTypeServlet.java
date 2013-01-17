@@ -1,6 +1,9 @@
 package com.quickwebframework.mvc.spring.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +27,15 @@ public class SpringMvcViewTypeServlet extends ViewTypeServlet {
 
 	@Override
 	public String[] getUrls() {
-		return null;
+		Map<String, String[]> map = SpringMvcContext
+				.getSpringMvcFrameworkService().getBundleUrlsMap();
+		List<String> rtnList = new ArrayList<String>();
+		for (String[] tmpUrls : map.values()) {
+			for (String tmpUrl : tmpUrls) {
+				rtnList.add(tmpUrl);
+			}
+		}
+		return rtnList.toArray(new String[rtnList.size()]);
 	}
 
 	@Override

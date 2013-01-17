@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 
-import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.mvc.spring.BundleHandler;
 import com.quickwebframework.mvc.spring.PluginPathMatcher;
 import com.quickwebframework.mvc.spring.PluginUrlPathHelper;
@@ -76,9 +75,6 @@ public class BundleControllerHandler implements BundleHandler {
 									.toUpperCase() + "_" + innerMappingUrl;
 							pluginControllerInfo.getMappingUrlHandlerMap().put(
 									tmpMappingUrl, handler);
-							// 添加到HTTP方法列表中
-							pluginControllerInfo.getHttpMethodList().add(
-									requestMethod.name());
 						}
 
 						if (sb.length() == 0)
