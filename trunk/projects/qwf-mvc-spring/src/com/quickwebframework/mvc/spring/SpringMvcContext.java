@@ -51,14 +51,14 @@ public class SpringMvcContext extends FrameworkContext {
 		mvcFrameworkService.registerBundleHandler(new BundleThreadHandler());
 
 		// 添加到MVC框架中
-		for (Bundle bundle : getBundleContext().getBundles()) {
+		for (Bundle bundle : this.getBundleContext().getBundles()) {
 			// 如果是系统Bundle，则不处理
 			if (bundle.getBundleId() == 0) {
 				continue;
 			}
 			// 如果状态是已激活
 			if (bundle.getState() == Bundle.ACTIVE) {
-				addBundleToMvcFramework(bundle);
+				registerBundle(bundle);
 			}
 		}
 	}
@@ -68,7 +68,7 @@ public class SpringMvcContext extends FrameworkContext {
 		// 从MVC框架中移除
 		for (Bundle bundle : mvcFrameworkService.bundleApplicationContextMap
 				.keySet().toArray(new Bundle[0])) {
-			mvcFrameworkService.removeBundle(bundle);
+			unregisterBundle(bundle);
 		}
 	}
 
@@ -77,11 +77,11 @@ public class SpringMvcContext extends FrameworkContext {
 		int bundleEventType = event.getType();
 		Bundle bundle = event.getBundle();
 		if (BundleEvent.STARTED == bundleEventType) {
-			// 添加插件的控制器
-			addBundleToMvcFramework(bundle);
+			// 注册插件到Spring MVC上下文中
+			registerBundle(bundle);
 		} else if (BundleEvent.STOPPING == bundleEventType) {
 			// 移除插件的控制器
-			mvcFrameworkService.removeBundle(bundle);
+			unregisterBundle(bundle);
 		}
 	}
 
@@ -90,9 +90,21 @@ public class SpringMvcContext extends FrameworkContext {
 
 	}
 
-	private void addBundleToMvcFramework(Bundle bundle) {
-		if (!mvcFrameworkService.containsBundle(bundle)) {
-			mvcFrameworkService.addBundle(bundle);
-		}
+	/**
+	 * 注册Bundle到Spring MVC上下文中
+	 * 
+	 * @param bundle
+	 */
+	public static void registerBundle(Bundle bundle) {
+		mvcFrameworkService.registerBundle(bundle);
+	}
+
+	/**
+	 * 取消注册Bundle到Spring MVC上下文中
+	 * 
+	 * @param bundle
+	 */
+	public static void unregisterBundle(Bundle bundle) {
+		mvcFrameworkService.unregisterBundle(bundle);
 	}
 }

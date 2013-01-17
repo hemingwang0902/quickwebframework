@@ -30,9 +30,9 @@ public class Activator implements BundleActivator {
 				Bundle startingBundle = event.getBundle();
 				int bundleEventType = event.getType();
 				if (BundleEvent.STARTING == bundleEventType) {
-					springIocFrameworkService.addBundle(startingBundle);
+					springIocFrameworkService.registerBundle(startingBundle);
 				} else if (BundleEvent.STOPPED == bundleEventType) {
-					springIocFrameworkService.removeBundle(startingBundle);
+					springIocFrameworkService.unregisterBundle(startingBundle);
 				}
 			}
 		};

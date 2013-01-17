@@ -14,18 +14,18 @@ import org.osgi.framework.Bundle;
 public interface IocFrameworkService {
 
 	/**
-	 * 添加一个Bundle到IoC框架中
+	 * 注册Bundle到IoC框架中
 	 * 
 	 * @param bundle
 	 */
-	public void addBundle(Bundle bundle);
+	public void registerBundle(Bundle bundle);
 
 	/**
-	 * 移除一个Bundle到IoC框架中
+	 * 取消注册Bundle到IoC框架中
 	 * 
 	 * @param bundle
 	 */
-	public void removeBundle(Bundle bundle);
+	public void unregisterBundle(Bundle bundle);
 
 	/**
 	 * (已过时)从IoC框架中得到此Bundle对应的应用程序上下文
