@@ -280,7 +280,7 @@ public class WebContext extends FrameworkContext {
 	 * @param typeName
 	 * @param servlet
 	 */
-	public static void registerViewTypeServlet(ViewTypeServlet servlet) {
+	public static void registerViewTypeServlet(final ViewTypeServlet servlet) {
 		PluginServletContext.registerViewTypeServlet(servlet);
 	}
 
@@ -290,6 +290,7 @@ public class WebContext extends FrameworkContext {
 	 * @param typeName
 	 */
 	public static void unregisterViewTypeServlet(String typeName) {
+
 		PluginServletContext.unregisterViewTypeServlet(typeName);
 	}
 
@@ -299,6 +300,7 @@ public class WebContext extends FrameworkContext {
 	 * @param servlet
 	 */
 	public static void unregisterViewTypeServlet(ViewTypeServlet servlet) {
+		servlet.destroy();
 		unregisterViewTypeServlet(servlet.getViewTypeName());
 	}
 
