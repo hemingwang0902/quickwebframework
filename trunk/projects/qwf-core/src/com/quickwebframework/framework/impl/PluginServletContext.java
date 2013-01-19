@@ -1,7 +1,13 @@
 package com.quickwebframework.framework.impl;
 
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -10,6 +16,7 @@ import org.osgi.framework.ServiceEvent;
 
 import com.quickwebframework.core.Activator;
 import com.quickwebframework.framework.FrameworkContext;
+import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.servlet.ViewTypeServlet;
 
 public class PluginServletContext extends FrameworkContext {
@@ -58,7 +65,35 @@ public class PluginServletContext extends FrameworkContext {
 	 * @param typeName
 	 * @param servlet
 	 */
-	public static void registerViewTypeServlet(ViewTypeServlet servlet) {
+	public static void registerViewTypeServlet(final ViewTypeServlet servlet) {
+		try {
+			final Dictionary<String, String> servletInitParameterDict = new Hashtable<String, String>();
+
+			servlet.init(new ServletConfig() {
+
+				@Override
+				public String getInitParameter(String arg0) {
+					return servletInitParameterDict.get(arg0);
+				}
+
+				@Override
+				public Enumeration<String> getInitParameterNames() {
+					return servletInitParameterDict.keys();
+				}
+
+				@Override
+				public ServletContext getServletContext() {
+					return WebContext.getServletContext();
+				}
+
+				@Override
+				public String getServletName() {
+					return "viewType_" + servlet.getViewTypeName();
+				}
+			});
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
 		String viewTypeName = servlet.getViewTypeName();
 		if (StringUtils.isEmpty(viewTypeName)) {
 			throw new RuntimeException(String.format(

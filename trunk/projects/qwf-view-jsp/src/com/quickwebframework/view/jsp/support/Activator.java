@@ -1,5 +1,7 @@
 package com.quickwebframework.view.jsp.support;
 
+import javax.el.ExpressionFactory;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -12,7 +14,7 @@ public class Activator implements BundleActivator {
 	private static BundleContext context;
 	private ViewTypeServlet viewTypeServlet;
 
-	static BundleContext getContext() {
+	public static BundleContext getContext() {
 		return context;
 	}
 
