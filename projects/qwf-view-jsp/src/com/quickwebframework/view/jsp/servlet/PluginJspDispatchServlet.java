@@ -19,7 +19,6 @@ import org.apache.jasper.EmbeddedServletOptions;
 import org.apache.jasper.Options;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
-import org.apache.jasper.runtime.InstanceManagerFactory;
 import org.apache.jasper.security.SecurityUtil;
 import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.tomcat.InstanceManager;
