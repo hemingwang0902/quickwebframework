@@ -2,7 +2,10 @@ package com.quickwebframework.view.jsp.servlet;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -10,8 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.jasper.compiler.TldLocationsCache;
-import org.apache.tomcat.InstanceManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
@@ -84,7 +85,34 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 
 	@Override
 	public String[] getUrls() {
-		return null;
+		List<String> rtnUrlList = new ArrayList<String>();
+		for (Bundle bundle : Activator.getContext().getBundles()) {
+			// OSGi框架插件不扫描
+			if (bundle.getBundleId() == 0) {
+				continue;
+			}
+			String bundleName = bundle.getSymbolicName();
+			try {
+				Enumeration<URL> resources = bundle.findEntries("/", "*"
+						+ this.jspPathSuffix, true);
+				if (resources == null) {
+					continue;
+				}
+				while (resources.hasMoreElements()) {
+					String entryPath = resources.nextElement().getPath();
+					String methodName = entryPath.substring(this.jspPathPrefix
+							.length());
+					methodName = methodName.substring(0, methodName.length()
+							- this.jspPathSuffix.length());
+					String url = "/" + bundleName + "/"
+							+ this.getViewTypeName() + methodName;
+					rtnUrlList.add(url);
+				}
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+		return rtnUrlList.toArray(new String[rtnUrlList.size()]);
 	}
 
 	@Override

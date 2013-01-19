@@ -25,10 +25,9 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
 
-import com.quickwebframework.framework.OsgiContext;
-
 public class JspCompileServletContext implements ServletContext {
 
+	public static final String BUNDLE_RESOURCE_URL_PREFIX = "/bundle:";
 	private ServletContext srcServletContext;
 	private Map<String, Object> attributeMap = new HashMap<String, Object>();
 
@@ -210,7 +209,6 @@ public class JspCompileServletContext implements ServletContext {
 
 	@Override
 	public URL getResource(String arg0) throws MalformedURLException {
-		System.out.println("getResource:" + arg0);
 		// 如果是插件中的资源
 		if (arg0.startsWith(BUNDLE_RESOURCE_URL_PREFIX)) {
 			return new URL(arg0.replace(BUNDLE_RESOURCE_URL_PREFIX, "bundle:/"));
@@ -218,11 +216,8 @@ public class JspCompileServletContext implements ServletContext {
 		return srcServletContext.getResource(arg0);
 	}
 
-	public static final String BUNDLE_RESOURCE_URL_PREFIX = "/bundle:";
-
 	@Override
 	public InputStream getResourceAsStream(String arg0) {
-		System.out.println("getResourceAsStream:" + arg0);
 		if (arg0.startsWith(BUNDLE_RESOURCE_URL_PREFIX)) {
 			String tmpStr = arg0.substring(BUNDLE_RESOURCE_URL_PREFIX.length());
 			while (tmpStr.startsWith("/")) {
@@ -247,7 +242,6 @@ public class JspCompileServletContext implements ServletContext {
 
 	@Override
 	public Set<String> getResourcePaths(String arg0) {
-		System.out.println("getResourcePaths:" + arg0);
 		return srcServletContext.getResourcePaths(arg0);
 	}
 
@@ -256,6 +250,7 @@ public class JspCompileServletContext implements ServletContext {
 		return srcServletContext.getServerInfo();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public Servlet getServlet(String arg0) throws ServletException {
 		return srcServletContext.getServlet(arg0);
@@ -266,6 +261,7 @@ public class JspCompileServletContext implements ServletContext {
 		return srcServletContext.getServletContextName();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public Enumeration<String> getServletNames() {
 		return srcServletContext.getServletNames();
@@ -281,6 +277,7 @@ public class JspCompileServletContext implements ServletContext {
 		return srcServletContext.getServletRegistrations();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public Enumeration<Servlet> getServlets() {
 		return srcServletContext.getServlets();
@@ -296,6 +293,7 @@ public class JspCompileServletContext implements ServletContext {
 		srcServletContext.log(arg0);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void log(Exception arg0, String arg1) {
 		srcServletContext.log(arg0, arg1);
