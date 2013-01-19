@@ -93,8 +93,8 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 			}
 			String bundleName = bundle.getSymbolicName();
 			try {
-				Enumeration<URL> resources = bundle.findEntries("/", "*"
-						+ this.jspPathSuffix, true);
+				Enumeration<URL> resources = bundle.findEntries(
+						this.jspPathPrefix, "*" + this.jspPathSuffix, true);
 				if (resources == null) {
 					continue;
 				}
@@ -105,7 +105,10 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 					methodName = methodName.substring(0, methodName.length()
 							- this.jspPathSuffix.length());
 					String url = "/" + bundleName + "/"
-							+ this.getViewTypeName() + methodName;
+							+ this.getViewTypeName() + "/" + methodName;
+					while (url.contains("//")) {
+						url = url.replace("//", "/");
+					}
 					rtnUrlList.add(url);
 				}
 			} catch (Exception ex) {
