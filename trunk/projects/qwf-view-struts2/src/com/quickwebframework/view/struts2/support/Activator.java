@@ -22,6 +22,10 @@ public class Activator implements BundleActivator {
 		return WebContext.getServletContext();
 	}
 
+	public static ViewTypeServlet getViewTypeServlet() {
+		return servlet;
+	}
+
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
 		String viewTypeName = WebContext
