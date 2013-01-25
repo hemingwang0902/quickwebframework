@@ -31,14 +31,23 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 	private Struts2ViewTypeServlet struts2ViewTypeServlet;
 	private Bundle bundle;
 	private StrutsPrepareAndExecuteFilter struts2Filter = null;
+	private static Bundle currentBundle;
+	private static ServletContext currentServletContext;
+
+	// 得到当前Bundle
+	public static Bundle getCurrentBundle() {
+		return currentBundle;
+	}
+
+	// 得到当前ServletContext
+	public static ServletContext getCurrentServletContext() {
+		return currentServletContext;
+	}
 
 	public PluginStruts2DispatchServlet(
 			Struts2ViewTypeServlet struts2ViewTypeServlet, Bundle bundle) {
 		this.struts2ViewTypeServlet = struts2ViewTypeServlet;
 		this.bundle = bundle;
-
-		struts2Filter = new StrutsPrepareAndExecuteFilter();
-
 	}
 
 	@Override
@@ -48,7 +57,14 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 		this.context = new Struts2ServletContext(config.getServletContext());
 		this.filterConfig = new Struts2FilterConfig(this.servletConfig,
 				this.context, bundle);
-		struts2Filter.init(this.filterConfig);
+		synchronized (PluginStruts2DispatchServlet.class) {
+			PluginStruts2DispatchServlet.currentBundle = this.bundle;
+			PluginStruts2DispatchServlet.currentServletContext = this.context;
+			struts2Filter = new StrutsPrepareAndExecuteFilter();
+			struts2Filter.init(this.filterConfig);
+			PluginStruts2DispatchServlet.currentBundle = null;
+			PluginStruts2DispatchServlet.currentServletContext = null;
+		}
 	}
 
 	@Override

@@ -11,5 +11,6 @@ Import-Package: javax.servlet,
  org.osgi.framework;version="1.3.0"
 Require-Bundle: qwf-core;bundle-version="1.0.0",
  qwf-ioc-spring;bundle-version="1.0.0",
- qwf-view-springmvc;bundle-version="1.0.0"
+ qwf-view-springmvc;bundle-version="1.0.0",
+ qwf-view-struts2;bundle-version="1.0.0"
 Export-Package: qwf.test.core
