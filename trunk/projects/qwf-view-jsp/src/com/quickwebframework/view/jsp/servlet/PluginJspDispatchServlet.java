@@ -51,12 +51,12 @@ public class PluginJspDispatchServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 
-		context = new JspCompileServletContext(config.getServletContext());
-		this.config = new JspCompileServletConfig(config, context);
+		this.context = new JspCompileServletContext(config.getServletContext());
+		this.config = new JspCompileServletConfig(config, this.context);
 
-		options = new EmbeddedServletOptions(this.config, context);
-		rctxt = new JspRuntimeContext(context, options);
-		context.setAttribute(InstanceManager.class.getName(),
+		options = new EmbeddedServletOptions(this.config, this.context);
+		rctxt = new JspRuntimeContext(this.context, options);
+		this.context.setAttribute(InstanceManager.class.getName(),
 				new DefaultInstanceManager(bundle));
 	}
 

@@ -53,12 +53,10 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 			public void bundleChanged(BundleEvent event) {
 				Bundle bundle = event.getBundle();
 				String pluginName = bundle.getSymbolicName();
-				if (BundleEvent.STARTED == event.getType()) {
-					PluginJspDispatchServlet pluginJspDispatchServlet = createNewPluginJspDispatchServlet(bundle);
-					pluginNameServletMap.put(pluginName,
-							pluginJspDispatchServlet);
-				} else if (BundleEvent.STOPPING == event.getType()) {
-					pluginNameServletMap.remove(pluginName);
+				if (BundleEvent.STOPPING == event.getType()) {
+					if (pluginNameServletMap.containsKey(pluginName)) {
+						pluginNameServletMap.remove(pluginName);
+					}
 				}
 			}
 		};
@@ -123,10 +121,10 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 			throws IOException {
 		String pluginName = request.getAttribute(WebContext.CONST_PLUGIN_NAME)
 				.toString();
-		Bundle bundle = OsgiContext.getBundleByName(pluginName);
 		PluginJspDispatchServlet pluginJspDispatchServlet = pluginNameServletMap
 				.get(pluginName);
 		if (pluginJspDispatchServlet == null) {
+			Bundle bundle = OsgiContext.getBundleByName(pluginName);
 			pluginJspDispatchServlet = createNewPluginJspDispatchServlet(bundle);
 			pluginNameServletMap.put(pluginName, pluginJspDispatchServlet);
 		}

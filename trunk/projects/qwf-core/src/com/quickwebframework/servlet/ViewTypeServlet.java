@@ -2,6 +2,7 @@ package com.quickwebframework.servlet;
 
 import java.io.IOException;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,5 +37,5 @@ public abstract class ViewTypeServlet extends HttpServlet {
 	 */
 	@Override
 	public abstract void service(HttpServletRequest request,
-			HttpServletResponse response) throws IOException;
+			HttpServletResponse response) throws IOException, ServletException;
 }
