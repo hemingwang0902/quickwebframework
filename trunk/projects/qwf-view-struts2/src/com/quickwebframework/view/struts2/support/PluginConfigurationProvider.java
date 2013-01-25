@@ -10,9 +10,11 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.apache.struts2.config.StrutsXmlConfigurationProvider;
+import org.osgi.framework.Bundle;
 
 import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ObjectFactory;
+import com.opensymphony.xwork2.config.Configuration;
 import com.opensymphony.xwork2.config.ConfigurationException;
 import com.opensymphony.xwork2.config.providers.XmlConfigurationProvider;
 import com.opensymphony.xwork2.inject.ContainerBuilder;
@@ -21,14 +23,17 @@ import com.opensymphony.xwork2.inject.Factory;
 import com.opensymphony.xwork2.util.location.LocatableProperties;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
+import com.quickwebframework.util.BundleUtil;
+import com.quickwebframework.view.struts2.servlet.PluginStruts2DispatchServlet;
 
 public class PluginConfigurationProvider extends XmlConfigurationProvider {
 
 	private static final Logger LOG = LoggerFactory
-			.getLogger(StrutsXmlConfigurationProvider.class);
+			.getLogger(PluginConfigurationProvider.class);
 	private String filename;
 	private String reloadKey;
 	private ServletContext servletContext;
+	private Bundle bundle;
 
 	/**
 	 * Constructs the configuration provider
@@ -37,7 +42,9 @@ public class PluginConfigurationProvider extends XmlConfigurationProvider {
 	 *            If we should throw an exception if the file can't be found
 	 */
 	public PluginConfigurationProvider() {
-		this("struts.xml", null);
+		this("/struts.xml", PluginStruts2DispatchServlet
+				.getCurrentServletContext(), PluginStruts2DispatchServlet
+				.getCurrentBundle());
 	}
 
 	/**
@@ -50,10 +57,12 @@ public class PluginConfigurationProvider extends XmlConfigurationProvider {
 	 * @param ctx
 	 *            Our ServletContext
 	 */
-	public PluginConfigurationProvider(String filename, ServletContext ctx) {
+	public PluginConfigurationProvider(String filename, ServletContext ctx,
+			Bundle bundle) {
 		super(filename, false);
-		this.servletContext = Activator.getServletContext();
+		this.servletContext = ctx;
 		this.filename = filename;
+		this.bundle = bundle;
 		reloadKey = "configurationReload-" + filename;
 		Map<String, String> dtdMappings = new HashMap<String, String>(
 				getDtdMappings());
@@ -70,6 +79,19 @@ public class PluginConfigurationProvider extends XmlConfigurationProvider {
 				.put("-//Apache Software Foundation//DTD Struts Configuration 2.3//EN",
 						"struts-2.3.dtd");
 		setDtdMappings(dtdMappings);
+	}
+
+	private void refreshObjectFactory() {
+		ClassLoader bundleClassLoader = BundleUtil.getBundleClassLoader(bundle);
+		ObjectFactory objectFactory = new ObjectFactory();
+		objectFactory.setClassLoader(bundleClassLoader);
+		this.setObjectFactory(objectFactory);
+	}
+
+	@Override
+	public void init(Configuration configuration) {
+		super.init(configuration);
+		refreshObjectFactory();
 	}
 
 	/*
@@ -104,6 +126,7 @@ public class PluginConfigurationProvider extends XmlConfigurationProvider {
 	 */
 	@Override
 	public void loadPackages() {
+		refreshObjectFactory();
 		ActionContext ctx = ActionContext.getContext();
 		ctx.put(reloadKey, Boolean.TRUE);
 		super.loadPackages();
@@ -136,6 +159,7 @@ public class PluginConfigurationProvider extends XmlConfigurationProvider {
 			LOG.debug("Trying to load resource " + fileName
 					+ " from OSGi bundle.");
 		}
+		url = bundle.getResource(fileName);
 		return url;
 	}
 
@@ -154,6 +178,6 @@ public class PluginConfigurationProvider extends XmlConfigurationProvider {
 	}
 
 	public String toString() {
-		return ("Struts XML configuration provider (" + filename + ")");
+		return ("qwf-view-struts2 XML configuration provider (" + filename + ")");
 	}
 }
