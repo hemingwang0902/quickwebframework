@@ -17,7 +17,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter;
 import org.osgi.framework.Bundle;
 
+import com.opensymphony.xwork2.ObjectFactory;
 import com.quickwebframework.framework.WebContext;
+import com.quickwebframework.util.BundleUtil;
+import com.quickwebframework.view.struts2.filter.PluginStrutsPrepareAndExecuteFilter;
 import com.quickwebframework.view.struts2.support.Struts2FilterConfig;
 import com.quickwebframework.view.struts2.support.Struts2ServletContext;
 
@@ -30,7 +33,7 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 	private FilterConfig filterConfig;
 	private Struts2ViewTypeServlet struts2ViewTypeServlet;
 	private Bundle bundle;
-	private StrutsPrepareAndExecuteFilter struts2Filter = null;
+	private PluginStrutsPrepareAndExecuteFilter struts2Filter = null;
 	private static Bundle currentBundle;
 	private static ServletContext currentServletContext;
 
@@ -60,7 +63,7 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 		synchronized (PluginStruts2DispatchServlet.class) {
 			PluginStruts2DispatchServlet.currentBundle = this.bundle;
 			PluginStruts2DispatchServlet.currentServletContext = this.context;
-			struts2Filter = new StrutsPrepareAndExecuteFilter();
+			struts2Filter = new PluginStrutsPrepareAndExecuteFilter();
 			struts2Filter.init(this.filterConfig);
 			PluginStruts2DispatchServlet.currentBundle = null;
 			PluginStruts2DispatchServlet.currentServletContext = null;
