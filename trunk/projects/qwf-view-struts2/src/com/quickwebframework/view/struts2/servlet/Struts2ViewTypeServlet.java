@@ -21,7 +21,7 @@ import com.quickwebframework.view.struts2.support.Activator;
 public class Struts2ViewTypeServlet extends ViewTypeServlet {
 
 	private static final long serialVersionUID = 830203994209104651L;
-	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-view-struts2.Struts2ViewTypeServlet.viewTypeName";
+	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-view-struts2.viewTypeName";
 
 	private Map<String, PluginStruts2DispatchServlet> pluginNameServletMap = new HashMap<String, PluginStruts2DispatchServlet>();
 	private BundleListener bundleListener;

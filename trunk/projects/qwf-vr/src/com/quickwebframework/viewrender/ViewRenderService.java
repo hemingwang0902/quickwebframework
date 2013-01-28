@@ -5,14 +5,16 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.framework.WebContext;
 
@@ -24,18 +26,16 @@ import com.quickwebframework.framework.WebContext;
  */
 public abstract class ViewRenderService {
 
-	private static Log log = LogFactory.getLog(ViewRenderService.class
-			.getName());
-
-	// 视图渲染器配置键
-	public final static String CONFIG_QWF_VIEW_RENDER_PROP = "qwf-core.viewrender.properties";
 	// 插件名称与路径分隔字符串配置键
-	public final static String CONFIG_PLUGIN_NAME_AND_PATH_SPLIT_STRING = "com.quickwebframework.viewrender.pluginNameAndPathSplitString";
+	public final static String CONFIG_PLUGIN_NAME_AND_PATH_SPLIT_STRING = "%s.pluginNameAndPathSplitString";
 	// 视图名称统一前缀配置键
-	public final static String CONFIG_VIEW_NAME_PREFIX = "com.quickwebframework.viewrender.viewNamePrefix";
+	public final static String CONFIG_VIEW_NAME_PREFIX = "%s.viewNamePrefix";
 	// 视图名称统一后缀配置键
-	public final static String CONFIG_VIEW_NAME_SUFFIX = "com.quickwebframework.viewrender.viewNameSuffix";
+	public final static String CONFIG_VIEW_NAME_SUFFIX = "%s.viewNameSuffix";
+	// 配置文件键
+	public final static String CONFIG_PROPERTIES = "%s.properties";
 
+	private ServiceRegistration<?> viewRenderServiceRegistration;
 	// 插件名称与路径分隔符
 	private String pluginNameAndPathSplitString = ":";
 	// 视图名称前缀
@@ -69,40 +69,54 @@ public abstract class ViewRenderService {
 	}
 
 	public ViewRenderService() {
-		// 得到viewrender配置文件路径
-		String viewrenderPropertyFilePath = WebContext
-				.getQwfConfig(CONFIG_QWF_VIEW_RENDER_PROP);
-		if (viewrenderPropertyFilePath == null
-				|| viewrenderPropertyFilePath.isEmpty()) {
-			log.info("ViewRender use default setting.");
-			return;
-		}
-
-		viewrenderPropertyFilePath = WebContext
-				.getRealPath(viewrenderPropertyFilePath);
-		// 读取viewrender配置文件
-		Properties viewRenderProp = getProperties(viewrenderPropertyFilePath);
-
+		String tmpStr = null;
 		// 分隔符
-		if (viewRenderProp
-				.containsKey(CONFIG_PLUGIN_NAME_AND_PATH_SPLIT_STRING)) {
-			setPluginNameAndPathSplitString(viewRenderProp
-					.getProperty(CONFIG_PLUGIN_NAME_AND_PATH_SPLIT_STRING));
+		tmpStr = WebContext.getQwfConfig(String.format(
+				CONFIG_PLUGIN_NAME_AND_PATH_SPLIT_STRING, getBundleName()));
+		if (tmpStr != null && !tmpStr.isEmpty()) {
+			this.setPluginNameAndPathSplitString(tmpStr);
 		}
 		// 前缀
-		if (viewRenderProp.containsKey(CONFIG_VIEW_NAME_PREFIX)) {
-			setViewNamePrefix(viewRenderProp
-					.getProperty(CONFIG_VIEW_NAME_PREFIX));
+		tmpStr = WebContext.getQwfConfig(String.format(CONFIG_VIEW_NAME_PREFIX,
+				getBundleName()));
+		if (tmpStr != null && !tmpStr.isEmpty()) {
+			this.setViewNamePrefix(tmpStr);
 		}
 		// 后缀
-		if (viewRenderProp.containsKey(CONFIG_VIEW_NAME_SUFFIX)) {
-			setViewNameSuffix(viewRenderProp
-					.getProperty(CONFIG_VIEW_NAME_SUFFIX));
+		tmpStr = WebContext.getQwfConfig(String.format(CONFIG_VIEW_NAME_SUFFIX,
+				getBundleName()));
+		if (tmpStr != null && !tmpStr.isEmpty()) {
+			this.setViewNameSuffix(tmpStr);
 		}
 	}
 
+	/**
+	 * 将ViewRender注册为服务
+	 * 
+	 * @param bundleContext
+	 */
+	public void registerService(BundleContext bundleContext) {
+		Dictionary<String, String> dict = new Hashtable<String, String>();
+		dict.put("bundle", this.getBundleName());
+		viewRenderServiceRegistration = bundleContext.registerService(
+				ViewRenderService.class.getName(), this, dict);
+	}
+
+	/**
+	 * 取消将ViewRender注册为服务
+	 */
+	public void unregisterService() {
+		viewRenderServiceRegistration.unregister();
+	}
+
 	// 得到配置信息
-	private Properties getProperties(String fileName) {
+	public Properties getProperties() {
+		String fileName = WebContext.getQwfConfig(String.format(
+				CONFIG_PROPERTIES, getBundleName()));
+		if (fileName == null || fileName.isEmpty()) {
+			return null;
+		}
+		fileName = WebContext.getRealPath(fileName);
 		File file = new File(fileName);
 		if (!file.exists() || !file.isFile()) {
 			String message = String.format("Properties file [%s] not exist!",
@@ -122,6 +136,21 @@ public abstract class ViewRenderService {
 		}
 	}
 
+	/**
+	 * 得到插件插件
+	 * 
+	 * @return
+	 */
+	public abstract String getBundleName();
+
+	/**
+	 * 渲染视图
+	 * 
+	 * @param request
+	 * @param response
+	 * @param viewName
+	 * @param model
+	 */
 	public abstract void renderView(HttpServletRequest request,
 			HttpServletResponse response, String viewName,
 			Map<String, Object> model);

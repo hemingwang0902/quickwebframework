@@ -16,10 +16,16 @@ import com.quickwebframework.framework.OsgiContext;
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.viewrender.ViewRenderService;
 import com.quickwebframework.viewrender.jsp.servlet.PluginJspDispatchServlet;
+import com.quickwebframework.viewrender.jsp.support.Activator;
 
 public class ViewRenderServiceImpl extends ViewRenderService {
 
 	private Map<String, PluginJspDispatchServlet> pluginNameServletMap = new HashMap<String, PluginJspDispatchServlet>();
+
+	@Override
+	public String getBundleName() {
+		return Activator.BUNDLE_NAME;
+	}
 
 	@Override
 	public void renderView(HttpServletRequest request,

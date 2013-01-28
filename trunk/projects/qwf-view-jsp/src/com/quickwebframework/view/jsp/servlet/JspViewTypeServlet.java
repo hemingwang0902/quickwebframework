@@ -21,9 +21,7 @@ import com.quickwebframework.viewrender.ViewRenderService;
 
 public class JspViewTypeServlet extends ViewTypeServlet {
 	private static final long serialVersionUID = 3719762515648054933L;
-	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-view-jsp.JspViewTypeServlet.viewTypeName";
-	public static final String JSP_PATH_PREFIX_PROPERTY_KEY = "qwf-view-jsp.JspViewTypeServlet.jspPathPrefix";
-	public static final String JSP_PATH_SUFFIX_PROPERTY_KEY = "qwf-view-jsp.JspViewTypeServlet.jspPathSuffix";
+	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-view-jsp.viewTypeName";
 
 	// JSP路径前缀
 	private String jspPathPrefix;
@@ -46,8 +44,8 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 
-		jspPathPrefix = WebContext.getQwfConfig(JSP_PATH_PREFIX_PROPERTY_KEY);
-		jspPathSuffix = WebContext.getQwfConfig(JSP_PATH_SUFFIX_PROPERTY_KEY);
+		jspPathPrefix = "";
+		jspPathSuffix = "";
 		if (jspPathSuffix == null || jspPathSuffix.isEmpty()) {
 			jspPathSuffix = ".jsp";
 		}

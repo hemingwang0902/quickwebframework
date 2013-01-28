@@ -16,8 +16,6 @@ import org.apache.velocity.runtime.resource.loader.ResourceLoader;
 import org.osgi.framework.Bundle;
 
 import com.quickwebframework.framework.OsgiContext;
-import com.quickwebframework.viewrender.ViewRenderService;
-import com.quickwebframework.viewrender.velocity.Activator;
 
 public class BundleResourceLoader extends ResourceLoader {
 	// 用来缓存已经找到的视图名称与插件
@@ -81,11 +79,10 @@ public class BundleResourceLoader extends ResourceLoader {
 
 	@Override
 	public void init(ExtendedProperties arg0) {
-		ViewRenderService viewRenderService = Activator.getViewRenderService();
-		this.pluginNameAndPathSplitString = viewRenderService
-				.getPluginNameAndPathSplitString();
-		this.viewNamePrefix = viewRenderService.getViewNamePrefix();
-		this.viewNameSuffix = viewRenderService.getViewNameSuffix();
+		this.pluginNameAndPathSplitString = arg0
+				.getString("class.pluginNameAndPathSplitString");
+		this.viewNamePrefix = arg0.getString("class.viewNamePrefix");
+		this.viewNameSuffix = arg0.getString("class.viewNameSuffix");
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.quickwebframework.viewrender.ViewRenderService;
+import com.quickwebframework.viewrender.freemarker.Activator;
 import com.quickwebframework.viewrender.freemarker.util.PluginTemplateLoader;
 
 import freemarker.template.Configuration;
@@ -14,7 +15,8 @@ import freemarker.template.Configuration;
 public class ViewRenderServiceImpl extends ViewRenderService {
 	private Configuration configuration;
 
-	public ViewRenderServiceImpl(Properties freeMarkerProp) {
+	public ViewRenderServiceImpl() {
+		Properties freeMarkerProp = this.getProperties();
 		configuration = new Configuration();
 		// 配置Freemarker
 		try {
@@ -30,6 +32,11 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 	}
 
 	@Override
+	public String getBundleName() {
+		return Activator.BUNDLE_NAME;
+	}
+
+	@Override
 	public void renderView(HttpServletRequest request,
 			HttpServletResponse response, String viewName,
 			Map<String, Object> model) {
@@ -42,5 +49,4 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 			throw new RuntimeException(ex);
 		}
 	}
-
 }
