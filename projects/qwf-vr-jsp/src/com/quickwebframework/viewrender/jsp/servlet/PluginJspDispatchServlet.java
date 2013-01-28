@@ -1,4 +1,4 @@
-package com.quickwebframework.view.jsp.servlet;
+package com.quickwebframework.viewrender.jsp.servlet;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,25 +25,22 @@ import org.apache.tomcat.InstanceManager;
 import org.osgi.framework.Bundle;
 
 import com.quickwebframework.framework.WebContext;
-import com.quickwebframework.view.jsp.support.DefaultInstanceManager;
-import com.quickwebframework.view.jsp.support.JspCompileServletConfig;
-import com.quickwebframework.view.jsp.support.JspCompileServletContext;
+import com.quickwebframework.viewrender.jsp.support.DefaultInstanceManager;
+import com.quickwebframework.viewrender.jsp.support.JspCompileServletConfig;
+import com.quickwebframework.viewrender.jsp.support.JspCompileServletContext;
 
 public class PluginJspDispatchServlet extends HttpServlet {
 	private static final long serialVersionUID = -8223091470395652222L;
 
-	private Log log = LogFactory.getLog(JspViewTypeServlet.class);
+	private Log log = LogFactory.getLog(PluginJspDispatchServlet.class);
 
 	private transient ServletContext context;
 	private ServletConfig config;
 	private transient Options options;
 	private transient JspRuntimeContext rctxt;
-	private JspViewTypeServlet jspViewTypeServlet;
 	private Bundle bundle;
 
-	public PluginJspDispatchServlet(JspViewTypeServlet jspViewTypeServlet,
-			Bundle bundle) {
-		this.jspViewTypeServlet = jspViewTypeServlet;
+	public PluginJspDispatchServlet(Bundle bundle) {
 		this.bundle = bundle;
 	}
 
@@ -65,12 +62,6 @@ public class PluginJspDispatchServlet extends HttpServlet {
 			throws IOException {
 		String pathName = request.getAttribute(WebContext.CONST_PATH_NAME)
 				.toString();
-		if (jspViewTypeServlet.getJspPathPrefix() != null) {
-			pathName = jspViewTypeServlet.getJspPathPrefix() + pathName;
-		}
-		if (jspViewTypeServlet.getJspPathSuffix() != null) {
-			pathName = pathName + jspViewTypeServlet.getJspPathSuffix();
-		}
 		URL url = bundle.getResource(pathName);
 		if (url == null) {
 			response.sendError(404, "在插件[" + bundle.getSymbolicName()

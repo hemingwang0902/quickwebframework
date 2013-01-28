@@ -1,7 +1,5 @@
 package com.quickwebframework.view.jsp.support;
 
-import javax.el.ExpressionFactory;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 

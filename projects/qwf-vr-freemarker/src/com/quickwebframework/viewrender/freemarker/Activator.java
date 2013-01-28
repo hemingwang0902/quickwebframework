@@ -67,8 +67,9 @@ public class Activator implements BundleActivator {
 	}
 
 	public void stop(BundleContext context) throws Exception {
-		Activator.context = null;
 		// 取消注册视图渲染服务
 		viewRenderServiceRegistration.unregister();
+		
+		Activator.context = null;
 	}
 }

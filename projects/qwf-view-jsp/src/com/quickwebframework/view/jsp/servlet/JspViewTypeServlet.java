@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -14,13 +12,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 
-import com.quickwebframework.framework.OsgiContext;
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.servlet.ViewTypeServlet;
 import com.quickwebframework.view.jsp.support.Activator;
+import com.quickwebframework.viewrender.ViewRenderContext;
+import com.quickwebframework.viewrender.ViewRenderService;
 
 public class JspViewTypeServlet extends ViewTypeServlet {
 	private static final long serialVersionUID = 3719762515648054933L;
@@ -28,15 +25,10 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 	public static final String JSP_PATH_PREFIX_PROPERTY_KEY = "qwf-view-jsp.JspViewTypeServlet.jspPathPrefix";
 	public static final String JSP_PATH_SUFFIX_PROPERTY_KEY = "qwf-view-jsp.JspViewTypeServlet.jspPathSuffix";
 
-	private Map<String, PluginJspDispatchServlet> pluginNameServletMap = new HashMap<String, PluginJspDispatchServlet>();
-
 	// JSP路径前缀
 	private String jspPathPrefix;
 	// JSP路径后缀
 	private String jspPathSuffix;
-	private ServletConfig config;
-
-	private BundleListener bundleListener;
 
 	public String getJspPathPrefix() {
 		return jspPathPrefix;
@@ -48,37 +40,22 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 
 	public JspViewTypeServlet(String viewTypeName) {
 		super(viewTypeName);
-		bundleListener = new BundleListener() {
-			@Override
-			public void bundleChanged(BundleEvent event) {
-				Bundle bundle = event.getBundle();
-				String pluginName = bundle.getSymbolicName();
-				if (BundleEvent.STOPPING == event.getType()) {
-					if (pluginNameServletMap.containsKey(pluginName)) {
-						pluginNameServletMap.remove(pluginName);
-					}
-				}
-			}
-		};
 	}
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		this.config = config;
 
 		jspPathPrefix = WebContext.getQwfConfig(JSP_PATH_PREFIX_PROPERTY_KEY);
 		jspPathSuffix = WebContext.getQwfConfig(JSP_PATH_SUFFIX_PROPERTY_KEY);
 		if (jspPathSuffix == null || jspPathSuffix.isEmpty()) {
 			jspPathSuffix = ".jsp";
 		}
-		Activator.getContext().addBundleListener(bundleListener);
 	}
 
 	@Override
 	public void destroy() {
 		super.destroy();
-		Activator.getContext().removeBundleListener(bundleListener);
 	}
 
 	@Override
@@ -121,25 +98,21 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 			throws IOException {
 		String pluginName = request.getAttribute(WebContext.CONST_PLUGIN_NAME)
 				.toString();
-		PluginJspDispatchServlet pluginJspDispatchServlet = pluginNameServletMap
-				.get(pluginName);
-		if (pluginJspDispatchServlet == null) {
-			Bundle bundle = OsgiContext.getBundleByName(pluginName);
-			pluginJspDispatchServlet = createNewPluginJspDispatchServlet(bundle);
-			pluginNameServletMap.put(pluginName, pluginJspDispatchServlet);
+		String pathName = request.getAttribute(WebContext.CONST_PATH_NAME)
+				.toString();
+		if (this.getJspPathPrefix() != null) {
+			pathName = this.getJspPathPrefix() + pathName;
 		}
-		pluginJspDispatchServlet.service(request, response);
-	}
+		if (this.getJspPathSuffix() != null) {
+			pathName = pathName + this.getJspPathSuffix();
+		}
 
-	private PluginJspDispatchServlet createNewPluginJspDispatchServlet(
-			Bundle bundle) {
-		PluginJspDispatchServlet servlet = new PluginJspDispatchServlet(this,
-				bundle);
-		try {
-			servlet.init(config);
-		} catch (ServletException e) {
-			throw new RuntimeException(e);
-		}
-		return servlet;
+		ViewRenderService viewRenderService = ViewRenderContext
+				.getViewRenderService();
+		// 得到视图名称：例 qwf.test.core:/jsp/test.jsp
+		String viewName = pluginName
+				+ viewRenderService.getPluginNameAndPathSplitString()
+				+ pathName;
+		viewRenderService.renderView(request, response, viewName, null);
 	}
 }
