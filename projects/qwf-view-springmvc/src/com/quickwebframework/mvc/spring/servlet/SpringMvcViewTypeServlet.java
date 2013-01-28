@@ -19,7 +19,7 @@ import com.quickwebframework.viewrender.ViewRenderService;
 public class SpringMvcViewTypeServlet extends ViewTypeServlet {
 
 	private static final long serialVersionUID = -6768041494697468584L;
-	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-view-spring.SpringMvcViewTypeServlet.viewTypeName";
+	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-view-spring.viewTypeName";
 
 	public SpringMvcViewTypeServlet(String viewTypeName) {
 		super(viewTypeName);

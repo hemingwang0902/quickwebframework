@@ -40,13 +40,11 @@ public class ViewRenderContext extends FrameworkContext {
 
 	@Override
 	protected void bundleChanged(BundleEvent event) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	protected void serviceChanged(ServiceEvent event) {
-		// TODO Auto-generated method stub
 
 	}
 }

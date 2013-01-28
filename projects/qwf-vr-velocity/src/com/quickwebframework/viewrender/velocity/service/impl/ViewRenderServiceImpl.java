@@ -13,21 +13,32 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 
 import com.quickwebframework.viewrender.ViewRenderService;
+import com.quickwebframework.viewrender.velocity.Activator;
 import com.quickwebframework.viewrender.velocity.util.BundleResourceLoader;
 
 public class ViewRenderServiceImpl extends ViewRenderService {
 
 	private VelocityEngine engine;
 
-	public ViewRenderServiceImpl(Properties velocityProp) {
+	public ViewRenderServiceImpl() {
+		Properties velocityProp = this.getProperties();
 		engine = new VelocityEngine(velocityProp);
 		engine.setProperty(Velocity.RESOURCE_LOADER, "class");
 		engine.setProperty("class.resource.loader.class",
 				BundleResourceLoader.class.getName());
+		engine.setProperty(
+				"class.resource.loader.class.pluginNameAndPathSplitString",
+				this.getPluginNameAndPathSplitString());
+		engine.setProperty("class.resource.loader.class.viewNamePrefix",
+				this.getViewNamePrefix());
+		engine.setProperty("class.resource.loader.class.viewNameSuffix",
+				this.getViewNameSuffix());
+		engine.init();
 	}
 
-	public void init() {
-		engine.init();
+	@Override
+	public String getBundleName() {
+		return Activator.BUNDLE_NAME;
 	}
 
 	@Override
