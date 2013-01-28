@@ -11,8 +11,8 @@ public class ContextManager {
 		contextList = new ArrayList<FrameworkContext>();
 
 		contextList.add(OsgiContext.getInstance());
-		contextList.add(LogContext.getInstance());
 		contextList.add(WebContext.getInstance());
+		contextList.add(LogContext.getInstance());
 		contextList.add(ThreadContext.getInstance());
 
 		for (FrameworkContext context : contextList) {
