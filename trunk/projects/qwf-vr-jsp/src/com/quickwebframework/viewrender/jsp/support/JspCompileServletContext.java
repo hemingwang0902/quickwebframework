@@ -1,4 +1,4 @@
-package com.quickwebframework.view.jsp.support;
+package com.quickwebframework.viewrender.jsp.support;
 
 import java.io.IOException;
 import java.io.InputStream;
