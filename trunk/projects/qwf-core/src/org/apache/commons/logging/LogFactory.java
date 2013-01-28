@@ -3,9 +3,9 @@ package org.apache.commons.logging;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.quickwebframework.framework.LogContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
-@SuppressWarnings("deprecation")
 public abstract class LogFactory {
 	private static Map<String, Log> logMap;
 
@@ -18,96 +18,96 @@ public abstract class LogFactory {
 			logMap = new HashMap<String, Log>();
 		if (logMap.containsKey(name))
 			return logMap.get(name);
-		final com.quickwebframework.entity.Log qwfLog = LogContext.getLog(name);
+		final Logger logger = Logger.getLogger(name);
 		Log log = new Log() {
 			@Override
 			public boolean isDebugEnabled() {
-				return true;
+				return logger.isEnabledFor(Level.DEBUG);
 			}
 
 			@Override
 			public boolean isErrorEnabled() {
-				return true;
+				return logger.isEnabledFor(Level.ERROR);
 			}
 
 			@Override
 			public boolean isFatalEnabled() {
-				return true;
+				return logger.isEnabledFor(Level.FATAL);
 			}
 
 			@Override
 			public boolean isInfoEnabled() {
-				return true;
+				return logger.isEnabledFor(Level.INFO);
 			}
 
 			@Override
 			public boolean isTraceEnabled() {
-				return true;
+				return logger.isEnabledFor(Level.TRACE);
 			}
 
 			@Override
 			public boolean isWarnEnabled() {
-				return true;
+				return logger.isEnabledFor(Level.WARN);
 			}
 
 			@Override
 			public void debug(Object message) {
-				qwfLog.debug(message);
+				logger.debug(message);
 			}
 
 			@Override
 			public void debug(Object message, Throwable exception) {
-				qwfLog.debug(message, exception);
+				logger.debug(message, exception);
 			}
 
 			@Override
 			public void error(Object message) {
-				qwfLog.error(message);
+				logger.error(message);
 			}
 
 			@Override
 			public void error(Object message, Throwable exception) {
-				qwfLog.error(message, exception);
+				logger.error(message, exception);
 			}
 
 			@Override
 			public void fatal(Object message) {
-				qwfLog.fatal(message);
+				logger.fatal(message);
 			}
 
 			@Override
 			public void fatal(Object message, Throwable exception) {
-				qwfLog.fatal(message, exception);
+				logger.fatal(message, exception);
 			}
 
 			@Override
 			public void info(Object message) {
-				qwfLog.info(message);
+				logger.info(message);
 			}
 
 			@Override
 			public void info(Object message, Throwable exception) {
-				qwfLog.info(message, exception);
+				logger.info(message, exception);
 			}
 
 			@Override
 			public void trace(Object message) {
-				qwfLog.trace(message);
+				logger.trace(message);
 			}
 
 			@Override
 			public void trace(Object message, Throwable exception) {
-				qwfLog.trace(message, exception);
+				logger.trace(message, exception);
 			}
 
 			@Override
 			public void warn(Object message) {
-				qwfLog.warn(message);
+				logger.warn(message);
 			}
 
 			@Override
 			public void warn(Object message, Throwable exception) {
-				qwfLog.warn(message, exception);
+				logger.warn(message, exception);
 			}
 		};
 		logMap.put(name, log);

@@ -1,9 +1,6 @@
 package com.quickwebframework.framework;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-
+import org.apache.log4j.PropertyConfigurator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceEvent;
@@ -11,12 +8,7 @@ import org.osgi.framework.ServiceRegistration;
 
 import com.quickwebframework.bridge.LogBridge;
 import com.quickwebframework.core.Activator;
-import com.quickwebframework.entity.Log;
-import com.quickwebframework.entity.LogFactory;
-import com.quickwebframework.entity.impl.DefaultLogImpl;
-import com.quickwebframework.entity.impl.JavaLoggerImpl;
 
-@SuppressWarnings("deprecation")
 public class LogContext extends FrameworkContext {
 	private static LogContext instance;
 
@@ -27,16 +19,9 @@ public class LogContext extends FrameworkContext {
 	}
 
 	// ======变量部分开始
-	// 日志器Map
-	private static Map<String, Log> logMap;
 	private ServiceRegistration<?> logBridgeServiceRegistration;
 
 	// ======变量部分结束
-
-	public LogContext() {
-		if (logMap == null)
-			logMap = new HashMap<String, Log>();
-	}
 
 	@Override
 	protected BundleContext getBundleContext() {
@@ -46,18 +31,18 @@ public class LogContext extends FrameworkContext {
 	@Override
 	protected void init(int arg) {
 		BundleContext bundleContext = getBundleContext();
-		// 设置默认的Java日志记录器配置
-		try {
 
-			String javaLoggerLevelStr = WebContext
-					.getQwfConfig("qwf-core.javalogger.level");
-			if (javaLoggerLevelStr != null) {
-				JavaLoggerImpl.javaLoggerLevel = Level
-						.parse(javaLoggerLevelStr);
-			}
-		} catch (Exception ex) {
-			LogFactory.getLog(LogContext.class.getName()).error(
-					"设置默认的Java日志记录器配置时出错。");
+		// 加载log4j的配置
+		String log4jConfigFilePath = WebContext
+				.getQwfConfig("qwf-log-log4j.properties");
+		// 如果配置文件为空
+		if (log4jConfigFilePath == null || log4jConfigFilePath.isEmpty()) {
+
+		} else {
+			log4jConfigFilePath = WebContext.getServletContext().getRealPath(
+					log4jConfigFilePath);
+			// 让log4j重新加载配置文件
+			PropertyConfigurator.configure(log4jConfigFilePath);
 		}
 
 		// 注册日志桥接对象
@@ -69,25 +54,6 @@ public class LogContext extends FrameworkContext {
 	protected void destory(int arg) {
 		// 取消注册日志桥接对象
 		logBridgeServiceRegistration.unregister();
-	}
-
-	public static Log getLog(Class<?> clazz) {
-		return getLog(clazz.getName());
-	}
-
-	public static Log getLog(String name) {
-		Log log = null;
-		if (logMap == null)
-			logMap = new HashMap<String, Log>();
-		synchronized (logMap) {
-			if (logMap.containsKey(name)) {
-				log = logMap.get(name);
-			} else {
-				log = new DefaultLogImpl(Activator.getContext(), name);
-				logMap.put(name, log);
-			}
-		}
-		return log;
 	}
 
 	@Override

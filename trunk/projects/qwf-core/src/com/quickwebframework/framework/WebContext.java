@@ -38,13 +38,14 @@ public class WebContext extends FrameworkContext {
 	public static final String CONST_PLUGIN_NAME = "com.quickwebframework.framework.WebContext.CONST_PLUGIN_NAME";
 	public static final String CONST_PATH_NAME = "com.quickwebframework.framework.WebContext.CONST_PATH_NAME";
 
-	//
 	// WEB项目的ServletContext
 	private static ServletContext servletContext;
 	// URL未找到处理Servlet
 	private static HttpServlet urlNotFoundHandleServlet;
 	// 得到处理器异常解决器
 	private static HandlerExceptionResolver handlerExceptionResolver;
+	// 默认资源视图类型Servlet
+	private DefaultResourceViewTypeServlet resourceServlet = null;
 
 	public static ServletContext getServletContext() {
 		return servletContext;
@@ -128,14 +129,18 @@ public class WebContext extends FrameworkContext {
 				.getQwfConfig(DefaultResourceViewTypeServlet.RESOURCE_SERVLET))) {
 			String viewTypeName = WebContext
 					.getQwfConfig(DefaultResourceViewTypeServlet.VIEW_TYPE_NAME_PROPERTY_KEY);
-			DefaultResourceViewTypeServlet resourceServlet = new DefaultResourceViewTypeServlet(
-					viewTypeName);
+			resourceServlet = new DefaultResourceViewTypeServlet(viewTypeName);
 			WebContext.registerViewTypeServlet(resourceServlet);
 		}
 	}
 
 	@Override
 	protected void destory(int arg) {
+		// 如果配置了默认的资源访问Servlet
+		if (resourceServlet != null) {
+			WebContext.unregisterViewTypeServlet(resourceServlet);
+		}
+
 		PluginServletContext.getInstance().destory();
 		ServletListenerContext.getInstance().destory();
 		ServletFilterContext.getInstance().destory();
