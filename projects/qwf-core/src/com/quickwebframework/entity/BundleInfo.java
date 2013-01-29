@@ -2,8 +2,10 @@ package com.quickwebframework.entity;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -11,6 +13,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /**
@@ -135,6 +138,16 @@ public class BundleInfo {
 
 	public BundleInfo() {
 		init(null);
+	}
+
+	public BundleInfo(Bundle bundle) {
+		init(null);
+		URL url = bundle.getResource(METAINF_FILE_PATH);
+		try {
+			loadManifestResource(url.openStream());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

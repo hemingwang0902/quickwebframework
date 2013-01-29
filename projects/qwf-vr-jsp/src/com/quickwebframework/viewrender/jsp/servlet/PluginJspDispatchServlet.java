@@ -25,6 +25,7 @@ import org.apache.tomcat.InstanceManager;
 import org.osgi.framework.Bundle;
 
 import com.quickwebframework.framework.WebContext;
+import com.quickwebframework.util.BundleUtils;
 import com.quickwebframework.viewrender.jsp.support.DefaultInstanceManager;
 import com.quickwebframework.viewrender.jsp.support.JspCompileServletConfig;
 import com.quickwebframework.viewrender.jsp.support.JspCompileServletContext;
@@ -39,9 +40,11 @@ public class PluginJspDispatchServlet extends HttpServlet {
 	private transient Options options;
 	private transient JspRuntimeContext rctxt;
 	private Bundle bundle;
+	private ClassLoader bundleClassLoader;
 
 	public PluginJspDispatchServlet(Bundle bundle) {
 		this.bundle = bundle;
+		this.bundleClassLoader = BundleUtils.getBundleClassLoader(bundle);
 	}
 
 	@Override
@@ -127,8 +130,7 @@ public class PluginJspDispatchServlet extends HttpServlet {
 							rctxt);
 					rctxt.addWrapper(jspUri, wrapper);
 				}
-				wrapper.getJspEngineContext().setClassLoader(
-						this.getClass().getClassLoader());
+				wrapper.getJspEngineContext().setClassLoader(bundleClassLoader);
 			}
 		}
 
