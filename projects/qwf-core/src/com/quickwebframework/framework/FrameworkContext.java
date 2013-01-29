@@ -13,7 +13,7 @@ import org.osgi.framework.SynchronousBundleListener;
 
 import com.quickwebframework.core.Activator;
 import org.apache.commons.logging.LogFactory;
-import com.quickwebframework.util.BundleContextUtil;
+import com.quickwebframework.util.BundleContextUtils;
 
 public abstract class FrameworkContext {
 
@@ -102,7 +102,7 @@ public abstract class FrameworkContext {
 	private void setServiceObjectToStaticField(String serviceName, Field field) {
 		field.setAccessible(true);
 		try {
-			field.set(null, BundleContextUtil.getServiceObject(
+			field.set(null, BundleContextUtils.getServiceObject(
 					Activator.getContext(), serviceName));
 		} catch (Exception ex) {
 			LogFactory.getLog(FrameworkContext.class.getName()).error(

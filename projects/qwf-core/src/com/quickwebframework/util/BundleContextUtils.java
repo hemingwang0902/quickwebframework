@@ -4,7 +4,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 
-public class BundleContextUtil {
+public class BundleContextUtils {
 	// 得到OSGi服务对象
 	public static Object getServiceObject(BundleContext bundleContext,
 			String serviceName, String filter) {

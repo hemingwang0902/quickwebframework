@@ -14,7 +14,7 @@ import com.opensymphony.xwork2.inject.Container;
 import com.opensymphony.xwork2.inject.Inject;
 import com.quickwebframework.framework.OsgiContext;
 import com.quickwebframework.framework.WebContext;
-import com.quickwebframework.util.BundleUtil;
+import com.quickwebframework.util.BundleUtils;
 
 public class PluginActionProxyFactory implements ActionProxyFactory {
 
@@ -64,7 +64,7 @@ public class PluginActionProxyFactory implements ActionProxyFactory {
 			String pluginName = (String) requestMap
 					.get(WebContext.CONST_PLUGIN_NAME);
 			Bundle bundle = OsgiContext.getBundleByName(pluginName);
-			ClassLoader bundleClassLoader = BundleUtil
+			ClassLoader bundleClassLoader = BundleUtils
 					.getBundleClassLoader(bundle);
 			objectFactory.setClassLoader(bundleClassLoader);
 		} catch (Exception ex) {

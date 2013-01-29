@@ -13,7 +13,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.quickwebframework.entity.BundleInfo;
-import com.quickwebframework.util.BundleUtil;
+import com.quickwebframework.util.BundleUtils;
 
 /**
  * 插件资源解析器
@@ -28,7 +28,7 @@ public class BundleResourceResolver {
 
 	public BundleResourceResolver(Bundle bundle) {
 		this.bundle = bundle;
-		bundleInfo = BundleUtil.getBundleInfo(bundle);
+		bundleInfo = BundleUtils.getBundleInfo(bundle);
 	}
 
 	private List<Resource> doJustGetBundleClassResources(
@@ -81,7 +81,7 @@ public class BundleResourceResolver {
 			Map<Bundle, List<String>> bundleClassPathListMap = new HashMap<Bundle, List<String>>();
 
 			for (Bundle tmpBundle : allBundles) {
-				BundleInfo tmpBundleInfo = BundleUtil.getBundleInfo(tmpBundle);
+				BundleInfo tmpBundleInfo = BundleUtils.getBundleInfo(tmpBundle);
 				List<String> tmpBundleExportPackageList = tmpBundleInfo.getExportPackageList();
 				
 				for (String tmpBundleExportPackageInfo : tmpBundleExportPackageList) {
@@ -135,10 +135,10 @@ public class BundleResourceResolver {
 				.getRequireBundleNameList();
 		if (requiredBundleNameList != null && !requiredBundleNameList.isEmpty()) {
 			for (String requireBundleName : requiredBundleNameList) {
-				Bundle requireBundle = BundleUtil.getBundleByName(
+				Bundle requireBundle = BundleUtils.getBundleByName(
 						bundle.getBundleContext(), requireBundleName);
 
-				BundleInfo requireBundleInfo = BundleUtil
+				BundleInfo requireBundleInfo = BundleUtils
 						.getBundleInfo(requireBundle);
 				// 处理reuiredBundles中的资源
 				List<String> requireBundleExportPackageList = requireBundleInfo

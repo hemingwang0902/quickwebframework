@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.quickwebframework.framework.FrameworkContext;
 import com.quickwebframework.ioc.impl.Activator;
-import com.quickwebframework.util.BundleContextUtil;
+import com.quickwebframework.util.BundleContextUtils;
 
 public class IocContext extends FrameworkContext {
 	private static IocContext instance;
@@ -103,7 +103,7 @@ public class IocContext extends FrameworkContext {
 	private static void checkIocFrameworkExist() {
 		if (iocFrameworkService == null) {
 			// 再尝试获取一次
-			Object obj = BundleContextUtil
+			Object obj = BundleContextUtils
 					.getServiceObject(Activator.getContext(),
 							IocFrameworkService.class.getName());
 			if (obj == null) {
