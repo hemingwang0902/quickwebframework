@@ -22,6 +22,7 @@ import org.osgi.framework.Version;
 import org.osgi.framework.wiring.FrameworkWiring;
 
 import com.quickwebframework.entity.BundleInfo;
+import com.quickwebframework.framework.OsgiContext;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -582,5 +583,22 @@ public class BundleUtils {
 			}
 		}
 		return shouldRefreshBundleInfoList;
+	}
+
+	public static URL getBundleResource(Bundle bundle, String resourcePath) {
+		URL url = bundle.getResource(resourcePath);
+		if (url != null) {
+			return url;
+		}
+		BundleInfo bundleInfo = new BundleInfo(bundle);
+		for (String requireBundleName : bundleInfo.getRequireBundleNameList()) {
+			url = getBundleResource(
+					OsgiContext.getBundleByName(requireBundleName),
+					resourcePath);
+			if (url != null) {
+				return url;
+			}
+		}
+		return null;
 	}
 }

@@ -25,6 +25,8 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
 
+import com.quickwebframework.util.BundleUtils;
+
 public class JspCompileServletContext implements ServletContext {
 
 	public static final String BUNDLE_RESOURCE_URL_PREFIX = "/bundle:";
@@ -244,19 +246,28 @@ public class JspCompileServletContext implements ServletContext {
 				throw new RuntimeException(e);
 			}
 		}
+
 		InputStream ins = srcServletContext.getResourceAsStream(arg0);
-		if (ins == null) {
-			// 从Bundle中去寻找资源
-			URL url = bundle.getResource(arg0);
+		if (ins != null) {
+			return ins;
+		}
+		String[] resourcePossiblePaths = new String[] { arg0, arg0 + ".tld",
+				"/META-INF" + arg0 + ".tld" };
+		for (String resourcePossiblePath : resourcePossiblePaths) {
+			URL url = BundleUtils.getBundleResource(bundle,
+					resourcePossiblePath);
 			if (url == null) {
-				System.out.println("资源未找到->getResourceAsStream->" + arg0);
-			} else {
-				try {
-					ins = url.openStream();
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
+				continue;
 			}
+			try {
+				ins = url.openStream();
+				break;
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		if (ins == null) {
+			System.out.println("资源未找到->getResourceAsStream->" + arg0);
 		}
 		return ins;
 	}
