@@ -8,10 +8,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.framework.BundleContext;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.mvc.spring.SpringMvcContext;
+import com.quickwebframework.mvc.spring.support.Activator;
 import com.quickwebframework.servlet.ViewTypeServlet;
 import com.quickwebframework.viewrender.ViewRenderContext;
 import com.quickwebframework.viewrender.ViewRenderService;
@@ -19,10 +21,15 @@ import com.quickwebframework.viewrender.ViewRenderService;
 public class SpringMvcViewTypeServlet extends ViewTypeServlet {
 
 	private static final long serialVersionUID = -6768041494697468584L;
-	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-view-spring.viewTypeName";
 
-	public SpringMvcViewTypeServlet(String viewTypeName) {
-		super(viewTypeName);
+	@Override
+	public String getBundleName() {
+		return Activator.BUNDLE_NAME;
+	}
+
+	@Override
+	public BundleContext getBundleContext() {
+		return Activator.getContext();
 	}
 
 	@Override

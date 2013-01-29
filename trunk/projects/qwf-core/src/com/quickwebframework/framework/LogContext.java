@@ -1,5 +1,7 @@
 package com.quickwebframework.framework;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -10,6 +12,7 @@ import com.quickwebframework.bridge.LogBridge;
 import com.quickwebframework.core.Activator;
 
 public class LogContext extends FrameworkContext {
+	private static Log log = LogFactory.getLog(LogContext.class.getName());
 	private static LogContext instance;
 
 	protected static LogContext getInstance() {
@@ -34,10 +37,10 @@ public class LogContext extends FrameworkContext {
 
 		// 加载log4j的配置
 		String log4jConfigFilePath = WebContext
-				.getQwfConfig("qwf-log-log4j.properties");
+				.getQwfConfig(Activator.BUNDLE_NAME + ".log4j.properties");
 		// 如果配置文件为空
 		if (log4jConfigFilePath == null || log4jConfigFilePath.isEmpty()) {
-
+			log.warn("qwf-core插件中未找到log4j.properties的配置！");
 		} else {
 			log4jConfigFilePath = WebContext.getServletContext().getRealPath(
 					log4jConfigFilePath);

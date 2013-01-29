@@ -11,8 +11,9 @@ import com.quickwebframework.view.struts2.servlet.Struts2ViewTypeServlet;
 
 public class Activator implements BundleActivator {
 
+	public final static String BUNDLE_NAME = "qwf-view-struts2";
 	private static BundleContext context;
-	private static ViewTypeServlet servlet;
+	private static ViewTypeServlet viewTypeServlet;
 
 	public static BundleContext getContext() {
 		return context;
@@ -23,24 +24,17 @@ public class Activator implements BundleActivator {
 	}
 
 	public static ViewTypeServlet getViewTypeServlet() {
-		return servlet;
+		return viewTypeServlet;
 	}
 
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
-		String viewTypeName = WebContext
-				.getQwfConfig(Struts2ViewTypeServlet.VIEW_TYPE_NAME_PROPERTY_KEY);
-		if (viewTypeName == null || viewTypeName.isEmpty()) {
-			throw new RuntimeException(String.format(
-					"未找到配置[qwf.config.%s]，Spring MVC框架启动失败！",
-					Struts2ViewTypeServlet.VIEW_TYPE_NAME_PROPERTY_KEY));
-		}
-		servlet = new Struts2ViewTypeServlet(viewTypeName);
-		WebContext.registerViewTypeServlet(servlet);
+		viewTypeServlet = new Struts2ViewTypeServlet();
+		viewTypeServlet.register();
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {
-		WebContext.unregisterViewTypeServlet(servlet);
+		viewTypeServlet.unregister();
 		Activator.context = null;
 	}
 }
