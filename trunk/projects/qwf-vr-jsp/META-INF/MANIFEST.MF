@@ -19,6 +19,7 @@ Bundle-ClassPath: ant-launcher.jar,
  jasper.jar,
  jsp-api.jar,
  tomcat-api.jar,
+ tomcat-util.jar,
  tomcat-juli.jar,
  ecj-4.2.1.jar,
  .
