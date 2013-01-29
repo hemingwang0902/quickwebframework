@@ -22,28 +22,9 @@ import com.quickwebframework.viewrender.servlet.VrViewTypeServlet;
 public class JspViewTypeServlet extends VrViewTypeServlet {
 	private static final long serialVersionUID = 3719762515648054933L;
 
-	// JSP路径前缀
-	private String jspPathPrefix;
-	// JSP路径后缀
-	private String jspPathSuffix;
-
-	public String getJspPathPrefix() {
-		return jspPathPrefix;
-	}
-
-	public String getJspPathSuffix() {
-		return jspPathSuffix;
-	}
-
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-
-		jspPathPrefix = "";
-		jspPathSuffix = "";
-		if (jspPathSuffix == null || jspPathSuffix.isEmpty()) {
-			jspPathSuffix = ".jsp";
-		}
 	}
 
 	@Override
@@ -64,6 +45,7 @@ public class JspViewTypeServlet extends VrViewTypeServlet {
 	@Override
 	public String[] getUrls() {
 		List<String> rtnUrlList = new ArrayList<String>();
+		ViewRenderService viewRenderService = this.getViewRenderService();
 		for (Bundle bundle : Activator.getContext().getBundles()) {
 			// OSGi框架插件不扫描
 			if (bundle.getBundleId() == 0) {
@@ -72,16 +54,17 @@ public class JspViewTypeServlet extends VrViewTypeServlet {
 			String bundleName = bundle.getSymbolicName();
 			try {
 				Enumeration<URL> resources = bundle.findEntries(
-						this.jspPathPrefix, "*" + this.jspPathSuffix, true);
+						viewRenderService.getViewNamePrefix(), "*"
+								+ viewRenderService.getViewNameSuffix(), true);
 				if (resources == null) {
 					continue;
 				}
 				while (resources.hasMoreElements()) {
 					String entryPath = resources.nextElement().getPath();
-					String methodName = entryPath.substring(this.jspPathPrefix
-							.length());
+					String methodName = entryPath.substring(viewRenderService
+							.getViewNamePrefix().length());
 					methodName = methodName.substring(0, methodName.length()
-							- this.jspPathSuffix.length());
+							- viewRenderService.getViewNameSuffix().length());
 					String url = "/" + bundleName + "/"
 							+ this.getViewTypeName() + "/" + methodName;
 					while (url.contains("//")) {
@@ -103,14 +86,15 @@ public class JspViewTypeServlet extends VrViewTypeServlet {
 				.toString();
 		String pathName = request.getAttribute(WebContext.CONST_PATH_NAME)
 				.toString();
-		if (this.getJspPathPrefix() != null) {
-			pathName = this.getJspPathPrefix() + pathName;
-		}
-		if (this.getJspPathSuffix() != null) {
-			pathName = pathName + this.getJspPathSuffix();
-		}
 
 		ViewRenderService viewRenderService = this.getViewRenderService();
+		if (viewRenderService.getViewNamePrefix() != null) {
+			pathName = viewRenderService.getViewNamePrefix() + pathName;
+		}
+		if (viewRenderService.getViewNameSuffix() != null) {
+			pathName = pathName + viewRenderService.getViewNameSuffix();
+		}
+
 		// 得到视图名称：例 qwf.test.core:/jsp/test.jsp
 		String viewName = pluginName
 				+ viewRenderService.getPluginNameAndPathSplitString()
