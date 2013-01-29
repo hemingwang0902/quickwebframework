@@ -1,7 +1,9 @@
 package com.quickwebframework.framework;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.EventListener;
+import java.util.List;
 import java.util.Properties;
 
 import javax.servlet.Filter;
@@ -275,10 +277,22 @@ public class WebContext extends FrameworkContext {
 	/**
 	 * 注册视图类型的Servlet
 	 * 
+	 * @param viewTypeName
 	 * @param servlet
 	 */
-	public static void registerViewTypeServlet(final ViewTypeServlet servlet) {
-		PluginServletContext.registerViewTypeServlet(servlet);
+	public static void registerViewTypeServlet(String viewTypeName,
+			HttpServlet servlet) {
+		PluginServletContext.registerViewTypeServlet(viewTypeName, servlet);
+	}
+
+	/**
+	 * 注册视图类型的Servlet
+	 * 
+	 * @param servlet
+	 */
+	public static void registerViewTypeServlet(ViewTypeServlet servlet) {
+		PluginServletContext.registerViewTypeServlet(servlet.getViewTypeName(),
+				servlet);
 	}
 
 	/**
@@ -306,7 +320,7 @@ public class WebContext extends FrameworkContext {
 	 * @param typeName
 	 * @return
 	 */
-	public static ViewTypeServlet getViewTypeServlet(String typeName) {
+	public static HttpServlet getViewTypeServlet(String typeName) {
 		return PluginServletContext.getViewTypeServlet(typeName);
 	}
 
@@ -315,7 +329,23 @@ public class WebContext extends FrameworkContext {
 	 * 
 	 * @return
 	 */
-	public static ViewTypeServlet[] getViewTypeServlets() {
+	public static HttpServlet[] getViewTypeServlets() {
 		return PluginServletContext.getViewTypeServlets();
+	}
+
+	/**
+	 * 得到所有ViewTypeServlet类型的视图类型Servlet
+	 * 
+	 * @return
+	 */
+	public static ViewTypeServlet[] getViewTypeServletServlets() {
+		List<ViewTypeServlet> rtnList = new ArrayList<ViewTypeServlet>();
+		Object[] servlets = PluginServletContext.getViewTypeServlets();
+		for (Object servlet : servlets) {
+			if (ViewTypeServlet.class.isInstance(servlet)) {
+				rtnList.add((ViewTypeServlet) servlet);
+			}
+		}
+		return rtnList.toArray(new ViewTypeServlet[rtnList.size()]);
 	}
 }

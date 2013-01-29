@@ -58,7 +58,8 @@ public class DefaultRootServlet extends HttpServlet {
 			sb.append("</table>");
 		}
 
-		ViewTypeServlet[] viewTypeServlets = WebContext.getViewTypeServlets();
+		ViewTypeServlet[] viewTypeServlets = WebContext
+				.getViewTypeServletServlets();
 		if (viewTypeServlets != null && viewTypeServlets.length > 0) {
 			for (ViewTypeServlet viewTypeServlet : viewTypeServlets) {
 				String[] urls = viewTypeServlet.getUrls();
