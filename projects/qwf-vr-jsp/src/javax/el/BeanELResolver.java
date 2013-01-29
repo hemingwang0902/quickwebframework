@@ -451,7 +451,6 @@ public class BeanELResolver extends ELResolver {
         Object[] parameters = null;
         if (parameterTypes.length > 0) {
             parameters = new Object[parameterTypes.length];
-            @SuppressWarnings("null")  // params.length >= parameterTypes.length
             int paramCount = params.length;
             if (matchingMethod.isVarArgs()) {
                 int varArgIndex = parameterTypes.length - 1;

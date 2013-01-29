@@ -14,11 +14,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.mvc.spring.SpringMvcContext;
 import com.quickwebframework.mvc.spring.support.Activator;
-import com.quickwebframework.servlet.ViewTypeServlet;
-import com.quickwebframework.viewrender.ViewRenderContext;
 import com.quickwebframework.viewrender.ViewRenderService;
+import com.quickwebframework.viewrender.servlet.VrViewTypeServlet;
 
-public class SpringMvcViewTypeServlet extends ViewTypeServlet {
+public class SpringMvcViewTypeServlet extends VrViewTypeServlet {
 
 	private static final long serialVersionUID = -6768041494697468584L;
 
@@ -69,8 +68,7 @@ public class SpringMvcViewTypeServlet extends ViewTypeServlet {
 	public void renderView(HttpServletRequest request,
 			HttpServletResponse response, String pluginName, ModelAndView mav) {
 		try {
-			ViewRenderService viewRenderService = ViewRenderContext
-					.getViewRenderService();
+			ViewRenderService viewRenderService = this.getViewRenderService();
 			if (viewRenderService != null) {
 				String viewName = mav.getViewName();
 				if (!viewName.contains(viewRenderService

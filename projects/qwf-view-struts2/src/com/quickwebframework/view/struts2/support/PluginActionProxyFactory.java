@@ -59,6 +59,7 @@ public class PluginActionProxyFactory implements ActionProxyFactory {
 		try {
 			ObjectFactory objectFactory = (ObjectFactory) FieldUtils.readField(
 					inv, "objectFactory", true);
+			@SuppressWarnings("rawtypes")
 			Map requestMap = (Map) extraContext.get("request");
 			String pluginName = (String) requestMap
 					.get(WebContext.CONST_PLUGIN_NAME);

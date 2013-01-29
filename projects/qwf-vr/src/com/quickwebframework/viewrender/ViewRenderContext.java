@@ -2,7 +2,9 @@ package com.quickwebframework.viewrender;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceReference;
 
 import com.quickwebframework.framework.FrameworkContext;
 import com.quickwebframework.viewrender.impl.Activator;
@@ -17,10 +19,26 @@ public class ViewRenderContext extends FrameworkContext {
 	}
 
 	// 视图渲染服务
-	private static ViewRenderService viewRenderService;
+	private static ViewRenderService defaultViewRenderService;
 
-	public static ViewRenderService getViewRenderService() {
-		return viewRenderService;
+	public static ViewRenderService getDefaultViewRenderService() {
+		return defaultViewRenderService;
+	}
+
+	public static ViewRenderService getViewRenderService(String viewRenderName) {
+		BundleContext bundleContext = Activator.getContext();
+		try {
+			ServiceReference<?>[] serviceReferences = bundleContext
+					.getServiceReferences(ViewRenderService.class.getName(),
+							"(bundle=" + viewRenderName + ")");
+			if (serviceReferences == null || serviceReferences.length == 0) {
+				return null;
+			}
+			return (ViewRenderService) bundleContext
+					.getService(serviceReferences[0]);
+		} catch (InvalidSyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -31,7 +49,7 @@ public class ViewRenderContext extends FrameworkContext {
 	@Override
 	protected void init(int arg0) {
 		super.addSimpleServiceStaticFieldLink(
-				ViewRenderService.class.getName(), "viewRenderService");
+				ViewRenderService.class.getName(), "defaultViewRenderService");
 	}
 
 	@Override

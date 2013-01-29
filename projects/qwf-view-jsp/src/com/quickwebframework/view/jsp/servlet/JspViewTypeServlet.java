@@ -15,12 +15,11 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 import com.quickwebframework.framework.WebContext;
-import com.quickwebframework.servlet.ViewTypeServlet;
 import com.quickwebframework.view.jsp.support.Activator;
-import com.quickwebframework.viewrender.ViewRenderContext;
 import com.quickwebframework.viewrender.ViewRenderService;
+import com.quickwebframework.viewrender.servlet.VrViewTypeServlet;
 
-public class JspViewTypeServlet extends ViewTypeServlet {
+public class JspViewTypeServlet extends VrViewTypeServlet {
 	private static final long serialVersionUID = 3719762515648054933L;
 
 	// JSP路径前缀
@@ -111,8 +110,7 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 			pathName = pathName + this.getJspPathSuffix();
 		}
 
-		ViewRenderService viewRenderService = ViewRenderContext
-				.getViewRenderService();
+		ViewRenderService viewRenderService = this.getViewRenderService();
 		// 得到视图名称：例 qwf.test.core:/jsp/test.jsp
 		String viewName = pluginName
 				+ viewRenderService.getPluginNameAndPathSplitString()

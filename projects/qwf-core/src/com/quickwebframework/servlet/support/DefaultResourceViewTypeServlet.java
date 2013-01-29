@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 
 import com.quickwebframework.core.Activator;
 import com.quickwebframework.framework.OsgiContext;
@@ -79,10 +78,5 @@ public class DefaultResourceViewTypeServlet extends ViewTypeServlet {
 	@Override
 	public String[] getUrls() {
 		return null;
-	}
-
-	@Override
-	public BundleContext getBundleContext() {
-		return Activator.getContext();
 	}
 }
