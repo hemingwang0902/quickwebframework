@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Version;
 
 /**
@@ -43,7 +44,7 @@ public class BundleInfo {
 			InputStream manifestInputStream) {
 		try {
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			IoUtil.copyStream(manifestInputStream, outputStream);
+			IOUtils.copy(manifestInputStream, outputStream);
 
 			byte[] buffer = outputStream.toByteArray();
 			String text = new String(buffer, "utf-8");
@@ -174,7 +175,7 @@ public class BundleInfo {
 		try {
 			// 先将输入流读取到一个ByteArrayOutputStream中
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			IoUtil.copyStream(bundleInputStream, outputStream);
+			IOUtils.copy(bundleInputStream, outputStream);
 			// 得到这个插件的字节数组
 			bundleContentBytes = outputStream.toByteArray();
 			if (bundleContentBytes.length < 2) {
@@ -202,7 +203,7 @@ public class BundleInfo {
 			}
 			// 将manifest文件的内容从压缩流中解压出来
 			outputStream = new ByteArrayOutputStream();
-			IoUtil.copyStream(zipInputStream, outputStream, manifestFileLength);
+			IOUtils.copy(zipInputStream, outputStream);
 			zipInputStream.close();
 
 			// 加载清单文件

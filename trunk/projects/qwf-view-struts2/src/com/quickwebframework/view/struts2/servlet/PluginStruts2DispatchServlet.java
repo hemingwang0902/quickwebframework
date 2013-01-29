@@ -23,6 +23,7 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 	private transient ServletContext context;
 	private ServletConfig servletConfig;
 	private FilterConfig filterConfig;
+	private Struts2ViewTypeServlet struts2ViewTypeServlet;
 	private Bundle bundle;
 	private PluginStrutsPrepareAndExecuteFilter struts2Filter = null;
 	private static Bundle currentBundle;
@@ -41,6 +42,7 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 	public PluginStruts2DispatchServlet(
 			Struts2ViewTypeServlet struts2ViewTypeServlet, Bundle bundle) {
 		this.bundle = bundle;
+		this.struts2ViewTypeServlet = struts2ViewTypeServlet;
 	}
 
 	@Override
@@ -63,7 +65,7 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
-		struts2Filter.doFilter(new PluginHttpServletRequest(request, bundle),
-				response, null);
+		struts2Filter.doFilter(new PluginHttpServletRequest(request, bundle,
+				struts2ViewTypeServlet.getViewRenderService()), response, null);
 	}
 }

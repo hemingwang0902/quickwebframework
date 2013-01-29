@@ -22,6 +22,8 @@ import org.osgi.framework.Version;
 import org.osgi.framework.wiring.FrameworkWiring;
 
 import com.quickwebframework.entity.BundleInfo;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -133,7 +135,7 @@ public class BundleUtil {
 					file.createNewFile();
 					FileOutputStream outputStream = new FileOutputStream(file);
 
-					IoUtil.copyStream(inputStream, outputStream);
+					IOUtils.copy(inputStream, outputStream);
 					outputStream.close();
 					inputStream.close();
 				}

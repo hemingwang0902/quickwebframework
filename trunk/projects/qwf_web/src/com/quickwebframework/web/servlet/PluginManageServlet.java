@@ -17,10 +17,10 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import com.quickwebframework.web.util.IoUtil;
 import com.quickwebframework.web.fileupload.memory.MemoryFileItemFactory;
 import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
 
@@ -56,7 +56,7 @@ public class PluginManageServlet extends QwfServlet {
 					.getResourceAsStream(
 							"com/quickwebframework/web/template/bundleManage.txt");
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			IoUtil.copyStream(inputStream, outputStream);
+			IOUtils.copy(inputStream, outputStream);
 			inputStream.close();
 			templateString = outputStream.toString("utf-8");
 		} catch (Exception ex) {
