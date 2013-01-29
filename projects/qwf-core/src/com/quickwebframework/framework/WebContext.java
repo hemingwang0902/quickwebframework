@@ -2,6 +2,7 @@ package com.quickwebframework.framework;
 
 import java.util.Dictionary;
 import java.util.EventListener;
+import java.util.Properties;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
@@ -9,6 +10,8 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -26,6 +29,7 @@ import com.quickwebframework.servlet.ViewTypeServlet;
 import com.quickwebframework.servlet.support.DefaultResourceViewTypeServlet;
 
 public class WebContext extends FrameworkContext {
+	private static Log log = LogFactory.getLog(WebContext.class.getName());
 	private static WebContext instance;
 
 	protected static WebContext getInstance() {
@@ -37,6 +41,7 @@ public class WebContext extends FrameworkContext {
 	// 用于从HttpServletRequest对象中设置或获取对应的参数
 	public static final String CONST_PLUGIN_NAME = "com.quickwebframework.framework.WebContext.CONST_PLUGIN_NAME";
 	public static final String CONST_PATH_NAME = "com.quickwebframework.framework.WebContext.CONST_PATH_NAME";
+	public final static String QWF_CONFIG_PROPERTY_KEY = "qwf.config";
 
 	// WEB项目的ServletContext
 	private static ServletContext servletContext;
@@ -88,26 +93,18 @@ public class WebContext extends FrameworkContext {
 	 * @return
 	 */
 	public static String getQwfConfig(String configKey) {
-		BundleContext context = Activator.getContext();
-
-		ServiceReference<?>[] serviceReferences;
-		try {
-			serviceReferences = context.getServiceReferences(
-					String.class.getName(),
-					String.format("(qwf.config=%s)", configKey));
-		} catch (InvalidSyntaxException e) {
-			throw new RuntimeException(e);
+		Properties quickWebFrameworkProperties = (Properties) servletContext
+				.getAttribute(QWF_CONFIG_PROPERTY_KEY);
+		if (quickWebFrameworkProperties == null) {
+			log.warn("QuickWebFramework的配置未设置到ServletContext中!");
+			return null;
 		}
-		if (serviceReferences != null && serviceReferences.length > 0) {
-			return (String) context.getService(serviceReferences[0]);
-		}
-		return null;
+		return quickWebFrameworkProperties.getProperty(configKey);
 	}
 
 	// ===== WEB相关变量部分结束
 
 	public WebContext() {
-
 	}
 
 	@Override
@@ -127,10 +124,8 @@ public class WebContext extends FrameworkContext {
 		// 如果配置了默认的资源访问Servlet
 		if ("true".equals(WebContext
 				.getQwfConfig(DefaultResourceViewTypeServlet.RESOURCE_SERVLET))) {
-			String viewTypeName = WebContext
-					.getQwfConfig(DefaultResourceViewTypeServlet.VIEW_TYPE_NAME_PROPERTY_KEY);
-			resourceServlet = new DefaultResourceViewTypeServlet(viewTypeName);
-			WebContext.registerViewTypeServlet(resourceServlet);
+			resourceServlet = new DefaultResourceViewTypeServlet();
+			resourceServlet.register();
 		}
 	}
 
@@ -138,7 +133,7 @@ public class WebContext extends FrameworkContext {
 	protected void destory(int arg) {
 		// 如果配置了默认的资源访问Servlet
 		if (resourceServlet != null) {
-			WebContext.unregisterViewTypeServlet(resourceServlet);
+			resourceServlet.unregister();
 		}
 
 		PluginServletContext.getInstance().destory();
@@ -282,7 +277,6 @@ public class WebContext extends FrameworkContext {
 	/**
 	 * 注册视图类型的Servlet
 	 * 
-	 * @param typeName
 	 * @param servlet
 	 */
 	public static void registerViewTypeServlet(final ViewTypeServlet servlet) {
@@ -295,7 +289,6 @@ public class WebContext extends FrameworkContext {
 	 * @param typeName
 	 */
 	public static void unregisterViewTypeServlet(String typeName) {
-
 		PluginServletContext.unregisterViewTypeServlet(typeName);
 	}
 

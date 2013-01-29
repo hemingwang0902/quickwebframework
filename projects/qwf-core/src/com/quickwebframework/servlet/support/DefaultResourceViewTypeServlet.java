@@ -7,7 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
+import com.quickwebframework.core.Activator;
 import com.quickwebframework.framework.OsgiContext;
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.servlet.ViewTypeServlet;
@@ -17,18 +19,18 @@ public class DefaultResourceViewTypeServlet extends ViewTypeServlet {
 
 	private static final long serialVersionUID = -1402692734489050382L;
 
-	public static final String RESOURCE_SERVLET = "qwf-core.DefaultResourceViewTypeServlet";
-	public static final String RESOURCE_PATH_PREFIX_PROPERTY_KEY = "qwf-core.DefaultResourceViewTypeServlet.resourcePathPrefix";
-	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-core.DefaultResourceViewTypeServlet.viewTypeName";
+	public static final String RESOURCE_SERVLET = Activator.BUNDLE_NAME
+			+ ".DefaultResourceViewTypeServlet";
 
 	// 资源路径统一前缀
 	private String resourcePathPrefix;
 
-	public DefaultResourceViewTypeServlet(String viewTypeName) {
-		super(viewTypeName);
-
-		resourcePathPrefix = WebContext
-				.getQwfConfig(RESOURCE_PATH_PREFIX_PROPERTY_KEY);
+	public DefaultResourceViewTypeServlet() {
+		super();
+		this.setViewTypeName(WebContext.getQwfConfig(Activator.BUNDLE_NAME
+				+ ".DefaultResourceViewTypeServlet.viewTypeName"));
+		resourcePathPrefix = WebContext.getQwfConfig(Activator.BUNDLE_NAME
+				+ ".DefaultResourceViewTypeServlet.resourcePathPrefix");
 	}
 
 	@Override
@@ -70,7 +72,17 @@ public class DefaultResourceViewTypeServlet extends ViewTypeServlet {
 	}
 
 	@Override
+	public String getBundleName() {
+		return Activator.BUNDLE_NAME;
+	}
+
+	@Override
 	public String[] getUrls() {
 		return null;
+	}
+
+	@Override
+	public BundleContext getBundleContext() {
+		return Activator.getContext();
 	}
 }

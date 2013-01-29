@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.servlet.ViewTypeServlet;
@@ -21,7 +22,6 @@ import com.quickwebframework.viewrender.ViewRenderService;
 
 public class JspViewTypeServlet extends ViewTypeServlet {
 	private static final long serialVersionUID = 3719762515648054933L;
-	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-view-jsp.viewTypeName";
 
 	// JSP路径前缀
 	private String jspPathPrefix;
@@ -34,10 +34,6 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 
 	public String getJspPathSuffix() {
 		return jspPathSuffix;
-	}
-
-	public JspViewTypeServlet(String viewTypeName) {
-		super(viewTypeName);
 	}
 
 	@Override
@@ -54,6 +50,16 @@ public class JspViewTypeServlet extends ViewTypeServlet {
 	@Override
 	public void destroy() {
 		super.destroy();
+	}
+
+	@Override
+	public String getBundleName() {
+		return Activator.BUNDLE_NAME;
+	}
+
+	@Override
+	public BundleContext getBundleContext() {
+		return Activator.getContext();
 	}
 
 	@Override

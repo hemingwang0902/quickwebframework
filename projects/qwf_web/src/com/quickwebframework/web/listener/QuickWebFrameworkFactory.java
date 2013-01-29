@@ -80,9 +80,8 @@ public abstract class QuickWebFrameworkFactory {
 	public final static String CONST_SERVLET_FILTER_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.ServletFilterBridge";
 	// 监听器桥接对象类名
 	public final static String CONST_SERVLET_LISTENER_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.ServletListenerBridge";
-
 	// 插件配置
-	public final static String PLUGIN_CONFIG_PROPERTY_KEY = "qwf.config";
+	public final static String QWF_CONFIG_PROPERTY_KEY = "qwf.config";
 
 	// 配置文件路径参数名称
 	public final static String CONFIG_LOCATION_PARAMETER_NAME = "quickwebframeworkConfigLocation";
@@ -325,24 +324,10 @@ public abstract class QuickWebFrameworkFactory {
 			getBundleContext().registerService(Framework.class.getName(),
 					framework, null);
 
-			// 设置插件要用到的配置文件
-			Enumeration<?> quickWebFrameworkPropertieNameEnumeration = quickWebFrameworkProperties
-					.propertyNames();
-			while (quickWebFrameworkPropertieNameEnumeration.hasMoreElements()) {
-				String propertieName = (String) quickWebFrameworkPropertieNameEnumeration
-						.nextElement();
-				if (propertieName.startsWith(PLUGIN_CONFIG_PROPERTY_KEY + ".")) {
-					String propName = propertieName
-							.substring((PLUGIN_CONFIG_PROPERTY_KEY + ".")
-									.length());
-					String propValue = quickWebFrameworkProperties
-							.getProperty(propertieName);
-					Dictionary<String, String> dict = new Hashtable<String, String>();
-					dict.put(PLUGIN_CONFIG_PROPERTY_KEY, propName);
-					getBundleContext().registerService(String.class.getName(),
-							propValue, dict);
-				}
-			}
+			// 将QuickWebFramework配置设置到ServletContext中
+			servletContext.setAttribute(QWF_CONFIG_PROPERTY_KEY,
+					quickWebFrameworkProperties);
+
 			// 设置WEB根目录到系统配置中
 			System.setProperty("web.root.dir", servletContext.getRealPath("/"));
 

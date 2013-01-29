@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 
@@ -27,9 +28,8 @@ public class Struts2ViewTypeServlet extends ViewTypeServlet {
 	private BundleListener bundleListener;
 	private ServletConfig config;
 
-	public Struts2ViewTypeServlet(String viewTypeName) {
-		super(viewTypeName);
-
+	public Struts2ViewTypeServlet() {
+		super();
 		bundleListener = new BundleListener() {
 			@Override
 			public void bundleChanged(BundleEvent event) {
@@ -54,6 +54,16 @@ public class Struts2ViewTypeServlet extends ViewTypeServlet {
 			throw new RuntimeException(e);
 		}
 		return servlet;
+	}
+
+	@Override
+	public String getBundleName() {
+		return Activator.BUNDLE_NAME;
+	}
+
+	@Override
+	public BundleContext getBundleContext() {
+		return Activator.getContext();
 	}
 
 	@Override
