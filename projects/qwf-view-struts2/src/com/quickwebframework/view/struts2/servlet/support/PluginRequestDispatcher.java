@@ -1,36 +1,40 @@
 package com.quickwebframework.view.struts2.servlet.support;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
+import com.quickwebframework.viewrender.ViewRenderService;
 
 public class PluginRequestDispatcher implements RequestDispatcher {
 
-	private URL url;
+	private String viewName;
+	private ViewRenderService viewRenderService;
 
-	public PluginRequestDispatcher(URL url) {
-		this.url = url;
+	public PluginRequestDispatcher(String viewName,
+			ViewRenderService viewRenderService) {
+		this.viewName = viewName;
+		this.viewRenderService = viewRenderService;
 	}
 
 	@Override
 	public void forward(ServletRequest arg0, ServletResponse arg1)
 			throws ServletException, IOException {
+
+		HttpServletRequest request = (HttpServletRequest) arg0;
 		HttpServletResponse response = (HttpServletResponse) arg1;
-		InputStream input = url.openStream();
-		OutputStream output = response.getOutputStream();
-		IOUtils.copy(input, output);
-		output.flush();
-		output.close();
-		input.close();
+
+		if (viewRenderService == null) {
+			response.sendError(500,
+					String.format("[%s]未找到视图渲染器服务!", this.getClass().getName()));
+			return;
+		}
+		viewRenderService.renderView(request, response, viewName, null);
 	}
 
 	@Override

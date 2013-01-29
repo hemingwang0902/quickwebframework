@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -103,7 +104,7 @@ public class BundleUtil {
 					file.createNewFile();
 					FileOutputStream outputStream = new FileOutputStream(file);
 
-					IoUtil.copyStream(inputStream, outputStream);
+					IOUtils.copy(inputStream, outputStream);
 					outputStream.close();
 					inputStream.close();
 				}

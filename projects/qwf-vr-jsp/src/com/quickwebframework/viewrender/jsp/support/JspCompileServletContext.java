@@ -29,10 +29,13 @@ public class JspCompileServletContext implements ServletContext {
 
 	public static final String BUNDLE_RESOURCE_URL_PREFIX = "/bundle:";
 	private ServletContext srcServletContext;
+	private Bundle bundle;
 	private Map<String, Object> attributeMap = new HashMap<String, Object>();
 
-	public JspCompileServletContext(ServletContext srcServletContext) {
+	public JspCompileServletContext(ServletContext srcServletContext,
+			Bundle bundle) {
 		this.srcServletContext = srcServletContext;
+		this.bundle = bundle;
 	}
 
 	@Override
@@ -199,7 +202,11 @@ public class JspCompileServletContext implements ServletContext {
 
 	@Override
 	public String getRealPath(String arg0) {
-		return srcServletContext.getRealPath(arg0);
+		if (arg0.startsWith("/WEB-INF/lib/")) {
+			return srcServletContext.getRealPath(arg0);
+		}
+		System.out.println("getRealPath-->" + arg0);
+		return null;
 	}
 
 	@Override
@@ -237,7 +244,21 @@ public class JspCompileServletContext implements ServletContext {
 				throw new RuntimeException(e);
 			}
 		}
-		return srcServletContext.getResourceAsStream(arg0);
+		InputStream ins = srcServletContext.getResourceAsStream(arg0);
+		if (ins == null) {
+			// 从Bundle中去寻找资源
+			URL url = bundle.getResource(arg0);
+			if (url == null) {
+				System.out.println("资源未找到->getResourceAsStream->" + arg0);
+			} else {
+				try {
+					ins = url.openStream();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		return ins;
 	}
 
 	@Override

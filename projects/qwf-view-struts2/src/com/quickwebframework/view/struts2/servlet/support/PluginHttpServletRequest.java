@@ -3,7 +3,6 @@ package com.quickwebframework.view.struts2.servlet.support;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -26,14 +25,19 @@ import javax.servlet.http.Part;
 
 import org.osgi.framework.Bundle;
 
+import com.quickwebframework.viewrender.ViewRenderService;
+
 public class PluginHttpServletRequest implements HttpServletRequest {
 
 	private HttpServletRequest srcRequest;
 	private Bundle bundle;
+	private ViewRenderService viewRenderService;
 
-	public PluginHttpServletRequest(HttpServletRequest srcRequest, Bundle bundle) {
+	public PluginHttpServletRequest(HttpServletRequest srcRequest,
+			Bundle bundle, ViewRenderService viewRenderService) {
 		this.srcRequest = srcRequest;
 		this.bundle = bundle;
+		this.viewRenderService = viewRenderService;
 	}
 
 	@Override
@@ -154,10 +158,9 @@ public class PluginHttpServletRequest implements HttpServletRequest {
 
 	@Override
 	public RequestDispatcher getRequestDispatcher(String arg0) {
-		URL url = bundle.getResource(arg0);
-		if (url == null)
-			return null;
-		return new PluginRequestDispatcher(url);
+		return new PluginRequestDispatcher(bundle.getSymbolicName()
+				+ viewRenderService.getPluginNameAndPathSplitString() + arg0,
+				viewRenderService);
 	}
 
 	@Override

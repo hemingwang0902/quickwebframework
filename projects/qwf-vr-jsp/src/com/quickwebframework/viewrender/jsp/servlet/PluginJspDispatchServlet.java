@@ -48,9 +48,9 @@ public class PluginJspDispatchServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 
-		this.context = new JspCompileServletContext(config.getServletContext());
+		this.context = new JspCompileServletContext(config.getServletContext(),
+				bundle);
 		this.config = new JspCompileServletConfig(config, this.context);
-
 		options = new EmbeddedServletOptions(this.config, this.context);
 		rctxt = new JspRuntimeContext(this.context, options);
 		this.context.setAttribute(InstanceManager.class.getName(),
