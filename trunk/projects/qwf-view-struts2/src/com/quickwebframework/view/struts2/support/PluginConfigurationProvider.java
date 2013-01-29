@@ -36,7 +36,7 @@ import com.opensymphony.xwork2.util.DomHelper;
 import com.opensymphony.xwork2.util.location.LocatableProperties;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
-import com.quickwebframework.util.BundleUtil;
+import com.quickwebframework.util.BundleUtils;
 import com.quickwebframework.view.struts2.servlet.PluginStruts2DispatchServlet;
 
 public class PluginConfigurationProvider extends XmlConfigurationProvider {
@@ -95,7 +95,7 @@ public class PluginConfigurationProvider extends XmlConfigurationProvider {
 	}
 
 	private void refreshObjectFactory() {
-		ClassLoader bundleClassLoader = BundleUtil.getBundleClassLoader(bundle);
+		ClassLoader bundleClassLoader = BundleUtils.getBundleClassLoader(bundle);
 		ObjectFactory objectFactory = new ObjectFactory();
 		objectFactory.setClassLoader(bundleClassLoader);
 		this.setObjectFactory(objectFactory);

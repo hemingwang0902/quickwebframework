@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 
 import com.quickwebframework.web.listener.QuickWebFrameworkFactory;
 import com.quickwebframework.web.listener.QuickWebFrameworkLoaderListener;
-import com.quickwebframework.web.util.BundleUtil;
+import com.quickwebframework.web.util.BundleUtils;
 
 public class BundleAutoManageThread extends Thread {
 
@@ -57,7 +57,7 @@ public class BundleAutoManageThread extends Thread {
 					continue;
 
 				try {
-					BundleUtil.installOrUpdateBundle(bundleContext, files);
+					BundleUtils.installOrUpdateBundle(bundleContext, files);
 				} catch (IOException ex) {
 					logger.warning("插件自动管理线程：安装或更新插件时出现IOException异常,原因："
 							+ ex.getMessage());

@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationContext;
 import com.quickwebframework.ioc.IocFrameworkService;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 import com.quickwebframework.ioc.spring.util.BundleScanner;
-import com.quickwebframework.util.BundleUtil;
+import com.quickwebframework.util.BundleUtils;
 
 public class SpringIocFrameworkService implements IocFrameworkService {
 
@@ -25,7 +25,7 @@ public class SpringIocFrameworkService implements IocFrameworkService {
 	@Override
 	public void registerBundle(Bundle bundle) {
 		if (!bundleApplicationContextMap.containsKey(bundle)) {
-			ClassLoader bundleClassLoader = BundleUtil
+			ClassLoader bundleClassLoader = BundleUtils
 					.getBundleClassLoader(bundle);
 			ApplicationContext applicationContext = scanner.scan(bundle,
 					bundleClassLoader);
