@@ -25,56 +25,64 @@ import java.util.ResourceBundle;
 
 /**
  * @author Jacob Hookom [jacob/hookom.net]
- *
+ * 
  */
 public abstract class ELResolver {
-    
-    static String message(ELContext context, String name, Object[] props) {
-        Locale locale = context.getLocale();
-        if (locale == null) {
-            locale = Locale.getDefault();
-            if (locale == null) {
-                return "";
-            }
-        }
-        ResourceBundle bundle = ResourceBundle.getBundle(
-                "javax.el.LocalStrings", locale);
-        try {
-            String template = bundle.getString(name);
-            if (props != null) {
-                template = MessageFormat.format(template, props);
-            }
-            return template;
-        } catch (MissingResourceException e) {
-            return "Missing Resource: '" + name + "' for Locale "
-                    + locale.getDisplayName();
-        }
-    }
 
-    public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
-    
-    public static final String TYPE = "type";
-    
-    public abstract Object getValue(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
-    
-    public abstract Class<?> getType(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
-    
-    public abstract void setValue(ELContext context, Object base, Object property, Object value) throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException, ELException;
+	static String message(ELContext context, String name, Object[] props) {
+		Locale locale = context.getLocale();
+		if (locale == null) {
+			locale = Locale.getDefault();
+			if (locale == null) {
+				return "";
+			}
+		}
+		ResourceBundle bundle = ResourceBundle.getBundle(
+				"javax.el.LocalStrings", locale);
+		try {
+			String template = bundle.getString(name);
+			if (props != null) {
+				template = MessageFormat.format(template, props);
+			}
+			return template;
+		} catch (MissingResourceException e) {
+			return "Missing Resource: '" + name + "' for Locale "
+					+ locale.getDisplayName();
+		}
+	}
 
-    public abstract boolean isReadOnly(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
-    
-    public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
-    
-    public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
-    
-    /**
-     * @since EL 2.2
-     */
-    public Object invoke(@SuppressWarnings("unused") ELContext context,
-            @SuppressWarnings("unused") Object base,
-            @SuppressWarnings("unused") Object method,
-            @SuppressWarnings("unused") Class<?>[] paramTypes,
-            @SuppressWarnings("unused") Object[] params) {
-        return null;
-    }
+	public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
+
+	public static final String TYPE = "type";
+
+	public abstract Object getValue(ELContext context, Object base,
+			Object property) throws NullPointerException,
+			PropertyNotFoundException, ELException;
+
+	public abstract Class<?> getType(ELContext context, Object base,
+			Object property) throws NullPointerException,
+			PropertyNotFoundException, ELException;
+
+	public abstract void setValue(ELContext context, Object base,
+			Object property, Object value) throws NullPointerException,
+			PropertyNotFoundException, PropertyNotWritableException,
+			ELException;
+
+	public abstract boolean isReadOnly(ELContext context, Object base,
+			Object property) throws NullPointerException,
+			PropertyNotFoundException, ELException;
+
+	public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(
+			ELContext context, Object base);
+
+	public abstract Class<?> getCommonPropertyType(ELContext context,
+			Object base);
+
+	/**
+	 * @since EL 2.2
+	 */
+	public Object invoke(ELContext context, Object base, Object method,
+			Class<?>[] paramTypes, Object[] params) {
+		return null;
+	}
 }

@@ -22,23 +22,28 @@ package javax.el;
  */
 public abstract class ValueExpression extends Expression {
 
-    private static final long serialVersionUID = 8577809572381654673L;
+	private static final long serialVersionUID = 8577809572381654673L;
 
-    public abstract Class<?> getExpectedType();
-    
-    public abstract Class<?> getType(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException;
-    
-    public abstract boolean isReadOnly(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException;
-    
-    public abstract void setValue(ELContext context, Object value) throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException, ELException;
-    
-    public abstract Object getValue(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException;
+	public abstract Class<?> getExpectedType();
 
-    /**
-     * @since EL 2.2
-     */
-    public ValueReference getValueReference(@SuppressWarnings("unused") ELContext context) {
-     // Expected to be over-ridden by implementation
-        return null;
-    }
+	public abstract Class<?> getType(ELContext context)
+			throws NullPointerException, PropertyNotFoundException, ELException;
+
+	public abstract boolean isReadOnly(ELContext context)
+			throws NullPointerException, PropertyNotFoundException, ELException;
+
+	public abstract void setValue(ELContext context, Object value)
+			throws NullPointerException, PropertyNotFoundException,
+			PropertyNotWritableException, ELException;
+
+	public abstract Object getValue(ELContext context)
+			throws NullPointerException, PropertyNotFoundException, ELException;
+
+	/**
+	 * @since EL 2.2
+	 */
+	public ValueReference getValueReference(ELContext context) {
+		// Expected to be over-ridden by implementation
+		return null;
+	}
 }

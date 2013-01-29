@@ -20,7 +20,8 @@ Bundle-ClassPath: struts2-core-2.3.8.jar,
  commons-fileupload-1.2.2.jar,
  freemarker-2.3.19.jar,
  jsp-api.jar
-Require-Bundle: qwf-core;bundle-version="1.0.0"
+Require-Bundle: qwf-core;bundle-version="1.0.0",
+ qwf-vr;bundle-version="1.0.0"
 Export-Package: com.opensymphony.xwork2,
  com.opensymphony.xwork2.config,
  com.opensymphony.xwork2.config.entities,

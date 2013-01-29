@@ -291,6 +291,7 @@ public class PluginConfigurationProvider extends XmlConfigurationProvider {
 							resultElement);
 				}
 
+				@SuppressWarnings("deprecation")
 				String resultClass = config.getClazz();
 
 				// invalid result type specified in result definition

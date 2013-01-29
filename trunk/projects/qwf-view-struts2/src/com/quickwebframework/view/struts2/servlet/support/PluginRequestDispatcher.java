@@ -12,7 +12,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.osgi.framework.Bundle;
 
 public class PluginRequestDispatcher implements RequestDispatcher {
 

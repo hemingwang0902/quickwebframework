@@ -16,10 +16,10 @@ import org.osgi.framework.BundleListener;
 
 import com.quickwebframework.framework.OsgiContext;
 import com.quickwebframework.framework.WebContext;
-import com.quickwebframework.servlet.ViewTypeServlet;
 import com.quickwebframework.view.struts2.support.Activator;
+import com.quickwebframework.viewrender.servlet.VrViewTypeServlet;
 
-public class Struts2ViewTypeServlet extends ViewTypeServlet {
+public class Struts2ViewTypeServlet extends VrViewTypeServlet {
 
 	private static final long serialVersionUID = 830203994209104651L;
 	public static final String VIEW_TYPE_NAME_PROPERTY_KEY = "qwf-view-struts2.viewTypeName";
