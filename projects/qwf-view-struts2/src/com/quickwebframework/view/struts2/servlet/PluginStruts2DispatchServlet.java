@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
 
+import com.opensymphony.xwork2.util.LocalizedTextUtil;
+import com.quickwebframework.util.BundleUtils;
 import com.quickwebframework.view.struts2.filter.PluginStrutsPrepareAndExecuteFilter;
 import com.quickwebframework.view.struts2.servlet.support.PluginHttpServletRequest;
 import com.quickwebframework.view.struts2.servlet.support.PluginHttpServletResponse;
@@ -26,6 +28,7 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 	private FilterConfig filterConfig;
 	private Struts2ViewTypeServlet struts2ViewTypeServlet;
 	private Bundle bundle;
+	private ClassLoader bundleClassLoader;
 	private PluginStrutsPrepareAndExecuteFilter struts2Filter = null;
 	private static Bundle currentBundle;
 	private static ServletContext currentServletContext;
@@ -43,6 +46,7 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 	public PluginStruts2DispatchServlet(
 			Struts2ViewTypeServlet struts2ViewTypeServlet, Bundle bundle) {
 		this.bundle = bundle;
+		bundleClassLoader = BundleUtils.getBundleClassLoader(bundle);
 		this.struts2ViewTypeServlet = struts2ViewTypeServlet;
 	}
 
@@ -66,6 +70,7 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
+		LocalizedTextUtil.setDelegatedClassLoader(bundleClassLoader);
 		struts2Filter.doFilter(
 				new PluginHttpServletRequest(request, struts2ViewTypeServlet
 						.getViewTypeName(), bundle.getSymbolicName(),

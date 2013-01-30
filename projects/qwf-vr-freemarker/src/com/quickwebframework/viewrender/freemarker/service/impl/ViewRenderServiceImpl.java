@@ -6,6 +6,8 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.framework.BundleEvent;
+
 import com.quickwebframework.viewrender.ViewRenderService;
 import com.quickwebframework.viewrender.freemarker.Activator;
 import com.quickwebframework.viewrender.freemarker.util.PluginTemplateLoader;
@@ -34,6 +36,11 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 	@Override
 	public String getBundleName() {
 		return Activator.BUNDLE_NAME;
+	}
+
+	@Override
+	public void bundleChanged(BundleEvent event) {
+
 	}
 
 	@Override
