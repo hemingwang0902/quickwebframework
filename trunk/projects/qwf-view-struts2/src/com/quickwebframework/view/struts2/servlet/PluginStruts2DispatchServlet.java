@@ -14,6 +14,7 @@ import org.osgi.framework.Bundle;
 
 import com.quickwebframework.view.struts2.filter.PluginStrutsPrepareAndExecuteFilter;
 import com.quickwebframework.view.struts2.servlet.support.PluginHttpServletRequest;
+import com.quickwebframework.view.struts2.servlet.support.PluginHttpServletResponse;
 import com.quickwebframework.view.struts2.support.Struts2FilterConfig;
 import com.quickwebframework.view.struts2.support.Struts2ServletContext;
 
@@ -65,7 +66,10 @@ public class PluginStruts2DispatchServlet extends HttpServlet {
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
-		struts2Filter.doFilter(new PluginHttpServletRequest(request, bundle,
-				struts2ViewTypeServlet.getViewRenderService()), response, null);
+		struts2Filter.doFilter(
+				new PluginHttpServletRequest(request, struts2ViewTypeServlet
+						.getViewTypeName(), bundle.getSymbolicName(),
+						struts2ViewTypeServlet.getViewRenderService()),
+				new PluginHttpServletResponse(response), null);
 	}
 }
