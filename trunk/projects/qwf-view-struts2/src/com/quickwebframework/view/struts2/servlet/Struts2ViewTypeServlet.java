@@ -35,7 +35,8 @@ public class Struts2ViewTypeServlet extends VrViewTypeServlet {
 			public void bundleChanged(BundleEvent event) {
 				Bundle bundle = event.getBundle();
 				String pluginName = bundle.getSymbolicName();
-				if (BundleEvent.STOPPING == event.getType()) {
+				if (BundleEvent.STOPPING == event.getType()
+						|| BundleEvent.STOPPED == event.getType()) {
 					if (pluginNameServletMap.containsKey(pluginName)) {
 						pluginNameServletMap.remove(pluginName);
 					}
@@ -93,6 +94,10 @@ public class Struts2ViewTypeServlet extends VrViewTypeServlet {
 				.get(pluginName);
 		if (pluginStruts2DispatchServlet == null) {
 			Bundle bundle = OsgiContext.getBundleByName(pluginName);
+			if (bundle == null) {
+				response.sendError(404, "未找到名称为[" + pluginName + "]的插件!");
+				return;
+			}
 			pluginStruts2DispatchServlet = createNewPluginStruts2DispatchServlet(bundle);
 			pluginNameServletMap.put(pluginName, pluginStruts2DispatchServlet);
 		}

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleEvent;
 
 import com.quickwebframework.framework.OsgiContext;
 import com.quickwebframework.framework.WebContext;
@@ -25,6 +26,17 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 	@Override
 	public String getBundleName() {
 		return Activator.BUNDLE_NAME;
+	}
+
+	@Override
+	public void bundleChanged(BundleEvent event) {
+		if (BundleEvent.STOPPING == event.getType()
+				|| BundleEvent.STOPPED == event.getType()) {
+			String pluginName = event.getBundle().getSymbolicName();
+			if (pluginNameServletMap.containsKey(pluginName)) {
+				pluginNameServletMap.remove(pluginName);
+			}
+		}
 	}
 
 	@Override

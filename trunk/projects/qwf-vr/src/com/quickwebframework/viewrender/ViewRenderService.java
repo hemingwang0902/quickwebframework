@@ -14,7 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.SynchronousBundleListener;
 
 import com.quickwebframework.framework.WebContext;
 
@@ -42,6 +45,8 @@ public abstract class ViewRenderService {
 	private String viewNamePrefix = "";
 	// 视图名称后缀
 	private String viewNameSuffix = ".html";
+	// 插件监听器
+	private BundleListener bundleListener;
 
 	public String getPluginNameAndPathSplitString() {
 		return pluginNameAndPathSplitString;
@@ -88,6 +93,14 @@ public abstract class ViewRenderService {
 		if (tmpStr != null && !tmpStr.isEmpty()) {
 			this.setViewNameSuffix(tmpStr);
 		}
+		final ViewRenderService thisService = this;
+		bundleListener = new SynchronousBundleListener() {
+
+			@Override
+			public void bundleChanged(BundleEvent event) {
+				thisService.bundleChanged(event);
+			}
+		};
 	}
 
 	/**
@@ -100,12 +113,14 @@ public abstract class ViewRenderService {
 		dict.put("bundle", this.getBundleName());
 		viewRenderServiceRegistration = bundleContext.registerService(
 				ViewRenderService.class.getName(), this, dict);
+		bundleContext.addBundleListener(bundleListener);
 	}
 
 	/**
 	 * 取消将ViewRender注册为服务
 	 */
-	public void unregisterService() {
+	public void unregisterService(BundleContext bundleContext) {
+		bundleContext.removeBundleListener(bundleListener);
 		viewRenderServiceRegistration.unregister();
 	}
 
@@ -142,6 +157,13 @@ public abstract class ViewRenderService {
 	 * @return
 	 */
 	public abstract String getBundleName();
+
+	/**
+	 * 插件状态改变时
+	 * 
+	 * @param event
+	 */
+	public abstract void bundleChanged(BundleEvent event);
 
 	/**
 	 * 渲染视图

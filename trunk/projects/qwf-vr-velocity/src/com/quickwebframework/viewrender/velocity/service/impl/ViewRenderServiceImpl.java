@@ -11,6 +11,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
+import org.osgi.framework.BundleEvent;
 
 import com.quickwebframework.viewrender.ViewRenderService;
 import com.quickwebframework.viewrender.velocity.Activator;
@@ -39,6 +40,11 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 	@Override
 	public String getBundleName() {
 		return Activator.BUNDLE_NAME;
+	}
+
+	@Override
+	public void bundleChanged(BundleEvent event) {
+
 	}
 
 	@Override
