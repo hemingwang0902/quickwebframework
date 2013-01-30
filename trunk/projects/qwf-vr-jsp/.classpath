@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="jsp-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="tomcat-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="ecj-4.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="ant-launcher.jar"/>
