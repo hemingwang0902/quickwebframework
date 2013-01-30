@@ -23,20 +23,25 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-import org.osgi.framework.Bundle;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.quickwebframework.viewrender.ViewRenderService;
 
 public class PluginHttpServletRequest implements HttpServletRequest {
-
+	private static Log log = LogFactory.getLog(PluginHttpServletRequest.class);
 	private HttpServletRequest srcRequest;
-	private Bundle bundle;
+	private String pluginName;
+	private String urlPrefix;
 	private ViewRenderService viewRenderService;
 
 	public PluginHttpServletRequest(HttpServletRequest srcRequest,
-			Bundle bundle, ViewRenderService viewRenderService) {
+			String viewTypeName, String pluginName,
+			ViewRenderService viewRenderService) {
+
 		this.srcRequest = srcRequest;
-		this.bundle = bundle;
+		this.pluginName = pluginName;
+		urlPrefix = "/" + pluginName + "/" + viewTypeName;
 		this.viewRenderService = viewRenderService;
 	}
 
@@ -158,9 +163,14 @@ public class PluginHttpServletRequest implements HttpServletRequest {
 
 	@Override
 	public RequestDispatcher getRequestDispatcher(String arg0) {
-		return new PluginRequestDispatcher(bundle.getSymbolicName()
-				+ viewRenderService.getPluginNameAndPathSplitString() + arg0,
-				viewRenderService);
+		log.debug("getRequestDispatcher->" + arg0);
+		if (arg0.startsWith(urlPrefix)) {
+			arg0 = arg0.substring(urlPrefix.length());
+		}
+		String viewName = pluginName
+				+ viewRenderService.getPluginNameAndPathSplitString() + arg0;
+		log.debug("getRequestDispatcher->viewName->" + viewName);
+		return new PluginRequestDispatcher(viewName, viewRenderService);
 	}
 
 	@Override
