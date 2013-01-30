@@ -25,7 +25,13 @@ public class PluginRequestDispatcher implements RequestDispatcher {
 	@Override
 	public void forward(ServletRequest arg0, ServletResponse arg1)
 			throws ServletException, IOException {
+		include(arg0, arg1);
+		arg1.flushBuffer();
+	}
 
+	@Override
+	public void include(ServletRequest arg0, ServletResponse arg1)
+			throws ServletException, IOException {
 		HttpServletRequest request = (HttpServletRequest) arg0;
 		HttpServletResponse response = (HttpServletResponse) arg1;
 
@@ -35,11 +41,5 @@ public class PluginRequestDispatcher implements RequestDispatcher {
 			return;
 		}
 		viewRenderService.renderView(request, response, viewName, null);
-	}
-
-	@Override
-	public void include(ServletRequest arg0, ServletResponse arg1)
-			throws ServletException, IOException {
-		throw new ServletException("此方法还未实现！");
 	}
 }
