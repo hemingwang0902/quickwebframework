@@ -98,12 +98,15 @@ public class QuickormContext extends FrameworkContext {
 			configProperty = "qwf-db-orm-quickorm." + propertyName
 					+ ".properties";
 		}
-		if (configProperty == null || configProperty.isEmpty()) {
+		String quickormPropertyFilePath = WebContext
+				.getQwfConfig(configProperty);
+		if (quickormPropertyFilePath == null
+				|| quickormPropertyFilePath.isEmpty()) {
 			throw new RuntimeException("在QuickWebFramework配置文件中未找到配置项："
 					+ configProperty);
 		}
-		String quickormPropertyFilePath = WebContext
-				.getRealPath(configProperty);
+		quickormPropertyFilePath = WebContext
+				.getRealPath(quickormPropertyFilePath);
 		File quickormPropertyFile = new File(quickormPropertyFilePath);
 		if (!quickormPropertyFile.exists() || !quickormPropertyFile.isFile()) {
 			String message = String.format("配置文件 [%s] 不存在!",

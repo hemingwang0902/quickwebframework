@@ -187,8 +187,7 @@ public class DataSourceContext extends FrameworkContext {
 		// 初始化Datasource
 		BasicDataSource basicDataSource = new BasicDataSource();
 		// 设置驱动的ClassLoader
-		basicDataSource.setDriverClassLoader(Thread.currentThread()
-				.getContextClassLoader());
+		basicDataSource.setDriverClassLoader(WebContext.getWebClassLoader());
 		// 如果指定了JDBC配置初始化器，则执行初始化
 		if (propertiesInitializer != null) {
 			propertiesInitializer.init(prop);
