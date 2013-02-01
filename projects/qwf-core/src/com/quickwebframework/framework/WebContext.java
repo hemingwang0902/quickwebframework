@@ -87,6 +87,17 @@ public class WebContext extends FrameworkContext {
 	}
 
 	/**
+	 * 得到WEB的类加载器
+	 * 
+	 * @return
+	 */
+	public static ClassLoader getWebClassLoader() {
+		if (servletContext == null)
+			return null;
+		return servletContext.getClassLoader();
+	}
+
+	/**
 	 * 得到quickwebframework.properties文件中的quickwebframework.config开头的配置
 	 * 
 	 * @param configKey
