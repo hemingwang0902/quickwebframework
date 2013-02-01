@@ -3,14 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: QuickWebFramework ORM Bundle(QuickORM)
 Bundle-SymbolicName: qwf-db-orm-quickorm
 Bundle-Version: 1.1.0.qualifier
-Bundle-Activator: com.quickwebframework.db.orm.quickorm.Activator
+Bundle-Activator: com.quickwebframework.db.orm.quickorm.support.Activator
 Bundle-Vendor: aaaSoft
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: javax.servlet,
  javax.sql,
  org.osgi.framework;version="1.3.0"
 Require-Bundle: qwf-core;bundle-version="1.0.0",
- qwf-db;bundle-version="1.0.0"
+ qwf-db-jdbc;bundle-version="1.0.0"
 Bundle-ClassPath: .,
  quickorm_1.1.0_M4.jar
 Export-Package: com.quickorm.config,
@@ -23,4 +23,4 @@ Export-Package: com.quickorm.config,
  com.quickorm.helpers,
  com.quickorm.stereotype,
  com.quickorm.support,
- com.quickwebframework.db.orm.quickorm.service
+ com.quickwebframework.db.orm.quickorm
