@@ -20,44 +20,42 @@ public class BundleScanner {
 		URL applicationContextUrl = bundle
 				.getResource("applicationContext.xml");
 
-		ApplicationContext applicationContext = null;
+		GenericApplicationContext applicationContext = null;
 
 		List<ApplicationContextListener> listenerList = BundleApplicationContextUtils
 				.getApplicationContextListenerList();
 
+		Map<String, Object> preloadBeansMap = new HashMap<String, Object>();
+
+		for (ApplicationContextListener listener : listenerList) {
+			Map<String, Object> tmpMap = listener.getPreloadBeans();
+			if (tmpMap == null) {
+				continue;
+			}
+			preloadBeansMap.putAll(tmpMap);
+		}
+
 		// 如果有xml文件，则初始化BundleGenericXmlApplicationContext类
 		if (applicationContextUrl != null) {
-			Map<String, Object> preloadBeansMap = new HashMap<String, Object>();
-
-			for (ApplicationContextListener listener : listenerList) {
-				Map<String, Object> tmpMap = listener.getPreloadBeans();
-				if (tmpMap == null) {
-					continue;
-				}
-				preloadBeansMap.putAll(tmpMap);
-			}
-
-			GenericApplicationContext parentApplicationContext = new GenericApplicationContext();
-			for (String beanName : preloadBeansMap.keySet()) {
-				Object beanObject = preloadBeansMap.get(beanName);
-				// 生成Bean定义
-				BeanDefinitionBuilder dataSourceBeanDefinitionBuilder = BeanDefinitionBuilder
-						.genericBeanDefinition(beanObject.getClass());
-				AbstractBeanDefinition beanDefinition = dataSourceBeanDefinitionBuilder
-						.getRawBeanDefinition();
-				beanDefinition.setSource(beanObject);
-				// 注册Bean定义
-				parentApplicationContext.registerBeanDefinition(beanName,
-						beanDefinition);
-			}
-			parentApplicationContext.refresh();
-			applicationContext = new BundleGenericXmlApplicationContext(bundle,
-					parentApplicationContext);
+			applicationContext = new BundleGenericXmlApplicationContext(bundle);
 		}
 		// 否则初始化BundleAnnotationConfigApplicationContext类
 		else {
 			applicationContext = new BundleAnnotationConfigApplicationContext(
 					bundle);
+		}
+
+		// 将用户指定的Bean定义加入到Spring上下文中
+		for (String beanName : preloadBeansMap.keySet()) {
+			Object beanObject = preloadBeansMap.get(beanName);
+			// 生成Bean定义
+			BeanDefinitionBuilder dataSourceBeanDefinitionBuilder = BeanDefinitionBuilder
+					.genericBeanDefinition(beanObject.getClass());
+			AbstractBeanDefinition beanDefinition = dataSourceBeanDefinitionBuilder
+					.getRawBeanDefinition();
+			beanDefinition.setSource(beanObject);
+			// 注册Bean定义
+			applicationContext.registerBeanDefinition(beanName, beanDefinition);
 		}
 
 		// 触发Starting事件
