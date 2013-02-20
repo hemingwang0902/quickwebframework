@@ -104,13 +104,33 @@ public class WebContext extends FrameworkContext {
 	 * @return
 	 */
 	public static String getQwfConfig(String configKey) {
+		Properties quickWebFrameworkProperties = getQuickWebFrameworkProperties();
+		if (quickWebFrameworkProperties == null)
+			return null;
+		return quickWebFrameworkProperties.getProperty(configKey);
+	}
+
+	private static Properties getQuickWebFrameworkProperties() {
 		Properties quickWebFrameworkProperties = (Properties) servletContext
 				.getAttribute(QWF_CONFIG_PROPERTY_KEY);
 		if (quickWebFrameworkProperties == null) {
 			log.warn("QuickWebFramework的配置未设置到ServletContext中!");
 			return null;
 		}
-		return quickWebFrameworkProperties.getProperty(configKey);
+		return quickWebFrameworkProperties;
+	}
+
+	/**
+	 * 得到QuickWebFramework所有配置的键名
+	 * 
+	 * @return
+	 */
+	public static String[] getQwfConfigKeys() {
+		Properties quickWebFrameworkProperties = getQuickWebFrameworkProperties();
+		if (quickWebFrameworkProperties == null)
+			return null;
+		return quickWebFrameworkProperties.stringPropertyNames().toArray(
+				new String[quickWebFrameworkProperties.size()]);
 	}
 
 	// ===== WEB相关变量部分结束

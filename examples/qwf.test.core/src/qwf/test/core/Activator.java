@@ -1,5 +1,7 @@
 package qwf.test.core;
 
+import java.util.Map;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -56,6 +58,9 @@ public class Activator implements BundleActivator {
 					Bundle bundle) {
 			}
 
+			public Map<String, Object> getPreloadBeans() {
+				return null;
+			}
 		};
 	}
 

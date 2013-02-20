@@ -3,6 +3,7 @@ package com.quickwebframework.ioc.spring.util;
 import org.osgi.framework.Bundle;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -16,6 +17,12 @@ public class BundleGenericXmlApplicationContext extends
 	private Bundle bundle;
 
 	public BundleGenericXmlApplicationContext(Bundle bundle) {
+		this(bundle, null);
+	}
+
+	public BundleGenericXmlApplicationContext(Bundle bundle,
+			ApplicationContext parentApplicationContext) {
+		super(parentApplicationContext);
 		this.bundle = bundle;
 		resolver = new BundleResourceResolver(this.bundle);
 	}

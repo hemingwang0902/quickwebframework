@@ -13,6 +13,8 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceEvent;
@@ -22,8 +24,6 @@ import com.quickwebframework.framework.FrameworkContext;
 import com.quickwebframework.framework.WebContext;
 
 public class DataSourceContext extends FrameworkContext {
-	// 默认数据源配置名称
-	public static final String DEFAULT_DATASOURCE_PROPERTY_NAME = "DEFAULT_DATASOURCE_PROPERTY_NAME";
 	private static DataSourceContext instance;
 
 	public static DataSourceContext getInstance() {
@@ -97,7 +97,7 @@ public class DataSourceContext extends FrameworkContext {
 	 * @return
 	 */
 	public static DataSource getDefaultDataSource() {
-		return getDataSource(DEFAULT_DATASOURCE_PROPERTY_NAME);
+		return getDataSource("");
 	}
 
 	/**
@@ -122,12 +122,39 @@ public class DataSourceContext extends FrameworkContext {
 		if (!propertyNameDataSourceMap.containsKey(propertyName)) {
 			DataSource dataSource = innerGetDataSource(propertyName,
 					jdbcPropertiesInitializer);
+			if (dataSource == null) {
+				return null;
+			}
 			propertyNameDataSourceMap.put(propertyName, dataSource);
 			// 触发数据源已创建事件
 			fireDataSourceEvent(new DataSourceEvent(propertyName, dataSource,
 					DataSourceEvent.CREATED));
 		}
 		return propertyNameDataSourceMap.get(propertyName);
+	}
+
+	/**
+	 * 得到所有数据源配置名称
+	 * 
+	 * @return
+	 */
+	public static String[] getDataSourcePropertyNames() {
+		String head = "qwf-db-jdbc.";
+		String tril = ".properties";
+		String defaultName = (head + tril).replace("..", ".");
+		String[] keys = WebContext.getQwfConfigKeys();
+		List<String> strList = new ArrayList<String>();
+		for (String key : keys) {
+			if (key.startsWith(head) && key.endsWith(tril)) {
+				if (defaultName.equals(key)) {
+					strList.add("");
+				} else {
+					strList.add(key.substring(head.length(), key.length()
+							- tril.length() - 1));
+				}
+			}
+		}
+		return strList.toArray(new String[strList.size()]);
 	}
 
 	/**
@@ -157,19 +184,21 @@ public class DataSourceContext extends FrameworkContext {
 		}
 	}
 
+	private static Log log = LogFactory.getLog(DataSourceContext.class);
+
 	private static DataSource innerGetDataSource(String propertyName,
 			PropertiesInitializer propertiesInitializer) {
 		// 得到JDBC配置文件路径
 		String configProperty = null;
-		if (DEFAULT_DATASOURCE_PROPERTY_NAME.equals(propertyName)) {
+		if (propertyName == null || propertyName.isEmpty()) {
 			configProperty = "qwf-db-jdbc.properties";
 		} else {
 			configProperty = "qwf-db-jdbc." + propertyName + ".properties";
 		}
 		String jdbcPropertyFilePath = WebContext.getQwfConfig(configProperty);
 		if (jdbcPropertyFilePath == null || jdbcPropertyFilePath.isEmpty()) {
-			throw new RuntimeException("在QuickWebFramework配置文件中未找到配置项："
-					+ configProperty);
+			log.warn("在QuickWebFramework配置文件中未找到配置项：" + configProperty);
+			return null;
 		}
 		jdbcPropertyFilePath = WebContext.getRealPath(jdbcPropertyFilePath);
 		// 读取JDBC配置文件

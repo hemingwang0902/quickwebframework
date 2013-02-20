@@ -69,7 +69,7 @@ public class JdbcTemplateContext extends FrameworkContext {
 	 * @return
 	 */
 	public static JdbcTemplate getDefaultJdbcTemplate() {
-		return getJdbcTemplate(DataSourceContext.DEFAULT_DATASOURCE_PROPERTY_NAME);
+		return getJdbcTemplate("");
 	}
 
 	/**
