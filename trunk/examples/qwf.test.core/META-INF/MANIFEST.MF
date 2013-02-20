@@ -18,5 +18,7 @@ Require-Bundle: qwf-core;bundle-version="1.0.0",
  qwf-view-struts2;bundle-version="1.0.0",
  qwf-vr-jsp;bundle-version="1.0.0",
  qwf-db-orm-quickorm;bundle-version="1.1.0",
- qwf-db-orm-springjdbc;bundle-version="3.2.0"
+ qwf-db-orm-springjdbc;bundle-version="3.2.0",
+ qwf-db-jdbc-spring;bundle-version="1.0.0",
+ qwf-db-orm-mybatis;bundle-version="1.0.0"
 Export-Package: qwf.test.core

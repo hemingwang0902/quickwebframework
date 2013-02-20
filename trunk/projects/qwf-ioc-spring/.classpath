@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="spring-jdbc-3.2.0.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="spring-aop-3.2.0.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="spring-beans-3.2.0.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="spring-context-3.2.0.RELEASE.jar"/>

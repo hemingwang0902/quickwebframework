@@ -77,7 +77,7 @@ public class QuickormContext extends FrameworkContext {
 	}
 
 	public static QuickormTemplate getDefaultTemplate() {
-		return getTemplate(DataSourceContext.DEFAULT_DATASOURCE_PROPERTY_NAME);
+		return getTemplate("");
 	}
 
 	public static QuickormTemplate getTemplate(String propertyName) {
@@ -91,8 +91,7 @@ public class QuickormContext extends FrameworkContext {
 
 	private static QuickormTemplate innerGetTemplate(String propertyName) {
 		String configProperty = null;
-		if (DataSourceContext.DEFAULT_DATASOURCE_PROPERTY_NAME
-				.equals(propertyName)) {
+		if (propertyName == null || propertyName.isEmpty()) {
 			configProperty = "qwf-db-orm-quickorm.properties";
 		} else {
 			configProperty = "qwf-db-orm-quickorm." + propertyName

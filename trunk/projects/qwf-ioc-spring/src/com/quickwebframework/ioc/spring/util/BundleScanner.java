@@ -1,10 +1,15 @@
 package com.quickwebframework.ioc.spring.util;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.framework.Bundle;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.UrlResource;
 
 public class BundleScanner {
@@ -17,18 +22,43 @@ public class BundleScanner {
 
 		ApplicationContext applicationContext = null;
 
+		List<ApplicationContextListener> listenerList = BundleApplicationContextUtils
+				.getApplicationContextListenerList();
+
 		// 如果有xml文件，则初始化BundleGenericXmlApplicationContext类
 		if (applicationContextUrl != null) {
-			applicationContext = new BundleGenericXmlApplicationContext(bundle);
+			Map<String, Object> preloadBeansMap = new HashMap<String, Object>();
+
+			for (ApplicationContextListener listener : listenerList) {
+				Map<String, Object> tmpMap = listener.getPreloadBeans();
+				if (tmpMap == null) {
+					continue;
+				}
+				preloadBeansMap.putAll(tmpMap);
+			}
+
+			GenericApplicationContext parentApplicationContext = new GenericApplicationContext();
+			for (String beanName : preloadBeansMap.keySet()) {
+				Object beanObject = preloadBeansMap.get(beanName);
+				// 生成Bean定义
+				BeanDefinitionBuilder dataSourceBeanDefinitionBuilder = BeanDefinitionBuilder
+						.genericBeanDefinition(beanObject.getClass());
+				AbstractBeanDefinition beanDefinition = dataSourceBeanDefinitionBuilder
+						.getRawBeanDefinition();
+				beanDefinition.setSource(beanObject);
+				// 注册Bean定义
+				parentApplicationContext.registerBeanDefinition(beanName,
+						beanDefinition);
+			}
+			parentApplicationContext.refresh();
+			applicationContext = new BundleGenericXmlApplicationContext(bundle,
+					parentApplicationContext);
 		}
 		// 否则初始化BundleAnnotationConfigApplicationContext类
 		else {
 			applicationContext = new BundleAnnotationConfigApplicationContext(
 					bundle);
 		}
-
-		List<ApplicationContextListener> listenerList = BundleApplicationContextUtils
-				.getApplicationContextListenerList();
 
 		// 触发Starting事件
 		for (ApplicationContextListener listener : listenerList)

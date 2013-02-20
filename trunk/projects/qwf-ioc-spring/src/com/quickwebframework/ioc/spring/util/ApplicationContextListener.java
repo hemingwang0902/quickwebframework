@@ -1,11 +1,19 @@
 package com.quickwebframework.ioc.spring.util;
 
 import java.util.EventListener;
+import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.springframework.context.ApplicationContext;
 
 public interface ApplicationContextListener extends EventListener {
+
+	/**
+	 * 得到预加载Beans
+	 * 
+	 * @return
+	 */
+	public Map<String, Object> getPreloadBeans();
 
 	/**
 	 * ApplicationContext 开始之前
