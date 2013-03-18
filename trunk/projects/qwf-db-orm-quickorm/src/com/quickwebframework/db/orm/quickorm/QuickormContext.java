@@ -19,8 +19,6 @@ import com.quickorm.config.Database;
 import com.quickorm.core.QuickormTemplate;
 import com.quickorm.core.impl.QuickormTemplateImpl;
 import com.quickwebframework.db.jdbc.DataSourceContext;
-import com.quickwebframework.db.jdbc.DataSourceEvent;
-import com.quickwebframework.db.jdbc.DataSourceListener;
 import com.quickwebframework.db.orm.quickorm.support.Activator;
 import com.quickwebframework.framework.FrameworkContext;
 import com.quickwebframework.framework.WebContext;
@@ -36,34 +34,18 @@ public class QuickormContext extends FrameworkContext {
 
 	// 配置名称与QuickormTemplate映射
 	private static Map<String, QuickormTemplate> propertyNamepropertyNameObjectMapMap = new HashMap<String, QuickormTemplate>();
-	private DataSourceListener dataSourceListener;
 
 	@Override
 	protected BundleContext getBundleContext() {
 		return Activator.getContext();
 	}
 
-	public QuickormContext() {
-		dataSourceListener = new DataSourceListener() {
-
-			@Override
-			public void dataSourceChanged(DataSourceEvent event) {
-				if (DataSourceEvent.REMOVED == event.getType()) {
-					propertyNamepropertyNameObjectMapMap.remove(event
-							.getPropertyName());
-				}
-			}
-		};
-	}
-
 	@Override
 	protected void init(int arg) {
-		DataSourceContext.addDataSourceListener(dataSourceListener);
 	}
 
 	@Override
 	protected void destory(int arg) {
-		DataSourceContext.removeDataSourceListener(dataSourceListener);
 	}
 
 	@Override
