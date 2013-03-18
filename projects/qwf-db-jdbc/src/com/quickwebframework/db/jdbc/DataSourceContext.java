@@ -35,8 +35,7 @@ public class DataSourceContext extends FrameworkContext {
 	// JDBC配置初始化器
 	private static PropertiesInitializer propertiesInitializer;
 	// 配置名称与数据源映射
-	private static Map<String, DataSource> propertyNameDataSourceMap = new HashMap<String, DataSource>();
-	private static List<DataSourceListener> dataSourceListenerList = new ArrayList<DataSourceListener>();
+	private static Map<String, DataSourceProxy> propertyNameDataSourceMap = new HashMap<String, DataSourceProxy>();
 
 	public static PropertiesInitializer getPropertiesInitializer() {
 		return propertiesInitializer;
@@ -50,24 +49,6 @@ public class DataSourceContext extends FrameworkContext {
 	public static void setPropertiesInitializer(
 			PropertiesInitializer propertiesInitializer) {
 		DataSourceContext.propertiesInitializer = propertiesInitializer;
-	}
-
-	/**
-	 * 添加数据源监听器
-	 * 
-	 * @param listener
-	 */
-	public static void addDataSourceListener(DataSourceListener listener) {
-		dataSourceListenerList.add(listener);
-	}
-
-	/**
-	 * 移除数据源监听器
-	 * 
-	 * @param listener
-	 */
-	public static void removeDataSourceListener(DataSourceListener listener) {
-		dataSourceListenerList.remove(listener);
 	}
 
 	@Override
@@ -125,10 +106,8 @@ public class DataSourceContext extends FrameworkContext {
 			if (dataSource == null) {
 				return null;
 			}
-			propertyNameDataSourceMap.put(propertyName, dataSource);
-			// 触发数据源已创建事件
-			fireDataSourceEvent(new DataSourceEvent(propertyName, dataSource,
-					DataSourceEvent.CREATED));
+			propertyNameDataSourceMap.put(propertyName, new DataSourceProxy(
+					dataSource));
 		}
 		return propertyNameDataSourceMap.get(propertyName);
 	}
@@ -158,6 +137,59 @@ public class DataSourceContext extends FrameworkContext {
 	}
 
 	/**
+	 * 重新加载默认的数据源s
+	 */
+	public static void reloadDataSource() {
+		reloadDataSource("", null);
+	}
+
+	/**
+	 * 重新加载指定的数据源
+	 * 
+	 * @param propertyName
+	 */
+	public static void reloadDataSource(String propertyName) {
+		reloadDataSource(propertyName, null);
+	}
+
+	/**
+	 * 重新加载指定的数据源
+	 * 
+	 * @param propertyName
+	 * @param jdbcPropertiesInitializer
+	 */
+	public static void reloadDataSource(String propertyName,
+			PropertiesInitializer jdbcPropertiesInitializer) {
+		DataSourceProxy dataSourceProxy = propertyNameDataSourceMap
+				.get(propertyName);
+		if (dataSourceProxy == null) {
+			return;
+		}
+		DataSource newDataSource = innerGetDataSource(propertyName,
+				jdbcPropertiesInitializer);
+		dataSourceProxy.setTargetDataSource(newDataSource);
+	}
+
+	/**
+	 * 重新加载所有的数据源
+	 */
+	public static void reloadAllDataSource() {
+		reloadAllDataSource(null);
+	}
+
+	/**
+	 * 重新加载所有的数据源
+	 * 
+	 * @param jdbcPropertiesInitializer
+	 */
+	public static void reloadAllDataSource(
+			PropertiesInitializer jdbcPropertiesInitializer) {
+		for (String propertyName : propertyNameDataSourceMap.keySet()) {
+			reloadDataSource(propertyName, jdbcPropertiesInitializer);
+		}
+	}
+
+	/**
 	 * 移除指定的数据源
 	 * 
 	 * @param propertyName
@@ -168,9 +200,6 @@ public class DataSourceContext extends FrameworkContext {
 			return;
 		}
 		propertyNameDataSourceMap.remove(propertyName);
-		// 触发数据源已移除事件
-		fireDataSourceEvent(new DataSourceEvent(propertyName, dataSource,
-				DataSourceEvent.REMOVED));
 	}
 
 	/**
@@ -259,12 +288,5 @@ public class DataSourceContext extends FrameworkContext {
 							.getProperty("jdbc.timeBetweenEvictionRunsMillis")));
 		}
 		return basicDataSource;
-	}
-
-	// 触发数据源事件
-	private static void fireDataSourceEvent(DataSourceEvent event) {
-		for (DataSourceListener listener : dataSourceListenerList) {
-			listener.dataSourceChanged(event);
-		}
 	}
 }

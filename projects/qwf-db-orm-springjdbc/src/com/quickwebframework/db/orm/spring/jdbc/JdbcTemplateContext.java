@@ -11,8 +11,6 @@ import org.osgi.framework.ServiceEvent;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.quickwebframework.db.jdbc.DataSourceContext;
-import com.quickwebframework.db.jdbc.DataSourceEvent;
-import com.quickwebframework.db.jdbc.DataSourceListener;
 import com.quickwebframework.db.orm.spring.jdbc.support.Activator;
 import com.quickwebframework.framework.FrameworkContext;
 
@@ -26,33 +24,18 @@ public class JdbcTemplateContext extends FrameworkContext {
 	}
 
 	private static Map<String, JdbcTemplate> propertyNameObjectMap = new HashMap<String, JdbcTemplate>();
-	private DataSourceListener dataSourceListener;
 
 	@Override
 	protected BundleContext getBundleContext() {
 		return Activator.getContext();
 	}
 
-	public JdbcTemplateContext() {
-		dataSourceListener = new DataSourceListener() {
-
-			@Override
-			public void dataSourceChanged(DataSourceEvent event) {
-				if (DataSourceEvent.REMOVED == event.getType()) {
-					propertyNameObjectMap.remove(event.getPropertyName());
-				}
-			}
-		};
-	}
-
 	@Override
 	protected void init(int arg) {
-		DataSourceContext.addDataSourceListener(dataSourceListener);
 	}
 
 	@Override
 	protected void destory(int arg) {
-		DataSourceContext.removeDataSourceListener(dataSourceListener);
 	}
 
 	@Override
