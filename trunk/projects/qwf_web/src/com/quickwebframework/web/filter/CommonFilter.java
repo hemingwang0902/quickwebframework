@@ -52,10 +52,11 @@ public class CommonFilter implements Filter {
 			return;
 		}
 
+		HttpServletRequest request = (HttpServletRequest) arg0;
+		String contextPath = request.getContextPath();
 		if (!QuickWebFrameworkFactory.qwfServletList.isEmpty()) {
-			HttpServletRequest request = (HttpServletRequest) arg0;
 			String requestUriWithoutContextPath = request.getRequestURI()
-					.substring(request.getContextPath().length());
+					.substring(contextPath.length());
 			if (StringUtils.isEmpty(requestUriWithoutContextPath)) {
 				requestUriWithoutContextPath = "/"
 						+ requestUriWithoutContextPath;
@@ -76,9 +77,13 @@ public class CommonFilter implements Filter {
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><head><title>Powered by QuickWebFramework</title></head><body>Welcome to use QuickWebFramework!");
 			if (PluginManageServlet.getInstance() != null) {
+				String bundleManageUrl = contextPath + "/"
+						+ PluginManageServlet.getInstance().getMapping();
+				while (bundleManageUrl.contains("//")) {
+					bundleManageUrl = bundleManageUrl.replace("//", "/");
+				}
 				sb.append("You can manage bundles in the <a href=\""
-						+ PluginManageServlet.getInstance().getMapping()
-						+ "\">Bundle Manage Page</a>!");
+						+ bundleManageUrl + "\">Bundle Manage Page</a>!");
 			}
 			sb.append("<p>QuickWebFrameweb's core bundle not installed or started,please install core bundle and start it first!</p>");
 			sb.append("</body></html>");
