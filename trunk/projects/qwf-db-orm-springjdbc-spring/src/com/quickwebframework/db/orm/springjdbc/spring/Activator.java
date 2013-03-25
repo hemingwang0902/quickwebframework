@@ -1,4 +1,4 @@
-package com.quickwebframework.db.jdbc.spring.impl;
+package com.quickwebframework.db.orm.springjdbc.spring;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,14 +13,13 @@ import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.quickwebframework.db.jdbc.DataSourceContext;
-import com.quickwebframework.db.jdbc.DataSourceProxy;
 import com.quickwebframework.ioc.spring.util.ApplicationContextListener;
 import com.quickwebframework.ioc.spring.util.BundleApplicationContextUtils;
 
 public class Activator implements BundleActivator {
-
 	private static BundleContext context;
 	private ApplicationContextListener applicationContextListener;
 
@@ -44,14 +43,14 @@ public class Activator implements BundleActivator {
 
 					String beanName;
 					if (propertyName.isEmpty()) {
-						beanName = "dataSource";
+						beanName = "jdbcTemplate";
 					} else {
-						beanName = "dataSource_" + propertyName;
+						beanName = "jdbcTemplate_" + propertyName;
 					}
 
 					// 生成Bean定义
 					BeanDefinitionBuilder dataSourceBeanDefinitionBuilder = BeanDefinitionBuilder
-							.genericBeanDefinition(DataSourceProxy.class);
+							.genericBeanDefinition(JdbcTemplate.class);
 					AbstractBeanDefinition beanDefinition = dataSourceBeanDefinitionBuilder
 							.getBeanDefinition();
 					ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();

@@ -58,7 +58,7 @@ public class Activator implements BundleActivator {
 					Bundle bundle) {
 			}
 
-			public Map<String, Object> getPreloadBeans() {
+			public Map<String, BeanDefinition> getExtraBeanDefinitions() {
 				return null;
 			}
 		};

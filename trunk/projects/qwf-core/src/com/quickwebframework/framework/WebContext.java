@@ -42,6 +42,7 @@ public class WebContext extends FrameworkContext {
 	public static final String CONST_PLUGIN_NAME = "com.quickwebframework.framework.WebContext.CONST_PLUGIN_NAME";
 	public static final String CONST_PATH_NAME = "com.quickwebframework.framework.WebContext.CONST_PATH_NAME";
 	public final static String QWF_CONFIG_PROPERTY_KEY = "qwf.config";
+	public final static String QWF_WEBAPP_CLASSLOADER = "qwf.webapp.classloader";
 
 	// WEB项目的ServletContext
 	private static ServletContext servletContext;
@@ -94,7 +95,8 @@ public class WebContext extends FrameworkContext {
 	public static ClassLoader getWebClassLoader() {
 		if (servletContext == null)
 			return null;
-		return servletContext.getClassLoader();
+		return (ClassLoader) servletContext
+				.getAttribute(QWF_WEBAPP_CLASSLOADER);
 	}
 
 	/**

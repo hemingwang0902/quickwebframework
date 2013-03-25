@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.UrlResource;
@@ -25,14 +24,15 @@ public class BundleScanner {
 		List<ApplicationContextListener> listenerList = BundleApplicationContextUtils
 				.getApplicationContextListenerList();
 
-		Map<String, Object> preloadBeansMap = new HashMap<String, Object>();
+		Map<String, BeanDefinition> extraBeanDefinitionMap = new HashMap<String, BeanDefinition>();
 
 		for (ApplicationContextListener listener : listenerList) {
-			Map<String, Object> tmpMap = listener.getPreloadBeans();
+			Map<String, BeanDefinition> tmpMap = listener
+					.getExtraBeanDefinitions();
 			if (tmpMap == null) {
 				continue;
 			}
-			preloadBeansMap.putAll(tmpMap);
+			extraBeanDefinitionMap.putAll(tmpMap);
 		}
 
 		// 如果有xml文件，则初始化BundleGenericXmlApplicationContext类
@@ -46,14 +46,9 @@ public class BundleScanner {
 		}
 
 		// 将用户指定的Bean定义加入到Spring上下文中
-		for (String beanName : preloadBeansMap.keySet()) {
-			Object beanObject = preloadBeansMap.get(beanName);
-			// 生成Bean定义
-			BeanDefinitionBuilder dataSourceBeanDefinitionBuilder = BeanDefinitionBuilder
-					.genericBeanDefinition(beanObject.getClass());
-			AbstractBeanDefinition beanDefinition = dataSourceBeanDefinitionBuilder
-					.getRawBeanDefinition();
-			beanDefinition.setSource(beanObject);
+		for (String beanName : extraBeanDefinitionMap.keySet()) {
+			BeanDefinition beanDefinition = extraBeanDefinitionMap
+					.get(beanName);
 			// 注册Bean定义
 			applicationContext.registerBeanDefinition(beanName, beanDefinition);
 		}
