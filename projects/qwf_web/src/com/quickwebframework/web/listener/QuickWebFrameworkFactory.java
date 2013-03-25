@@ -8,11 +8,8 @@ import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -82,6 +79,8 @@ public abstract class QuickWebFrameworkFactory {
 	public final static String CONST_SERVLET_LISTENER_BRIDGE_CLASS_NAME = "com.quickwebframework.bridge.ServletListenerBridge";
 	// 插件配置
 	public final static String QWF_CONFIG_PROPERTY_KEY = "qwf.config";
+	// WEB应用的类加载器
+	public final static String QWF_WEBAPP_CLASSLOADER = "qwf.webapp.classloader";
 
 	// 配置文件路径参数名称
 	public final static String CONFIG_LOCATION_PARAMETER_NAME = "quickwebframeworkConfigLocation";
@@ -327,7 +326,9 @@ public abstract class QuickWebFrameworkFactory {
 			// 将QuickWebFramework配置设置到ServletContext中
 			servletContext.setAttribute(QWF_CONFIG_PROPERTY_KEY,
 					quickWebFrameworkProperties);
-
+			// 将当前Web app的类加载器设置到ServletContext中
+			servletContext.setAttribute(QWF_WEBAPP_CLASSLOADER, this.getClass()
+					.getClassLoader());
 			// 设置WEB根目录到系统配置中
 			System.setProperty("web.root.dir", servletContext.getRealPath("/"));
 

@@ -4,6 +4,7 @@ import java.util.EventListener;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
 
 public interface ApplicationContextListener extends EventListener {
@@ -13,7 +14,7 @@ public interface ApplicationContextListener extends EventListener {
 	 * 
 	 * @return
 	 */
-	public Map<String, Object> getPreloadBeans();
+	public Map<String, BeanDefinition> getExtraBeanDefinitions();
 
 	/**
 	 * ApplicationContext 开始之前
