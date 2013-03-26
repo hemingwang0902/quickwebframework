@@ -24,18 +24,15 @@ public class StudentDaoImpl implements StudentDao {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@Override
 	public int getStudentCount() {
 		return jdbcTemplate.queryForInt("select count(*) from student");
 	}
 
-	@Override
 	public Student getStudent(String id) {
 		return jdbcTemplate.queryForObject(
 				"select * from student where id = ?", Student.class, id);
 	}
 
-	@Override
 	public List<Student> queryStudent(String name, int pageIndex, int pageSize) {
 		return jdbcTemplate
 				.queryForList(
@@ -46,29 +43,24 @@ public class StudentDaoImpl implements StudentDao {
 								* pageSize, pageIndex * pageSize);
 	}
 
-	@Override
 	public void addStudent(Student stu) {
 		jdbcTemplate.update("insert into student(id,name) values(?,?)",
 				stu.getId(), stu.getName());
 	}
 
-	@Override
 	public void updateStudent(Student stu) {
 		jdbcTemplate.update("update student set name = ? where id=?",
 				stu.getName(), stu.getId());
 	}
 
-	@Override
 	public void deleteStudent(Student stu) {
 		deleteStudentById(stu.getId());
 	}
 
-	@Override
 	public void deleteStudentById(String id) {
 		jdbcTemplate.update("delete from student where id=?", id);
 	}
 
-	@Override
 	public boolean checkStudentTable() {
 		try {
 			this.getStudentCount();
@@ -78,7 +70,6 @@ public class StudentDaoImpl implements StudentDao {
 		}
 	}
 
-	@Override
 	public void repairStudentTable() {
 		Bundle currentBundle = Activator.getContext().getBundle();
 		try {

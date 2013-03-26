@@ -16,6 +16,6 @@ Require-Bundle: qwf-core;bundle-version="1.0.0",
  qwf-ioc-spring;bundle-version="3.2.0",
  qwf-view-springmvc;bundle-version="3.2.0",
  qwf-vr;bundle-version="1.0.0",
- qwf-vr-velocity;bundle-version="1.7.0"
-Bundle-ClassPath: commons-io-2.4.jar,
- .
+ qwf-vr-velocity;bundle-version="1.7.0",
+ qwf-school-mis-core;bundle-version="1.0.0"
+Bundle-ClassPath: .
