@@ -12,6 +12,8 @@ import javax.servlet.ServletResponse;
 
 import org.springframework.stereotype.Component;
 
+import com.qwf.school.mis.core.util.MisMenuUtils;
+
 @Component
 public class WebVarFillFilter implements Filter {
 
@@ -24,6 +26,7 @@ public class WebVarFillFilter implements Filter {
 			FilterChain arg2) throws IOException, ServletException {
 		String contextPath = servletContext.getContextPath();
 		arg0.setAttribute("contextPath", contextPath);
+		arg0.setAttribute("allMenuMap", MisMenuUtils.getAllMenuMap());
 		arg2.doFilter(arg0, arg1);
 	}
 
