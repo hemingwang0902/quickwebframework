@@ -3,6 +3,10 @@ package com.quickwebframework.viewrender.jsp.servlet;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -21,12 +25,10 @@ import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.security.SecurityUtil;
 import org.apache.jasper.servlet.JspServletWrapper;
-import org.apache.tomcat.InstanceManager;
 import org.osgi.framework.Bundle;
 
 import com.quickwebframework.framework.WebContext;
 import com.quickwebframework.util.BundleUtils;
-import com.quickwebframework.viewrender.jsp.support.DefaultInstanceManager;
 import com.quickwebframework.viewrender.jsp.support.JspCompileServletConfig;
 import com.quickwebframework.viewrender.jsp.support.JspCompileServletContext;
 
@@ -56,8 +58,6 @@ public class PluginJspDispatchServlet extends HttpServlet {
 		this.config = new JspCompileServletConfig(config, this.context);
 		options = new EmbeddedServletOptions(this.config, this.context);
 		rctxt = new JspRuntimeContext(this.context, options);
-		this.context.setAttribute(InstanceManager.class.getName(),
-				new DefaultInstanceManager(bundle));
 	}
 
 	@Override
@@ -127,10 +127,17 @@ public class PluginJspDispatchServlet extends HttpServlet {
 				wrapper = rctxt.getWrapper(jspUri);
 				if (wrapper == null) {
 					wrapper = new JspServletWrapper(config, options, jspUri,
-							rctxt);
+							false, rctxt);
 					rctxt.addWrapper(jspUri, wrapper);
 				}
-				wrapper.getJspEngineContext().setClassLoader(bundleClassLoader);
+				Enumeration<URL> urlEnum = bundleClassLoader.getResources("");
+				List<URL> urlList = new ArrayList<URL>();
+				while (urlEnum.hasMoreElements()) {
+					urlList.add(urlEnum.nextElement());
+				}
+				wrapper.getJspEngineContext().setClassLoader(
+						new URLClassLoader(urlList.toArray(new URL[urlList
+								.size()]), bundleClassLoader));
 			}
 		}
 
