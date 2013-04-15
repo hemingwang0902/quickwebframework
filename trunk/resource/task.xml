@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assignment>
+	<tasks id="com.dynamic.model.project.dynamicPluginBuilder">
+		<task key="sync">
+			<resource>/sync</resource>
+			<destination>/WEB-INF/plugins/*.jar</destination>
+		</task>
+		<task key="launch">
+			<resource>/launch</resource>
+			<destination>/WEB-INF/plugins/*.jar</destination>
+		</task>
+	</tasks>
+	<tasks id="com.dynamic.model.project.dynamicPluginNature">
+		<task key="model">
+			<resource>/model.xml</resource>
+			<destination>/model.xml</destination>
+		</task>
+	</tasks>
+	<tasks id="com.dynamic.model.project.dynamicWebNature">
+		<task key="nature">
+			<resource>/WEB-INF/@**/*.*</resource>
+			<destination>/WebContent/WEB-INF/</destination>
+		</task>
+		<task key="deploy">
+			<resource>/deploy.xml</resource>
+			<destination>/WebContent/WEB-INF/config/deploy.xml</destination>
+		</task>
+	</tasks>
+</assignment>
