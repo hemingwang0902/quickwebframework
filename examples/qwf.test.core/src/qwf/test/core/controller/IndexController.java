@@ -18,9 +18,9 @@ public class IndexController {
 	@RequestMapping(value = "index", method = RequestMethod.GET)
 	public String index_get(HttpServletRequest request,
 			HttpServletResponse response) {
-		JdbcTemplate template = JdbcTemplateContext.getDefaultJdbcTemplate();
-		List<?> map = template.queryForList("show databases");
-		System.out.println(map.size());
+//		JdbcTemplate template = JdbcTemplateContext.getDefaultJdbcTemplate();
+//		List<?> map = template.queryForList("show databases");
+//		System.out.println(map.size());
 		return "index";
 	}
 }
