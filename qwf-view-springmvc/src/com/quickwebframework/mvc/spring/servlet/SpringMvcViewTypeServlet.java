@@ -2,6 +2,7 @@ package com.quickwebframework.mvc.spring.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +55,17 @@ public class SpringMvcViewTypeServlet extends VrViewTypeServlet {
 		// 处理
 		ModelAndView mav = SpringMvcContext.getSpringMvcFrameworkService()
 				.handle(request, response, pluginName, pathName);
+
 		if (mav != null) {
+			// 如果mav中的Model是空的，那么将request中的attribute放到mav的Model中
+			if (mav.getModel().isEmpty()) {
+				Enumeration<String> atttributeNamesEnumeration = request
+						.getAttributeNames();
+				while (atttributeNamesEnumeration.hasMoreElements()) {
+					String key = atttributeNamesEnumeration.nextElement();
+					mav.getModel().put(key, request.getAttribute(key));
+				}
+			}
 			renderView(request, response, pluginName, mav);
 			return;
 		}

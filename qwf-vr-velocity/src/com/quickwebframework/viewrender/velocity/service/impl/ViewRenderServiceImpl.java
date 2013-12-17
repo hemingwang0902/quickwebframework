@@ -1,6 +1,5 @@
 package com.quickwebframework.viewrender.velocity.service.impl;
 
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 
@@ -8,9 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.context.Context;
 import org.osgi.framework.BundleEvent;
 
 import com.quickwebframework.viewrender.ViewRenderService;
@@ -50,17 +49,32 @@ public class ViewRenderServiceImpl extends ViewRenderService {
 	@Override
 	public void renderView(HttpServletRequest request,
 			HttpServletResponse response, String viewName,
-			Map<String, Object> model) {
+			final Map<String, Object> model) {
 		// 得到模板
 		Template template = engine.getTemplate(viewName);
 		// 准备数据
-		VelocityContext context = new VelocityContext();
-		Enumeration<String> attributeNameEnumeration = request
-				.getAttributeNames();
-		while (attributeNameEnumeration.hasMoreElements()) {
-			String attributeName = attributeNameEnumeration.nextElement();
-			context.put(attributeName, request.getAttribute(attributeName));
-		}
+		Context context = new Context() {
+			public boolean containsKey(Object key) {
+				return model.containsKey(key);
+			}
+
+			public Object get(String key) {
+				return model.get(key);
+			}
+
+			public Object[] getKeys() {
+				return model.keySet().toArray();
+			}
+
+			public Object put(String key, Object value) {
+				return model.put(key, value);
+			}
+
+			public Object remove(Object key) {
+				return model.remove(key);
+			}
+		};
+
 		// 输出
 		try {
 			// 设置编码
